@@ -6,8 +6,7 @@ using namespace arma;
 #define pi = 3.141592653589793238462643383280;
 
 /* Convention:
- * Since composition will be used as predictor, 
- *    so single sample will be saved as row vector
+ *    single sample will be saved as col vectors
  */
 
 // Auto-Poisson
@@ -41,9 +40,9 @@ arma::mat Auto_Poisson_Gibbs_Batch_Cpp(const int & Nsample, // number of samples
                                        const int & Winsorized, // right censor
                                        const int & nIter){  
   int N = graph.n_rows;
-  arma::mat Res(Nsample,N)
+  arma::mat Res(N,Nsample)
   for(int i = 0 ; i < Nsample ; ++i ){
-    Res.row(i) = Auto_Poisson_Gibbs_Single_Cpp(graph,thresholds,Winsorized,nIter);
+    Res.col(i) = Auto_Poisson_Gibbs_Single_Cpp(graph,thresholds,Winsorized,nIter);
   }
   return(Res);
 }
@@ -52,14 +51,14 @@ arma::mat Auto_Poisson_Gibbs_Batch_Cpp(const int & Nsample, // number of samples
 double Auto_Poisson_Pseudo_likelihood_Cpp(const arma::mat Sample,
                                           const arma::sp_mat & graph,
                                           const arma::vec & thresholds){
-  int Nsample = Sample.n_rows; //samples
-  int N = Sample.n_cols; // nodes
+  int Nsample = Sample.n_cols; //samples
+  int N = Sample.n_rows; // nodes
   double Res = 0;
-  arma::mat Interactions = Sample * graph ; // interaction terms
+  arma::mat Interactions = graph * Sample ; // interaction terms
   for(int i = 0 ; i < Nsample ; ++i){
-    arma::vec Lambda = exp(thresholds + Interactions.row(i)); // lambda of Poisson of that repeat
+    arma::vec Lambda = exp(thresholds + Interactions.col(i)); // lambda of Poisson of that repeat
     for(int j = 0 ; j < N ; ++j){
-      Res += R::dpois(Sample(i,j),Lambda(j),true); // likelihood, use Poisson approximation 
+      Res += R::dpois(Sample(j,i),Lambda(j),true); // likelihood, use Poisson approximation 
     } 
   }
   
@@ -70,12 +69,13 @@ double Auto_Poisson_Pseudo_likelihood_Cpp(const arma::mat Sample,
 double Auto_Poisson_Q_Cpp(const arma::mat Sample,
                           const arma::sp_mat & graph,
                           const arma::vec & thresholds){
-  arma::vec thr_contribution = Sample * thresholds - sum( lgamma(Sample + 1),1); // non-interaction part of Besag's Q-function, see Augustin et al. 2006
+  // not sure if this line work sonce sum(...) will give a row vec
+  arma::rowvec thr_contribution = thresholds.t() * Sample - sum( lgamma(Sample + 1),0); // non-interaction part of Besag's Q-function, see Augustin et al. 2006
   double Res = 0;
   int Nsample = Sample.n_cols;
   
   for(int i = 0 ; i < Nsample ; ++i){
-    Res += thr_contribution(i) + .5 * (Sample.row(i) * graph * Sample.row(i).t()); // Besag's Q function for (spatial) auto Poisson model 
+    Res += thr_contribution(i) + .5 * (Sample.col(i).t() * graph * Sample.col(i)); // Besag's Q function for (spatial) auto Poisson model 
   }
   return(Res);
 }
@@ -89,7 +89,7 @@ double logLik_Normal_Response(const arma::vec & data,
                               const arma::vec & beta_composition,
                               const double & sigma){
   int N = Design.n_rows;
-  arma::vec mu = Design * beta_fix + composition * beta_composition;
+  arma::vec mu = Design * beta_fix + composition.t() * beta_composition;
   double Res = 0;
   for(int i = 0 ; i < N ; ++i){
     Res += R::dnorm(data(i) , mu(i) , true);
@@ -187,7 +187,7 @@ arma::mat Sample_SAR_Cpp(const int Nsample,
   arma::mat full_Sigma = try_solve * Sigma * try_solve.t(); //cov matrix of this Sar model
   arma::mat Res;
   mvnrnd(Res, mu, full_Sigma, Nsample )); // this will give column vectors
-  return(Res.t());
+  return(Res);
 }
 
 

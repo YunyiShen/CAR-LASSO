@@ -291,7 +291,7 @@ IntegerVector constrain)
     }
   }
   
-  return(Res);
+  return(transpose(Res)); //give column vectors
 }
 
 
@@ -389,11 +389,10 @@ double f(IntegerMatrix Y, const arma::sp_mat& J, NumericVector h)
 double Ising_PseudoLikelihood_Cpp(const arma::mat & x, 
                                   const arma::sp_mat & graph, 
                                   const arma::vec & thresholds, 
-                                   
                                   const IntegerVector & responses, 
                                   bool log){
-  int n = x.n_rows;
-  int k = x.n_cols;
+  int k = x.n_rows;
+  int n = x.n_cols;
   
   double logPS = 0;
   double e = 0;
@@ -402,7 +401,7 @@ double Ising_PseudoLikelihood_Cpp(const arma::mat & x,
   for (int i = 0 ; i < n ; ++i){
     // for every node, compute log PL and sum:
     for (int j = 0 ; j < k ; ++j){
-      e = thresholds[j] + 0.5 * x.row(i) * graph.col(j);
+      e = thresholds[j] + 0.5  * graph.row(j) * x.col(i);
       logPS += x(i,j) * e  -  log(exp(responses[0]*e) + exp(responses[1]*e));
     }
   }
