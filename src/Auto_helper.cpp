@@ -5,6 +5,13 @@ using namespace Rcpp;
 using namespace arma;
 #define pi = 3.141592653589793238462643383280;
 
+/* Convention:
+ * Since composition will be used as predictor, 
+ *    so single sample will be saved as row vector
+ */
+
+// Auto-Poisson
+
 arma::vec Auto_Poisson_Gibbs_Single_Cpp(const arma::sp_mat &graph, // graph
                                         const arma::vec &thresholds, // mean 
                                         const int & Winsorized, // right censor
@@ -34,24 +41,25 @@ arma::mat Auto_Poisson_Gibbs_Batch_Cpp(const int & Nsample, // number of samples
                                        const int & Winsorized, // right censor
                                        const int & nIter){  
   int N = graph.n_rows;
-  arma::mat Res(N,Nsample)
+  arma::mat Res(Nsample,N)
   for(int i = 0 ; i < Nsample ; ++i ){
-    Res.col(i) = Auto_Poisson_Gibbs_Single_Cpp(graph,thresholds,Winsorized,nIter);
+    Res.row(i) = Auto_Poisson_Gibbs_Single_Cpp(graph,thresholds,Winsorized,nIter);
   }
   return(Res);
 }
 
+// [[Rcpp::export]]
 double Auto_Poisson_Pseudo_likelihood_Cpp(const arma::mat Sample,
                                           const arma::sp_mat & graph,
                                           const arma::vec & thresholds){
-  int Nsample = Sample.n_cols;
-  int N = Sample.n_rows;
+  int Nsample = Sample.n_rows; //samples
+  int N = Sample.n_cols; // nodes
   double Res = 0;
-  arma::mat Interactions = graph * Sample; // interaction terms
+  arma::mat Interactions = Sample * graph ; // interaction terms
   for(int i = 0 ; i < Nsample ; ++i){
-    arma::vec Lambda = exp(thresholds + Interactions.col(i)); // lambda of Poisson of that repeat
+    arma::vec Lambda = exp(thresholds + Interactions.row(i)); // lambda of Poisson of that repeat
     for(int j = 0 ; j < N ; ++j){
-      Res += R::dpois(Sample(j,i),Lambda(j),true); // likelihood, use Poisson approximation 
+      Res += R::dpois(Sample(i,j),Lambda(j),true); // likelihood, use Poisson approximation 
     } 
   }
   
@@ -62,12 +70,12 @@ double Auto_Poisson_Pseudo_likelihood_Cpp(const arma::mat Sample,
 double Auto_Poisson_Q_Cpp(const arma::mat Sample,
                           const arma::sp_mat & graph,
                           const arma::vec & thresholds){
-  arma::vec thr_contribution = Sample.t() * thresholds - lgamma(Sample + 1); // non-interaction part of Besag's Q-function, see Augustin et al. 2006
+  arma::vec thr_contribution = Sample * thresholds - sum( lgamma(Sample + 1),1); // non-interaction part of Besag's Q-function, see Augustin et al. 2006
   double Res = 0;
-  int Nsample = Sample.n_rows;
+  int Nsample = Sample.n_cols;
   
   for(int i = 0 ; i < Nsample ; ++i){
-    Res += thr_contribution(i) + .5 * (Sample.col(i).t() * graph * Sample.col(i)); // Besag's Q function for (spatial) auto Poisson model 
+    Res += thr_contribution(i) + .5 * (Sample.row(i) * graph * Sample.row(i).t()); // Besag's Q function for (spatial) auto Poisson model 
   }
   return(Res);
 }
@@ -98,10 +106,6 @@ double dLaplace_Cpp(const double &x,const double &mu, const double &b, bool log)
 
 
 
-
-
-
-
 /* TODO:
  * 1. Coupling from the past for one perfect sample from the auto poisson model
  * 2. Auto-NegBin model sampling, 
@@ -109,7 +113,20 @@ double dLaplace_Cpp(const double &x,const double &mu, const double &b, bool log)
  */
 
 
-// Starting here is auto-normal, the main idea was fitting a SAR and convert it to CAR if needed, see Ver Hoef et al. 2018
+
+// Auto-normal
+
+/* Starting here is auto-normal, the main idea was fitting a SAR and convert it to CAR if needed, see Ver Hoef et al. 2018
+ * The Reason for using SAR rather than CAR is that SAR asks for a ralative easier to check condition 
+ *   condition on B (I-B) non-singular, while CAR asks for C to have positive eigen value
+ *   We can use independent Laplace prior in SAR to get similar result as LASSO.
+ * This is all because Sigma has to be positive semi-definite.
+ * Also, matrix B can be asymmertic, 
+ *   however this will cause some explaning problem, 
+ *    as B is no longer an adjacency matrix of the faithfuil graph related with the joint distribution 
+ */
+
+
 
 double Loglik_SAR_Cpp(const arma::vec & Z,
                       const arma::vec & mu,
@@ -162,18 +179,15 @@ arma::mat Sample_SAR_Cpp(const int Nsample,
   arma::sp_mat Sigma(N,N);
   Simga.diag() = sigma; // Var for noise
   arma::mat try_solve;
-  spsolve(try_solve, I_minus_B);
+  spsolve(try_solve, I_minus_B);// This will be all false if I_minus_B is singular
   if(!try_solve(0,0)){
     return(try_solve); // if I-B not inversible, return 0s
   }
   
   arma::mat full_Sigma = try_solve * Sigma * try_solve.t(); //cov matrix of this Sar model
   arma::mat Res;
-  mvnrnd(Res, mu, full_Sigma, Nsample ));
-  
-  return(Res);
-  
-  
+  mvnrnd(Res, mu, full_Sigma, Nsample )); // this will give column vectors
+  return(Res.t());
 }
 
 
