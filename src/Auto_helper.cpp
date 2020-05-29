@@ -424,7 +424,6 @@ List Auto_Gaussian_LASSO_sampler_Cpp(const arma::mat & data, // raw composition 
     
     // Update sigma
     
-    
     // Update tau
     
     
