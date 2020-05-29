@@ -82,3 +82,5 @@ arma::vec update_B_helper(const arma::mat & data,
 
 
 
+
+

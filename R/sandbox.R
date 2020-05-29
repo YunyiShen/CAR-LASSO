@@ -16,6 +16,7 @@ test_beta = rnorm(k*p)
 test_sigma2 = 1
 test_eta2 = runif(k*(k-1))
 
+
 update_B_helper(test_data,
                 test_design,
                 test_mu,
