@@ -304,8 +304,7 @@ List SAR_LASSO_Cpp(const arma::mat & data, // raw composition data, column as a 
                    const double delta_beta,
                    const double r_B,
                    const double delta_B,
-                   bool progress
-){
+                   bool progress){
   int k = data.n_rows; // number of nodes
   int p = design.n_cols; //number of predictors
   int n = data.n_cols; // number of samples
@@ -347,11 +346,11 @@ List SAR_LASSO_Cpp(const arma::mat & data, // raw composition data, column as a 
     if (Progress::check_abort()){
       Rcerr << "keyboard abort\n";
       return(Rcpp::List::create(
-          Rcpp::Named("beta") = NA_REAL,
-          Rcpp::Named("mu") = NA_REAL,
-          Rcpp::Named("B") = NA_REAL,
-          Rcpp::Named("sigma") = NA_REAL,
-          Rcpp::Named("lambda") = NA_REAL
+          Rcpp::Named("beta") = beta_mcmc,
+          Rcpp::Named("mu") = mu_mcmc,
+          Rcpp::Named("B") = B_mcmc,
+          Rcpp::Named("sigma") = sigma_mcmc,
+          Rcpp::Named("lambda") = lambda_mcmc
       );
     }
     // block update start:

@@ -103,9 +103,9 @@ Rcpp::List Graphical_LASSO_Cpp(const arma::mat & data,
     if (Progress::check_abort()){
       Rcerr << "keyboard abort\n"; // abort using esc
       return(Rcpp::List::create(
-        Rcpp::Named("Sigma") = NA_REAL,
-        Rcpp::Named("Omega") = NA_REAL,
-        Rcpp::Named("lambda") = NA_REAL));
+          Rcpp::Named("Sigma") = Sigma_mcmc,
+          Rcpp::Named("Omega") = Omega_mcmc,
+          Rcpp::Named("lambda") = lambda_mcmc);
     }
     
     // update LASSO parameter lambda
@@ -174,7 +174,7 @@ Rcpp::List Graphical_LASSO_Cpp(const arma::mat & data,
   
   return(Rcpp::List::create(
       Rcpp::Named("Sigma") = Sigma_mcmc,
-      Rcpp::Named("Omega") = Ometa_mcmc,
+      Rcpp::Named("Omega") = Omega_mcmc,
       Rcpp::Named("lambda") = lambda_mcmc);
   
 }

@@ -11,16 +11,11 @@ using namespace std;
 #include <progress_bar.hpp>
 
 // [[Rcpp::export]]
-double calculatee(int n){
-  double res=0;
-  Progress p(n, true);
-  for(int i = 0 ; i < n ; ++i){
-    if (Progress::check_abort()){
-      Rcerr << "keyboard abort\n";
-      return NA_REAL;
-    } 
-    res+=1/tgamma(i+1);
-    p.increment();
-  }
-  return(res);
+double intmin(int n){
+  arma::vec res(n,fill::zeros);
+  res += NA_REAL;
+  
+  if(R_IsNA(res(0))) return(1);
+  return(0);
+  
 }
