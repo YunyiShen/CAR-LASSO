@@ -2,3 +2,5 @@
 .Rproj.user/*
 .Rproj.user
 *.o
+src/sandbox.cpp
+R/sandbox.R
