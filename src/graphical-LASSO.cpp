@@ -7,23 +7,7 @@ static const double pi = 3.141592653589793238462643383280;
 // [[Rcpp::depends(RcppProgress)]]
 #include <progress.hpp>
 #include <progress_bar.hpp>
-
-// [[Rcpp::export]]
-double rinvGau_trunc(const double & mu, const double & lambda){
-  mu = mu < 1e-12 ? 1e-12 : mu;
-  double b = 0.5 * mu / lambda;
-  double a = mu * b;
-  double c = 4.0 * mu * lambda;
-  double d = mu * mu;
-  double res;
-  double u = R::runif(0,1);
-  double chisqr = R::rchisq(1);
-  
-  double x = mu + a * chisqr - b * sqrt( c * chisqr + d * chisqr * chisqr); // solve the smaller root
-  res = (u < (mu / (mu + x))) ? x : d/x; // accept the small one with prob mu/(mu+x), otherwise the larger one
-  return(res);
-}
-
+#include "helper.h"
 
 
 /*
@@ -51,9 +35,7 @@ Rcpp::List Graphical_LASSO_Cpp(const arma::mat & data,
   
   
   // indicator matrix and permutation matrix for looping through columns & rows ("blocks")
-  //arma::vec indMat_vec = linspace<vec>(1, p*p , p*p);
-  //arma::mat indMat = reshape(indMat_vec,p,p);
-  arma::uvec pertub_vec = linspace<uvec>(0,p-1,p); // we will not convert this to matrix
+  arma::uvec pertub_vec = linspace<uvec>(0,p-1,p); 
   
   // mcmc storage
   n_store = floor(nIter/thin_by);
@@ -116,7 +98,7 @@ Rcpp::List Graphical_LASSO_Cpp(const arma::mat & data,
     tau_curr.zeros();
     for(int j = 0 ; j < n_upper_tri ; ++n){
       tau_curr(Omega_upper_tri(j)) = 
-        rinvGau_trunc(abs(lambda_curr/Omega(Omega_upper_tri(j))),
+        rinvGau(abs(lambda_curr/Omega(Omega_upper_tri(j))),
                       lambda_curr*lambda_curr)
     }
     tau_curr = tau_curr + t_curr.t(); // use symmertric to update lower tri
