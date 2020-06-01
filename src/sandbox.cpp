@@ -10,12 +10,4 @@ using namespace std;
 #include <progress.hpp>
 #include <progress_bar.hpp>
 
-// [[Rcpp::export]]
-double intmin(int n){
-  arma::vec res(n,fill::zeros);
-  res += NA_REAL;
-  
-  if(R_IsNA(res(0))) return(1);
-  return(0);
-  
-}
+#include "helper.h"
