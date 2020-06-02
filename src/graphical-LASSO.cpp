@@ -78,7 +78,7 @@ Rcpp::List Graphical_LASSO_Cpp(const arma::mat & data,
   arma::mat OmegaInvTemp;
   
   // progress bar
-  Progress p((n_iter+n_burn_in), progress); 
+  Progress prog((n_iter+n_burn_in), progress); 
   
   // main iterations
   for(int i = 0 ; i < (nIter+burn_in) ; ++i){
@@ -151,7 +151,7 @@ Rcpp::List Graphical_LASSO_Cpp(const arma::mat & data,
       i_save++ ;
     }
     
-    p.increment();
+    prog.increment();
   }
   
   return(Rcpp::List::create(

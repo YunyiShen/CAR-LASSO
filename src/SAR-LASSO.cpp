@@ -320,7 +320,7 @@ List SAR_LASSO_Cpp(const arma::mat & data, // raw composition data, column as a 
   double lambda2_beta = R::rgamma(r_beta,1/delta_beta); // current value of squared LASSO parameter of \beta
   double lambda2_B = R::rgamma(r_B,1/delta_B); // current value of squared LASSO parameter of B
   
-  Progress p((n_iter+n_burn_in), progress); // progress bar
+  Progress prog((n_iter+n_burn_in), progress); // progress bar
   
   // main loop
   for(int i = 0 ; i<(n_iter+n_burn_in) ; ++i){
@@ -391,7 +391,7 @@ List SAR_LASSO_Cpp(const arma::mat & data, // raw composition data, column as a 
     }
     
     
-    p.increment();
+    prog.increment();
   }
   return(Rcpp::List::create(
       Rcpp::Named("beta") = beta_mcmc,
