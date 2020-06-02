@@ -18,7 +18,6 @@ arma::vec dLaplace_Cpp(const arma::vec & x, const double mu, const double lambda
  */	
 
 // tested 20200601
-// [[Rcpp::export]]
 double rinvGau(double mu, double lambda){
   mu = mu < 1e-12 ? 1e-12 : mu; // truncate mu
   mu = lambda < 1e-12 ? 1e-12 : lambda;
@@ -71,6 +70,30 @@ arma::sp_mat getDesign_i_helper(const arma::rowvec & X_i,//row vector of that sa
     Design(j,arma::span( j*p , (j+1) * p - 1 )) = X_i ; 
   }
   return(Design);
+}
+
+List resize( const List& x, int n ){
+  int oldsize = x.size() ;
+  List y(n) ;
+  for( int i=0; i<oldsize; i++) y(i) = x(i) ;
+  return y ;
+}
+
+
+// Inner function to simulate random uniforms in a matrix:
+arma::mat RandMat(int nrow, int ncol)
+{
+  arma::mat Res = arma::randu(nrow,ncol);
+  return(Res);
+}
+
+
+arma::sp_mat block_diag(const arma::mat A, int d, int n){
+  arma::sp_mat D(n*d,n*d);
+  for(int i = 0 ; i < n ; ++i){
+    D.submat(i*d, i*d, (i+1)*d-1, (i+1)*d-1) = A;
+  }
+  return(D);
 }
 
 
