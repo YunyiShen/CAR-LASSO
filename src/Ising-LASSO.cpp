@@ -1,13 +1,19 @@
-// ((Rcpp::depends(RcppArmadillo)))
+// [[Rcpp::depends(RcppArmadillo)]]
+// [[Rcpp::depends(RcppProgress)]]
 #include <RcppArmadillo.h> // to use sparse matrix
 #include <tgmath.h>
-using namespace Rcpp;
-static const double pi = 3.141592653589793238462643383280;
 
-// ((Rcpp::depends(RcppProgress)))
+
 #include <progress.hpp>
 #include <progress_bar.hpp>
 #include "helper.h"
+
+using namespace Rcpp;
+using namespace arma;
+static const double pi = 3.141592653589793238462643383280;
+
+
+// Ising Sampling tested 20200601
 
 List resize( const List& x, int n ){
   int oldsize = x.size() ;
@@ -89,14 +95,13 @@ arma::vec PplusMinMax(int i,
 // Inner function:
 arma::vec IsingEx(const arma::mat& graph, 
                   const arma::mat& thresholds, 
-                  double beta, 
                   int nIter, 
                   const arma::vec& responses, 
                   bool exact){
   // Parameters and results vector:
   int N = graph.n_rows;
   arma::vec state(N, fill::zeros);
-  state += NA_real;
+  state += NA_REAL;
   double u;
   arma::vec P(2,fill::zeros);
   int maxChain = 100;
@@ -194,7 +199,7 @@ double Pplus(int i,
     }
   }
   
-  return(exp(beta * H1) / ( exp(beta * H0) + exp(beta * H1) ));// MH ratio here, need changing
+  return(exp( H1) / ( exp( H0) + exp(H1) ));// MH ratio here, need changing
 }
 
 
@@ -205,9 +210,9 @@ arma::vec IsingMet(const arma::mat& graph,
   // Parameters and results vector:
   int N = graph.n_rows;
   arma::vec state_temp(N,fill::randu);
-  arma::vec state(N);
-  state(find(state_temp<0.5)) = response(0);
-  state(find(state_temp>=0.5)) = response(1);
+  arma::vec state(N,fill::ones);
+  state(find(state_temp<0.5)) *= responses(0);
+  state(find(state_temp>=0.5)) *= responses(1);
   
   double u;
   double P;
@@ -234,19 +239,17 @@ arma::vec IsingMet(const arma::mat& graph,
 
 
 ///ISING PROCESS SAMPLER: return column vectors
-// [[Rcpp::export]]
 arma::mat IsingProcess(int nSample, 
                        const arma::mat& graph, 
                        const arma::vec& thresholds, 
-                       double beta, 
                        arma::vec responses)
 {
   // Parameters and results vector:
   int N = graph.n_rows;
   arma::vec state_temp(N,fill::randu);
-  arma::vec state(N);
-  state(find(state_temp<0.5)) = response(0);
-  state(find(state_temp>=0.5)) = response(1);
+  arma::vec state(N,fill::ones);
+  state(find(state_temp<0.5)) *= responses(0);
+  state(find(state_temp>=0.5)) *= responses(1);
   
   double u;
   double P;
@@ -259,7 +262,7 @@ arma::mat IsingProcess(int nSample,
   for (int it = 0 ; it < nSample ; ++it){
     node = floor(R::runif(0,N));
     u = R::runif(0,1);
-    P = Pplus(node, graph, state, thresholds, beta, responses);
+    P = Pplus(node, graph, state, thresholds, responses);
     if (u < P)
     {
       state(node) = responses(1);
@@ -303,20 +306,18 @@ arma::mat IsingSamplerCpp(int n,
 }
 
 // Hamiltonian:
-// [[Rcpp::export]]
 double H(const arma::mat& J, 
          const arma::vec& s, 
          const arma::vec& h)
 {
-  double Res = 0;
-  Res = -s.t() * h - .5 * s.t() * J * s;
-  return(Res);
+  arma::mat Res;
+  Res = (-s.t() * h - .5 * s.t() * J * s);
+  return(Res(0,0));
 }
 
+// Ising Sampling tested 20200601
 
-
-// log MH ratio 
-
+// log MH ratio for inverse Ising 
 double logMH_Ising(const arma::mat & data,
                    const arma::mat & thr_prop,
                    const arma::mat & thr_curr,
@@ -338,14 +339,15 @@ double logMH_Ising(const arma::mat & data,
   double log_q_theta_prop_Z_prime = 0;
   
   for(int i = 0 ; i < n ; ++i){
+    // Optimization todo: change this to joint sample at once instead of run CFTP for n times
     Z_prime_i = IsingSamplerCpp(1, J_prop, thr_prop.col(i), 
-                                nIter, responses, exact)
+                                nIter, responses, exact);
     
     log_q_theta_curr_data -= H(J_curr,data.col(i),thr_curr.col(i));
     log_q_theta_prop_data -= H(J_prop,data.col(i),thr_prop.col(i));
     
     log_q_theta_curr_Z_prime -= H(J_curr,Z_prime_i,thr_curr.col(i));
-    log_q_prop_curr_Z_prime -= H(J_prop,Z_prime_i,thr_prop.col(i));
+    log_q_theta_prop_Z_prime -= H(J_prop,Z_prime_i,thr_prop.col(i));
   }
   
   double log_MH = log_prior_beta_prop + 
@@ -362,7 +364,9 @@ double logMH_Ising(const arma::mat & data,
 }
 
 
+// main sampler
 
+// [[Rcpp::export]]
 Rcpp::List Ising_LASSO_Cpp(const arma::mat & data,
                            const arma::mat & design,
                            const int n_iter, // how many iteractions?
@@ -370,14 +374,14 @@ Rcpp::List Ising_LASSO_Cpp(const arma::mat & data,
                            const int thin_by, // thinning?
                            const double r_beta, // prior on lambda of beta
                            const double delta_beta,
-                           const double r_B,
-                           const double delta_B,
+                           const double r_J,
+                           const double delta_J,
                            const arma::vec & propsd_mu,
                            const arma::vec & propsd_beta,
                            const arma::vec & propsd_J,
                            const arma::vec & propsd_lambda,// beta first then J
                            bool exact, // whether use CFTP for the sampler in sampling Z*
-                           int nIter, // still, interactions in Ising sampling 
+                           int nauxIter, // still, interactions in Ising sampling 
                            bool progress,
                            bool verbos,int reportby){
   arma::vec responses(2);
@@ -401,25 +405,27 @@ Rcpp::List Ising_LASSO_Cpp(const arma::mat & data,
   J_mcmc += NA_REAL;
   
   arma::mat mu_mcmc(n_save , k); // mean for node 1 to k
-  mu += NA_REAL;
+  mu_mcmc += NA_REAL;
   
-  arma::mat lambda(n_save , 2); // LASSO parameter for beta and J
-  lambda += NA_REAL;
+  arma::mat lambda_mcmc(n_save , 2); // LASSO parameter for beta and J
+  lambda_mcmc += NA_REAL;
   
   // some initial values
   arma::mat J_mat_curr(k,k,fill::zeros);
-  arma::uvec upperdiag = trimatu_ind(size(J_curr),1);
+  arma::uvec upperdiag = trimatu_ind(size(J_mat_curr),1);
   
   arma::vec beta_curr(k*p,fill::zeros);
-  arma::mat betamat_curr = reshape(beta_curr,p,k);
+  arma::mat beta_mat_curr = reshape(beta_curr,p,k);
   arma::vec mu_curr(k,fill::zeros);
   arma::vec J_curr(upperdiag.n_elem,fill::zeros);
   
   
-  arma::vec beta_prop;
-  arma::mat beta_mat_prop;
-  arma::vec J_prop;
-  arma::mat J_mat_prop;
+  // obejects for proposal state
+  arma::vec beta_prop(k*p,fill::zeros);
+  arma::mat beta_mat_prop(p,k,fill::zeros);
+  arma::vec J_prop(J_curr.n_elem);
+  arma::mat J_mat_prop(k,k,fill::zeros);
+  arma::vec mu_prop(k,fill::zeros);
   
   double lambda_beta_curr = 1;
   double lambda_J_curr = 1;
@@ -427,8 +433,8 @@ Rcpp::List Ising_LASSO_Cpp(const arma::mat & data,
   double lambda_beta_prop;
   double lambda_J_prop;
   
-  double log_prior_beta_curr = dLaplace_Cpp(beta_curr,0,lambda_beta_curr,true);
-  double log_prior_J_curr = dLaplace_Cpp(J_curr,0,lambda_beta_curr,true);
+  double log_prior_beta_curr = sum( dLaplace_Cpp(beta_curr,0,lambda_beta_curr,true));
+  double log_prior_J_curr = sum( dLaplace_Cpp(J_curr,0,lambda_beta_curr,true));
   
   double log_prior_beta_prop;
   double log_prior_J_prop;
@@ -436,21 +442,22 @@ Rcpp::List Ising_LASSO_Cpp(const arma::mat & data,
   double logMH;
   
   
-  double logPostlambda_beta_curr = sum(dLaplace_Cpp(beta_curr),0,lambda_beta_curr,true) + 
+  double logPostlambda_beta_curr = sum(dLaplace_Cpp(beta_curr,0,lambda_beta_curr,true)) + 
     R::dgamma(lambda_beta_curr,r_beta,1/delta_beta,true);
-  double logPostlambda_J_curr = sum(dLaplace_Cpp(J_curr),0,lambda_J_curr,true) + 
+  double logPostlambda_J_curr = sum(dLaplace_Cpp(J_curr,0,lambda_J_curr,true)) + 
     R::dgamma(lambda_J_curr,r_J,1/delta_J,true);
   
   double logPostlambda_beta_prop;
-  double logPostlambda_J_curr;
+  double logPostlambda_J_prop;
   
   
   arma::mat thr_curr(size(data),fill::zeros);
   arma::mat thr_prop = thr_curr;
   
-  Progress p((n_iter+n_burn_in), progress); 
-  
+  Progress prog((n_iter+n_burn_in), progress); 
   // main loop
+  
+  
   for(int i = 0 ; i < (n_iter+n_burn_in) ; ++i){
     
     if (Progress::check_abort()){
@@ -460,7 +467,7 @@ Rcpp::List Ising_LASSO_Cpp(const arma::mat & data,
           Rcpp::Named("mu") = mu_mcmc,
           Rcpp::Named("J") = J_mcmc,
           Rcpp::Named("lambda") = lambda_mcmc
-      );
+      ));
     }
     
     // update Ising parameters
@@ -468,12 +475,17 @@ Rcpp::List Ising_LASSO_Cpp(const arma::mat & data,
     beta_mat_prop = reshape(beta_prop,p,k);
     J_prop = propsd_J % randn(size(J_curr)) + J_curr;
     J_mat_prop = J_mat_prop.zeros();
+    
     J_mat_prop(upperdiag) = J_prop;
+    
     J_mat_prop += J_mat_prop.t();
     mu_prop = propsd_mu % randn(size(mu_curr)) + mu_curr;
     
     thr_prop = trans(design * beta_mat_prop);
     thr_prop.each_col() += mu_prop;
+    
+    log_prior_beta_prop = sum( dLaplace_Cpp(beta_prop,0,lambda_beta_curr,true));
+    log_prior_J_prop = sum( dLaplace_Cpp(J_prop,0,lambda_J_curr,true));
     
     // MH ratio
     
@@ -483,8 +495,8 @@ Rcpp::List Ising_LASSO_Cpp(const arma::mat & data,
                         responses,
                         log_prior_beta_curr,log_prior_J_curr,
                         log_prior_beta_prop,log_prior_J_prop,             
-                        exact,nIter,n,k);
-    
+                        exact,nauxIter,n,k);
+    //Rcout<<logMH<<endl;
     if(log(R::runif(0,1)) <= logMH){ // accept
       beta_curr = beta_prop;
       beta_mat_curr = beta_mat_prop;
@@ -498,18 +510,17 @@ Rcpp::List Ising_LASSO_Cpp(const arma::mat & data,
       
       log_prior_beta_curr = log_prior_beta_prop;
       
-      log_prior_J_curr = log_prior_beta_prop;
+      log_prior_J_curr = log_prior_J_prop;
       
       accept_Ising++;
       
     }
-    
     // updating lambdas
     lambda_beta_prop = lambda_beta_curr + propsd_lambda(0) * R::rnorm(0,1);
     lambda_J_prop = lambda_J_curr + propsd_lambda(1) * R::rnorm(0,1);
     
     if(lambda_beta_prop>0){
-      logPostlambda_beta_prop = sum(dLaplace_Cpp(beta_curr),0,lambda_beta_prop,true) + 
+      logPostlambda_beta_prop = sum(dLaplace_Cpp(beta_curr,0,lambda_beta_prop,true)) + 
         R::dgamma(lambda_beta_prop,r_beta,1/delta_beta,true);
       if(log(R::runif(0,1)) <= logPostlambda_beta_prop-logPostlambda_beta_curr){
         lambda_beta_curr = lambda_beta_prop;
@@ -519,7 +530,7 @@ Rcpp::List Ising_LASSO_Cpp(const arma::mat & data,
     }
     
     if(lambda_J_prop>0){
-      logPostlambda_J_prop = sum(dLaplace_Cpp(J_curr),0,lambda_J_prop,true) + 
+      logPostlambda_J_prop = sum(dLaplace_Cpp(J_curr,0,lambda_J_prop,true)) + 
         R::dgamma(lambda_J_prop,r_J,1/delta_J,true);
       if(log(R::runif(0,1)) <= logPostlambda_J_prop-logPostlambda_J_curr){
         lambda_J_curr = lambda_J_prop;
@@ -528,26 +539,29 @@ Rcpp::List Ising_LASSO_Cpp(const arma::mat & data,
       }
     }
     
-    if(verbos && (i+1) % reportby ==0){
-      Rcout << "Grand acceptance rate for Ising:" << 100 * accept_Ising/(i+1) << "%\n" <<endl;
-      Rcout << "Grand acceptance rate for LASSO:" << 100 * accept_lambda/(i+1) << "%\n" <<endl;
+    if(verbos && ((i+1) % reportby ==0)){
+      Rcout << "Iteration: " << (i+1-reportby) << " to " << "iteration " << i+1 << "\n" << endl;
+      Rcout << "    Grand acceptance rate for Ising:" << 100.0 * accept_Ising/(i+1.0) << "%" <<endl;
+      Rcout << "    Grand acceptance rate for LASSO:" << 100.0 * accept_lambda/(i+1.0) << "%\n" <<endl;
     }
     
     // 
     
-    if( (i-burn_in)>=0 && (i+1-burn_in)%thin_by == 0 ){
+    if( (i-n_burn_in)>=0 && (i+1-n_burn_in)%thin_by == 0 ){
       lambda_mcmc(i_save,0) = lambda_beta_curr;
       lambda_mcmc(i_save,1) = lambda_J_curr;
       
-      beta_mcmc.row(i) = beta_curr.t();
-      J_mcmc.row(i) = J_curr.t();
+      beta_mcmc.row(i_save) = beta_curr.t();
+      J_mcmc.row(i_save) = J_curr.t();
+      
+      mu_mcmc.row(i_save) = mu_curr.t();
 
       i_save++ ;
     }
     
     
     
-    p.increment(); // progress bar
+    prog.increment(); // progress bar
   }
   
   return(Rcpp::List::create(
@@ -555,7 +569,7 @@ Rcpp::List Ising_LASSO_Cpp(const arma::mat & data,
       Rcpp::Named("mu") = mu_mcmc,
       Rcpp::Named("J") = J_mcmc,
       Rcpp::Named("lambda") = lambda_mcmc
-  );
+  ));
   
   
 }
