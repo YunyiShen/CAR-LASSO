@@ -1,10 +1,12 @@
 // [[Rcpp::depends(RcppArmadillo)]]
+// [[Rcpp::depends(RcppProgress)]]
 #include <RcppArmadillo.h> // to use sparse matrix
 #include <tgmath.h>
 using namespace Rcpp;
+using namespace arma;
 static const double pi = 3.141592653589793238462643383280;
 
-// [[Rcpp::depends(RcppProgress)]]
+
 #include <progress.hpp>
 #include <progress_bar.hpp>
 #include "helper.h"
@@ -17,9 +19,10 @@ static const double pi = 3.141592653589793238462643383280;
  * matrix specifying a Gaussian Graphical Model
  */
 
+// [[Rcpp::export]]
 Rcpp::List Graphical_LASSO_Cpp(const arma::mat & data,
-                           const int nIter,
-                           const int burn_in,
+                           const int n_iter,
+                           const int n_burn_in,
                            const int thin_by,
                            const double lambda_a, // Gamma prior for LASSO parameter
                            const double lambda_b,
@@ -38,14 +41,14 @@ Rcpp::List Graphical_LASSO_Cpp(const arma::mat & data,
   arma::uvec pertub_vec = linspace<uvec>(0,p-1,p); 
   
   // mcmc storage
-  n_store = floor(nIter/thin_by);
+  int n_store = floor(n_iter/thin_by);
   arma::mat Sigma_mcmc(n_store,p*p,fill::zeros);
   Sigma_mcmc += NA_REAL;
   
   arma::mat Omega_mcmc(n_store,p*p,fill::zeros);
   Omega_mcmc += NA_REAL;
   
-  arma::vec lambda_mcmc(n_store,fill::zeors);
+  arma::vec lambda_mcmc(n_store,fill::zeros);
   lambda_mcmc + NA_REAL;
   
   int i_save = 0;
@@ -81,13 +84,13 @@ Rcpp::List Graphical_LASSO_Cpp(const arma::mat & data,
   Progress prog((n_iter+n_burn_in), progress); 
   
   // main iterations
-  for(int i = 0 ; i < (nIter+burn_in) ; ++i){
+  for(int i = 0 ; i < (n_iter+n_burn_in) ; ++i){
     if (Progress::check_abort()){
       Rcerr << "keyboard abort\n"; // abort using esc
       return(Rcpp::List::create(
           Rcpp::Named("Sigma") = Sigma_mcmc,
           Rcpp::Named("Omega") = Omega_mcmc,
-          Rcpp::Named("lambda") = lambda_mcmc);
+          Rcpp::Named("lambda") = lambda_mcmc));
     }
     
     // update LASSO parameter lambda
@@ -96,12 +99,13 @@ Rcpp::List Graphical_LASSO_Cpp(const arma::mat & data,
     
     // update latent tau (it is symmertric so we only work on upper tri)
     tau_curr.zeros();
-    for(int j = 0 ; j < n_upper_tri ; ++n){
+    for(int j = 0 ; j < n_upper_tri ; ++j){
       tau_curr(Omega_upper_tri(j)) = 
-        rinvGau(abs(lambda_curr/Omega(Omega_upper_tri(j))),
-                      lambda_curr*lambda_curr)
+        rinvGau(sqrt(lambda_curr*lambda_curr/(Omega(Omega_upper_tri(j))*Omega(Omega_upper_tri(j)))),
+                      lambda_curr*lambda_curr);
     }
-    tau_curr = tau_curr + t_curr.t(); // use symmertric to update lower tri
+    tau_curr = tau_curr + tau_curr.t(); // use symmertric to update lower tri
+    
     
     for(int j = 0 ; j < p ; ++j){
       perms_j = find(pertub_vec!=j);
@@ -114,15 +118,15 @@ Rcpp::List Graphical_LASSO_Cpp(const arma::mat & data,
       Sigma12 = Sigma.col(j);
       Sigma12 = Sigma12(perms_j);
       
-      S21 = S.row(i);
+      S21 = S.row(j);
       S21 = S21(perms_j);
       
       Omega11inv = Sigma11-Sigma12 * Sigma12.t() / Sigma(j,j);
       Ci = (S(j,j)+lambda_curr) * Omega11inv;
       Ci.diag() += 1/tauI;
-      CiChol = chol(Ci)
+      CiChol = chol(Ci);
       
-      S_temp = S.col(i);
+      S_temp = S.col(j);
       S_temp = S_temp(perms_j);
       mui = solve(-Ci,S_temp);
       
@@ -131,24 +135,35 @@ Rcpp::List Graphical_LASSO_Cpp(const arma::mat & data,
         
       // Replacing omega entries
       Omega.submat(perms_j,ind_j) = beta;
-      Omega.submat(ind_j,perms_j) = beta;
-      gamm = R::rgamma(n/2+1,(S(0,0)+lambda_curr)/2);
-      Omega(j,j) = gamm + beta.t() * Omega11inv * beta;
-          
+      Omega.submat(ind_j,perms_j) = beta.t();
+      
+      
+      
+      gamm = R::rgamma(n/2+1,2/( as_scalar( S(0,0) )+lambda_curr));
+      Omega(j,j) = gamm + as_scalar( beta.t() * Omega11inv * beta);
+       
       // Replacing sigma entries
       OmegaInvTemp = Omega11inv * beta;
       Sigma.submat(perms_j,perms_j) = Omega11inv+(OmegaInvTemp * OmegaInvTemp.t())/gamm ;
-      Sigma[perms_j,ind_j]<-Sigma[ind_j,perms_j] = -OmegaInvTemp/gamm;
+      
+      //flagged
+      
+      Sigma(perms_j,ind_j) = -OmegaInvTemp/gamm;
+      
+       
+      Sigma(ind_j,perms_j) = trans( -OmegaInvTemp/gamm);
       Sigma(j,j) = 1/gamm ;
       
     }
     
+    
     // saving current state
-    if( (i-burn_in)>=0 && (i+1-burn_in)%thin_by == 0 ){
+    if( (i-n_burn_in)>=0 && (i+1-n_burn_in)%thin_by == 0 ){
       lambda_mcmc(i_save) = lambda_curr;
       Sigma_mcmc.row(i_save) = vectorise(Sigma,1);
       Omega_mcmc.row(i_save) = vectorise(Omega,1);
       i_save++ ;
+      
     }
     
     prog.increment();
@@ -157,7 +172,7 @@ Rcpp::List Graphical_LASSO_Cpp(const arma::mat & data,
   return(Rcpp::List::create(
       Rcpp::Named("Sigma") = Sigma_mcmc,
       Rcpp::Named("Omega") = Omega_mcmc,
-      Rcpp::Named("lambda") = lambda_mcmc);
+      Rcpp::Named("lambda") = lambda_mcmc));
   
 }
 
