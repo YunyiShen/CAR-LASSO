@@ -1,6 +1,7 @@
 library(Matrix)
 library(RcppArmadillo)
 library(Rcpp)
+library(RcppProgress)
 
 rm(list = ls())
 sourceCpp("./src/sandbox.cpp")
