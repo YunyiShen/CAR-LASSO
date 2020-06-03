@@ -27,60 +27,82 @@ static const double pi = 3.141592653589793238462643383280;
 
 /*Full conditional dist'n of beta was normal with:
  *   
- * Sigma_beta = sigma^2 * (\sum_i [(B-I)X_i]^T[(B-I)X_i] + D_{\tau}^{-1} )^{-1}
+ * Sigma_beta = (\sum_i [X_i]^T\Omega[X_i] + D_{\tau}^{-1} )^{-1}
  * 
- * mu_beta = (\sum_i [(B-I)X_i]^T[(B-I)X_i] + D_{\tau}^{-1} )^{-1} (\sum_i [(B-I)X_i]^T[(B-I)(Z_i-\mu)]  )
+ * mu_beta = (\sum_i [X_i]^T\Omega[X_i] + D_{\tau}^{-1} )^{-1} (\sum_i [X_i]^T\Omega[(Z_i-\mu)]  )
  * 
  */
 
-// tested for dimension compatibility 20200528
-arma::vec update_beta_helper(const arma::mat & data,
+// tested for dimension compatibility 20200603
+arma::mat update_beta_helper(const arma::mat & data,
                              const arma::mat & design,
                              const arma::vec & mu,
                              const arma::vec & tau2,
                              const arma::mat & Omega,
                              int k, int p, int n){
   
-  
+  arma::mat Y = data.t(); // convert to col vectors
   arma::vec mu_beta(k*p,fill::zeros);
   arma::mat Q_beta(k*p,k*p,fill::zeros);// percision matrix up to sigma^2 scaling
   Q_beta.diag() += 1/tau2;
-  arma::vec res;
+  arma::mat res;
   
   arma::sp_mat X_i;
   
   for(int i = 0 ; i < n ; ++i){
     X_i = getDesign_i_helper(design.row(i),k);
     Q_beta +=  X_i.t() * Omega * X_i ;
-    mu_beta +=  X_i.t() * Omega * (data.col(i)-mu);
+    mu_beta +=  X_i.t() * Omega * (Y.col(i)-mu);
   }
   
+  
+  //Rcout << "beta" <<endl;
   mu_beta = solve(Q_beta,mu_beta);
   res = mvnrnd(mu_beta, inv(Q_beta));
+  res = reshape(res,p,k);
+  
   return(res);
 }
 
+// tested dimension 20200603
+arma::vec update_mu_helper(const arma::mat & data,
+                           const arma::mat & design,
+                           const arma::mat & beta,
+                           const arma::mat & Omega, 
+                           int k,int p,int n){
+  arma::vec mu(k);
+  arma::mat Sigma_mu = inv(Omega)/n;
+  arma::mat YminusXbeta = data - design * beta;
+  arma::vec mu_mu = trans(mean(YminusXbeta));
+  
+  //Rcout << "mu" <<endl;
+  mu = mvnrnd(mu_mu, Sigma_mu);
+  
+  return(mu);
+  
+}
 
 
-
-// return Omega (first col), eta2 (last col)
+// return Omega matrix
+// tested dimension 20200603
 arma::mat update_Omega_helper(const arma::mat & data,
-                          const arma::mat & design,
-                          const arma::vec & mu,
-                          const arma::vec & beta,
-                          const double & lambda_curr,
-                          int k, int p,int n){
-  arma::mat beta_mat = reshape(beta,p,k);
-  arma::mat Omega;
+                              const arma::mat & design,
+                              const arma::vec & mu,
+                              const arma::mat & beta,
+                              const double lambda_curr,
+                              int k, int p,int n){
+  //arma::mat Omega;
   arma::mat Y_tilde;
   
-  arma::mat expectation = trans(design * beta);
-  expectation.each_col() += mu;
+  arma::mat expectation = design * beta;
+  expectation.each_row() += mu.t();
   
-  Y_tilde = trans( data - expectation);
+  Y_tilde = data - expectation;
   
   arma::mat S = Y_tilde.t() * Y_tilde;
   arma::mat Sigma = cov(Y_tilde);
+  
+
   
   // Concentration matrix and it's dimension:
   arma::mat Omega = pinv(Sigma); // Moore-Penrose inverse
@@ -130,7 +152,11 @@ arma::mat update_Omega_helper(const arma::mat & data,
     S21 = S21(perms_j);
     
     Omega11inv = Sigma11-Sigma12 * Sigma12.t() / Sigma(j,j);
-    Ci = (S(j,j)+tau_curr) * Omega11inv;
+    
+    // flagged
+    Ci = (S(j,j)+lambda_curr) * Omega11inv;
+    // flagged end
+    
     Ci.diag() += 1/tauI;
     CiChol = chol(Ci);
     
@@ -144,32 +170,32 @@ arma::mat update_Omega_helper(const arma::mat & data,
     Omega.submat(perms_j,ind_j) = gamma;
     Omega.submat(ind_j,perms_j) = gamma.t();
     
-    gamm_rn = R::rgamma(n/2+1,2/( as_scalar( S(0,0) )+tau_curr));
+    gamm_rn = R::rgamma(n/2+1,2/( as_scalar( S(0,0) +lambda_curr)));
     Omega(j,j) = gamm_rn + as_scalar( gamma.t() * Omega11inv * gamma);
   }
   
-  arma::mat Res(k*k,2,fill::zeros);
-  Res.col(0) = vectorise(Omega);
-  Res.col(1) = vectorise(tau_curr);
-  
-  return(Res);
-  
+  return(Omega);
 }
 
 
-
-arma::vec tau2_eta2_update_helper(const arma::vec & beta,
-                                  const double & lambda2,
-                                  const double & sigma2){
-  int n = beta.n_elem;
-  arma::vec invtau2(n);
-  arma::vec mu_prime = sqrt(lambda2*sigma2/(beta%beta));
-  for(int i = 0 ; i < n ; ++i){
+arma::vec update_tau2_helper(const arma::mat & beta,
+                             const double & lambda2,
+                             const arma::mat & Omega,
+                             int k, int p, int n){
+  arma::vec betavec = vectorise(beta);
+  arma::vec invtau2(k*p);
+  
+  double detSigma = 1/det(Omega);
+  detSigma = pow(detSigma,1/(k));
+  
+  
+  
+  arma::vec mu_prime = sqrt(lambda2*detSigma/(betavec%betavec));
+  for(int i = 0 ; i < k*p ; ++i){
     invtau2(i) =  rinvGau(mu_prime(i),lambda2);
   }
   return(1/invtau2);
 }
-
 /* 
  * Convention:
  * mcmc obects were vectorized column first, e.g. each row: looks like
@@ -178,19 +204,19 @@ arma::vec tau2_eta2_update_helper(const arma::vec & beta,
  */
 
 // [[Rcpp::export]]
-List SRG_LASSO_Cpp(const arma::mat & data, // raw composition data, column as a sample
+List SRG_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sample
                    const arma::mat & design, // design matrix, each ROW as a sample
-                   const int n_iter, // how many iteractions?
+                   const int n_iter, // how many iterations?
                    const int n_burn_in, // burn in
                    const int thin_by, // thinning?
                    const double r_beta, // prior on lambda of beta
                    const double delta_beta,
-                   const double r_B,
-                   const double delta_B,
+                   const double r_Omega,
+                   const double delta_Omega,
                    bool progress){
-  int k = data.n_rows; // number of nodes
+  int k = data.n_cols; // number of nodes
   int p = design.n_cols; //number of predictors
-  int n = data.n_cols; // number of samples
+  int n = data.n_rows; // number of samples
   
   int n_save = floor(n_iter/thin_by); //
   int i_save = 0;  
@@ -199,11 +225,9 @@ List SRG_LASSO_Cpp(const arma::mat & data, // raw composition data, column as a 
   arma::mat beta_mcmc(n_save,k * p); // beta mcmc
   beta_mcmc += NA_REAL; 
   
-  arma::mat B_mcmc(n_save , k * (k - 1)); // vectorized column first, but had no diagnol
-  B_mcmc += NA_REAL;
+  arma::mat Omega_mcmc(n_save , floor( k * (k+1)/2 )  ); // vectorized column first, but had no diagnol
+  Omega_mcmc += NA_REAL;
   
-  arma::mat sigma_mcmc(n_save , 1); //noise standard deviation
-  sigma_mcmc += NA_REAL;
   
   arma::mat mu_mcmc(n_save , k); // mean for node 1 to k
   mu_mcmc += NA_REAL;
@@ -211,67 +235,65 @@ List SRG_LASSO_Cpp(const arma::mat & data, // raw composition data, column as a 
   arma::mat lambda_mcmc(n_save , 2); // LASSO parameter for beta and B
   lambda_mcmc += NA_REAL;
   
-  arma::vec tau2_curr = randg<arma::vec> (k*p,distr_param(r_beta,1/delta_beta)); // current latent variable tau^2, for prior of beta
-  arma::vec eta2_curr = randg<arma::vec> (k*(k-1),distr_param(r_B,1/delta_B)); // current latent eta^2, for prior of B
-  //
-  arma::vec mu_curr = mean(data,1); // current value of mean
+  arma::vec tau2_curr = randg<arma::vec> (k*p,distr_param(r_beta,delta_beta)); // current latent variable tau^2, for prior of beta
+
+  arma::vec mu_curr = trans( mean(data) ); // current value of mean
   
-  arma::vec beta_curr(k*p , fill::randu); // current value of beta
-  arma::vec B_curr(k*(k-1) , fill::randu); // current value of B
-  double sigma_curr = sqrt(1/ R::rgamma(1,1)); // current value of sigma
+  arma::mat beta_curr(p , k , fill::randu); // current value of beta
+  arma::mat Omega_curr(k,k); // current value of B
+  Omega_curr = Omega_curr.eye();
+  
   
   arma::vec mean_uncertain(k); // for sampling mu
   
   double lambda2_beta = R::rgamma(r_beta,1/delta_beta); // current value of squared LASSO parameter of \beta
-  double lambda2_B = R::rgamma(r_B,1/delta_B); // current value of squared LASSO parameter of B
+  double lambda_Omega = R::rgamma(r_Omega,1/delta_Omega); // current value of squared LASSO parameter of B
+  
+  double Omega_r_post = (r_Omega+(k*(k+1)/2));
+  double Omega_delta_post;
   
   Progress prog((n_iter+n_burn_in), progress); // progress bar
-  //Rcout << "flag" <<endl;
+  
   // main loop
   for(int i = 0 ; i<(n_iter+n_burn_in) ; ++i){
+    
+    
     if (Progress::check_abort()){
       Rcerr << "keyboard abort\n";
       return(Rcpp::List::create(
           Rcpp::Named("beta") = beta_mcmc,
           Rcpp::Named("mu") = mu_mcmc,
-          Rcpp::Named("B") = B_mcmc,
-          Rcpp::Named("sigma") = sigma_mcmc,
+          Rcpp::Named("Omega") = Omega_mcmc,
           Rcpp::Named("lambda") = lambda_mcmc
       ));
     }
     // block update start:
     
-    // Update betas:
+    //Update betas:
     beta_curr = update_beta_helper(data,design,mu_curr,
-                                   sigma_curr * sigma_curr,
-                                   tau2_curr,B_curr,
+                                   tau2_curr,Omega_curr, 
                                    k,p,n);
     
-    // Update Bs
-    B_curr = update_B_helper(data,design,mu_curr,beta_curr,
-                             sigma_curr * sigma_curr,
-                             eta2_curr,
-                             k,n);
-      
     // Update mu
-    mu_curr = mean(data,1) + sigma_curr/sqrt(n*k) * mean_uncertain.randu();
     
-    // Update sigma
-    sigma_curr = update_sigma_helper(data, design, mu_curr,
-                                     beta_curr, B_curr,
-                                     eta2_curr, tau2_curr,
+    mu_curr = update_mu_helper(data,design,beta_curr,
+                               Omega_curr, 
+                               k,p,n);
+    
+    // Update Bs
+    
+    
+    Omega_curr = update_Omega_helper(data, design, 
+                                     mu_curr,beta_curr,
+                                     lambda_Omega,
                                      k,p,n);
       
+
+    
+  
     // Update tau
-    tau2_curr = tau2_eta2_update_helper(beta_curr,lambda2_beta,
-                                          sigma_curr * sigma_curr);
-    
-    
-    
-    // Update eta
-    eta2_curr = tau2_eta2_update_helper(B_curr,lambda2_B,
-                                        sigma_curr * sigma_curr);
-    
+    tau2_curr = update_tau2_helper(beta_curr,lambda2_beta,
+                                   Omega_curr,k,p,n);
     
     
     // Update lambda_beta
@@ -279,18 +301,21 @@ List SRG_LASSO_Cpp(const arma::mat & data, // raw composition data, column as a 
     lambda2_beta = R::rgamma(r_beta+k*p,1/(delta_beta+sum(tau2_curr)/2));
     
     
-    // Update lambda_B
-    lambda2_B = R::rgamma(r_B+k*(k-1),1/(delta_B+sum(eta2_curr)/2));
+    // Update lambda_Omega
+    Omega_delta_post = (delta_Omega+sum(sum(abs(Omega_curr)))/2);
+    lambda_Omega = R::rgamma(Omega_r_post,1/Omega_delta_post);
+    
+    
     
     // saving the state
     if( (i-n_burn_in)>=0 && (i+1-n_burn_in)%thin_by ==0 ){
-      beta_mcmc.row(i_save) = beta_curr.t();
-      B_mcmc.row(i_save) = B_curr.t();
+      
+      beta_mcmc.row(i_save) = trans(vectorise(beta_curr));
+      Omega_mcmc.row(i_save) = trans( Omega_curr(trimatu_ind( size(Omega_curr) )));
       mu_mcmc.row(i_save) = mu_curr.t();
-      sigma_mcmc(i_save) = sigma_curr;
       
       lambda_mcmc(i_save,0) = sqrt( lambda2_beta);
-      lambda_mcmc(i_save,1) = sqrt( lambda2_B );
+      lambda_mcmc(i_save,1) = lambda_Omega;
       
       i_save++;
     }
@@ -301,8 +326,7 @@ List SRG_LASSO_Cpp(const arma::mat & data, // raw composition data, column as a 
   return(Rcpp::List::create(
       Rcpp::Named("beta") = beta_mcmc,
       Rcpp::Named("mu") = mu_mcmc,
-      Rcpp::Named("B") = B_mcmc,
-      Rcpp::Named("sigma") = sigma_mcmc,
+      Rcpp::Named("Omega") = Omega_mcmc,
       Rcpp::Named("lambda") = lambda_mcmc
   ));
 }

@@ -6,30 +6,26 @@ library(RcppProgress)
 rm(list = ls())
 sourceCpp("./src/sandbox.cpp")
 
-k = 3
-n = 4
-p = 1
+k = 5
+n = 20
+p = 2
 
+test_sigma <- matrix(rnorm(k^2),k,k)
+test_sigma <- t(test_sigma) %*% test_sigma
+test_data = MASS::mvrnorm(n,c(0,0,0,0,0),test_sigma)
 
-test_data = matrix(rnorm(n * k),k,n)
-test_design = matrix(rnorm( n * p ) , n , p)
-test_mu = rnorm(k)
-test_beta = rnorm(k*p)
-test_B = rnorm(k*(k-1))
-test_sigma2 = 1
-test_tau2 = runif(k*p)
-test_eta2 = runif(k*(k-1))
-test_lambda2_beta = 1
-test_lambda2_B = 1
+test_design <- matrix(rnorm(n*p),n,p)
 
+test_mu <- rnorm(k)
+test_tau2 <- runif(k*p)
 
-test_sigma_vec = runif(k)
-test_B = matrix(rnorm(k*k),k,k)
-diag(test_B) = 0
+test_beta = matrix(rnorm(k*p),p,k)
 
+test_lambda_Omega <- runif(1)
 
-set.seed(42)
-test_SAR = Sample_SAR_Cpp(10000,test_mu,test_sigma_vec,test_B)
-
-cov(t(test_SAR))
-rowMeans(test_SAR)
+#update_beta_helper(test_data,test_design,test_mu,test_tau2,test_sigma,k,p,n)
+#update_mu_helper(test_data,test_design,test_beta,test_sigma,k,p,n)
+update_tau2_helper(test_beta,
+                    test_lambda_Omega,
+                    test_sigma,
+                    k,p,n)
