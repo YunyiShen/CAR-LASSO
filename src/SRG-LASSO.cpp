@@ -57,8 +57,9 @@ arma::mat update_beta_helper(const arma::mat & data,
   
   
   //Rcout << "beta" <<endl;
-  mu_beta = solve(Q_beta,mu_beta);
-  res = mvnrnd(mu_beta, inv(Q_beta));
+  arma::mat Sigma_beta = inv_sympd(Q_beta);
+  mu_beta = Sigma_beta*mu_beta;
+  res = mvnrnd(mu_beta, Sigma_beta);
   res = reshape(res,p,k);
   
   return(res);
@@ -71,7 +72,7 @@ arma::vec update_mu_helper(const arma::mat & data,
                            const arma::mat & Omega, 
                            int k,int p,int n){
   arma::vec mu(k);
-  arma::mat Sigma_mu = inv(Omega)/n;
+  arma::mat Sigma_mu = inv_sympd(Omega)/n;
   arma::mat YminusXbeta = data - design * beta;
   arma::vec mu_mu = trans(mean(YminusXbeta));
   
@@ -102,17 +103,18 @@ arma::mat update_Omega_helper(const arma::mat & data,
   arma::mat S = Y_tilde.t() * Y_tilde;
   arma::mat Sigma = cov(Y_tilde);
   
-
+  //Rcout << "det cov of centered data: " << det(Sigma) << endl;
+  //Rcout << "lambda of Omega: " << lambda_curr <<endl;
   
   // Concentration matrix and it's dimension:
   arma::mat Omega = pinv(Sigma); // Moore-Penrose inverse
-  
-  arma::uvec pertub_vec = linspace<uvec>(0,k-1,k); 
+  int d = Omega.n_rows;
+  arma::uvec pertub_vec = linspace<uvec>(0,d-1,d); 
   
   arma::uvec Omega_upper_tri = trimatu_ind(size(Omega),1);
   int n_upper_tri = Omega_upper_tri.n_elem;
   
-  arma::mat tau_curr(k,k,fill::zeros);
+  arma::mat tau_curr(d,d,fill::zeros);
   
   arma::uvec perms_j;
   arma::uvec ind_j(1,fill::zeros);
@@ -126,18 +128,20 @@ arma::mat update_Omega_helper(const arma::mat & data,
   arma::mat S_temp;
   arma::mat mui;
   arma::mat gamma;
-  
-  double gamm_rn;
+  double gamm_rn = 0;
   arma::mat OmegaInvTemp;
   
+  
+  tau_curr.zeros();
   for(int j = 0 ; j < n_upper_tri ; ++j){
     tau_curr(Omega_upper_tri(j)) = 
       rinvGau(sqrt(lambda_curr*lambda_curr/(Omega(Omega_upper_tri(j))*Omega(Omega_upper_tri(j)))),
               lambda_curr*lambda_curr);
   }
-  tau_curr = tau_curr + tau_curr.t(); // use symmertric to update lower tri
   
-  for(int j = 0 ; j < k ; ++j){
+  tau_curr += tau_curr.t(); // use symmertric to update lower tri
+  
+  for(int j = 0 ; j < d ; ++j){
     perms_j = find(pertub_vec!=j);
     ind_j = ind_j.zeros();
     ind_j += j;
@@ -152,11 +156,7 @@ arma::mat update_Omega_helper(const arma::mat & data,
     S21 = S21(perms_j);
     
     Omega11inv = Sigma11-Sigma12 * Sigma12.t() / Sigma(j,j);
-    
-    // flagged
     Ci = (S(j,j)+lambda_curr) * Omega11inv;
-    // flagged end
-    
     Ci.diag() += 1/tauI;
     CiChol = chol(Ci);
     
@@ -164,14 +164,32 @@ arma::mat update_Omega_helper(const arma::mat & data,
     S_temp = S_temp(perms_j);
     mui = solve(-Ci,S_temp);
     
-    gamma = mui+solve(CiChol,randn(k-1));
+    gamma = mui+solve(CiChol,randn(d-1));
     
     // Replacing omega entries
     Omega.submat(perms_j,ind_j) = gamma;
     Omega.submat(ind_j,perms_j) = gamma.t();
     
-    gamm_rn = R::rgamma(n/2+1,2/( as_scalar( S(0,0) +lambda_curr)));
+    
+    
+    gamm_rn = R::rgamma(n/2+1,2/( as_scalar( S(0,0) )+lambda_curr));
     Omega(j,j) = gamm_rn + as_scalar( gamma.t() * Omega11inv * gamma);
+    
+    
+    // Replacing sigma entries
+    OmegaInvTemp = Omega11inv * gamma;
+    Sigma.submat(perms_j,perms_j) = Omega11inv+(OmegaInvTemp * OmegaInvTemp.t())/gamm_rn ;
+    
+    //flagged
+    
+    Sigma(perms_j,ind_j) = -OmegaInvTemp/gamm_rn;
+    
+    
+    Sigma(ind_j,perms_j) = trans( -OmegaInvTemp/gamm_rn);
+    Sigma(j,j) = 1/gamm_rn ;
+    
+    
+    
   }
   
   return(Omega);
@@ -186,6 +204,7 @@ arma::vec update_tau2_helper(const arma::mat & beta,
   arma::vec invtau2(k*p);
   
   double detSigma = 1/det(Omega);
+  //Rcout << "detOmega:" << 1/detSigma << endl;
   detSigma = pow(detSigma,1/(k));
   
   
@@ -238,16 +257,17 @@ List SRG_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sam
   arma::vec tau2_curr = randg<arma::vec> (k*p,distr_param(r_beta,delta_beta)); // current latent variable tau^2, for prior of beta
 
   arma::vec mu_curr = trans( mean(data) ); // current value of mean
+  arma::mat centered_data = data;
+  centered_data.each_row() -= mu_curr.t();
+  arma::mat Omega_curr(k,k); // current value of Omega
+  Omega_curr = pinv(cov(data));
+  arma::mat beta_curr = solve( design.t()*design,design.t()*(centered_data)); // current value of beta
   
-  arma::mat beta_curr(p , k , fill::randu); // current value of beta
-  arma::mat Omega_curr(k,k); // current value of B
-  Omega_curr = Omega_curr.eye();
   
-  
-  arma::vec mean_uncertain(k); // for sampling mu
+  //arma::vec mean_uncertain(k); // for sampling mu
   
   double lambda2_beta = R::rgamma(r_beta,1/delta_beta); // current value of squared LASSO parameter of \beta
-  double lambda_Omega = R::rgamma(r_Omega,1/delta_Omega); // current value of squared LASSO parameter of B
+  double lambda_Omega = 0;//R::rgamma(r_Omega,1/delta_Omega); // current value of squared LASSO parameter of B
   
   double Omega_r_post = (r_Omega+(k*(k+1)/2));
   double Omega_delta_post;
@@ -268,11 +288,22 @@ List SRG_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sam
       ));
     }
     // block update start:
+    Omega_delta_post = (delta_Omega+sum(sum(abs(Omega_curr)))/2);
+    lambda_Omega = R::rgamma(Omega_r_post,1/Omega_delta_post);
     
     //Update betas:
     beta_curr = update_beta_helper(data,design,mu_curr,
                                    tau2_curr,Omega_curr, 
                                    k,p,n);
+    
+    
+    // update Omega
+    Omega_curr = update_Omega_helper(data, design, 
+                                     mu_curr,beta_curr,
+                                     lambda_Omega,
+                                     k,p,n);
+    
+    
     
     // Update mu
     
@@ -280,16 +311,12 @@ List SRG_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sam
                                Omega_curr, 
                                k,p,n);
     
-    // Update Bs
     
     
-    Omega_curr = update_Omega_helper(data, design, 
-                                     mu_curr,beta_curr,
-                                     lambda_Omega,
-                                     k,p,n);
       
-
-    
+    //Rcout << "detOmega curr in main loop:" << det(Omega_curr) << endl;
+    //Rcout << "sum beta in main loop:" <<sum(sum(beta_curr)) <<endl;
+    //Rcout << "mean of mu in main loop:" << mean(mu_curr) <<endl;
   
     // Update tau
     tau2_curr = update_tau2_helper(beta_curr,lambda2_beta,
@@ -302,8 +329,6 @@ List SRG_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sam
     
     
     // Update lambda_Omega
-    Omega_delta_post = (delta_Omega+sum(sum(abs(Omega_curr)))/2);
-    lambda_Omega = R::rgamma(Omega_r_post,1/Omega_delta_post);
     
     
     
