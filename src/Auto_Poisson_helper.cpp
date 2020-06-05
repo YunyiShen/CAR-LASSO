@@ -2,11 +2,11 @@
 #include <RcppArmadillo.h> // to use sparse matrix
 #include <tgmath.h>
 using namespace Rcpp;
-static const double pi = 3.141592653589793238462643383280;
 
 // [[Rcpp::depends(RcppProgress)]]
 #include <progress.hpp>
 #include <progress_bar.hpp>
+#include "helper.h"
 
 /* Convention:
  *    single sample will be saved as col vectors
@@ -101,12 +101,6 @@ double logLik_Normal_Response(const arma::vec & data,
 }
 
 
-// Laplace distribution density, for L1 regularization
-// [[Rcpp::export]]
-arma::vec dLaplace_Cpp(const arma::vec &x,const double &mu, const double &lambda, bool take_log){
-  arma::vec logd = - lambda * abs(x-mu) + log(lambda/2);
-  return(take_log ? logd : exp(logd));
-}
 
 
 
