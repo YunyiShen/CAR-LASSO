@@ -17,8 +17,8 @@ arma::vec dLaplace_Cpp(const arma::vec & x, const double mu, const double lambda
  American Statistician. 30-2. 88-91.
  */	
 
-// tested 20200601
-double rinvGau(double mu, double lambda){
+// 
+double rinvGau(double mu, const double & lambda){
   mu = mu < 1e-12 ? 1e-12 : mu; // truncate mu
   mu = lambda < 1e-12 ? 1e-12 : lambda;
   double b = 0.5 * mu / lambda;
@@ -72,6 +72,7 @@ arma::sp_mat getDesign_i_helper(const arma::rowvec & X_i,//row vector of that sa
   return(Design);
 }
 
+// resize a List
 List resize( const List& x, int n ){
   int oldsize = x.size() ;
   List y(n) ;
@@ -88,7 +89,7 @@ arma::mat RandMat(int nrow, int ncol)
 }
 
 
-arma::sp_mat block_diag(const arma::mat A, int d, int n){
+arma::sp_mat block_diag(const arma::mat & A, int d, int n){
   arma::sp_mat D(n*d,n*d);
   for(int i = 0 ; i < n ; ++i){
     D.submat(i*d, i*d, (i+1)*d-1, (i+1)*d-1) = A;

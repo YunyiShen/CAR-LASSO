@@ -4,7 +4,7 @@
 #include <tgmath.h>
 using namespace Rcpp;
 using namespace arma;
-static const double pi = 3.141592653589793238462643383280;
+
 
 
 #include <progress.hpp>

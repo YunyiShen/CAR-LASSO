@@ -20,10 +20,12 @@ Omega <- as.matrix(Omega)
 
 Sigma <- solve(Omega)
 
-Design <- matrix(rnorm(n*p),n,p)
+Design <- matrix(rnorm(n*p,0,3),n,p)
 Design <- (Design-mean(Design))/sd(Design)
-beta <- rsparsematrix(p,k,0.7)
-beta <- as.matrix(beta)
+#beta <- rsparsematrix(p,k,0.7)
+beta <- matrix(rnorm(p*k,1.1,0.05),p,k)
+#beta <- as.matrix(beta)
+#beta[sample(length(beta),floor(0.3*length(beta)))] <- 0
 beta
 mu <- rnorm(k)
 mu
