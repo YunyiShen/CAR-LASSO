@@ -34,18 +34,18 @@ Rcpp::List Graphical_LASSO_Cpp(const arma::mat & data,
   
   // Concentration matrix and it's dimension:
   arma::mat Omega = pinv(Sigma); // Moore-Penrose inverse
-  int p = Omega.n_rows;
+  int k = Omega.n_rows;
   
   
   // indicator matrix and permutation matrix for looping through columns & rows ("blocks")
-  arma::uvec pertub_vec = linspace<uvec>(0,p-1,p); 
+  arma::uvec pertub_vec = linspace<uvec>(0,k-1,k); 
   
   // mcmc storage
   int n_store = floor(n_iter/thin_by);
-  arma::mat Sigma_mcmc(n_store,p*p,fill::zeros);
-  Sigma_mcmc += NA_REAL;
+  //arma::mat Sigma_mcmc(n_store,k*k,fill::zeros);
+  //Sigma_mcmc += NA_REAL;
   
-  arma::mat Omega_mcmc(n_store,p*p,fill::zeros);
+  arma::mat Omega_mcmc(n_store,floor( k * (k+1)/2 ) ,fill::zeros);
   Omega_mcmc += NA_REAL;
   
   arma::vec lambda_mcmc(n_store,fill::zeros);
@@ -54,9 +54,9 @@ Rcpp::List Graphical_LASSO_Cpp(const arma::mat & data,
   int i_save = 0;
   
   // latent tau
-  arma::mat tau_curr(p,p,fill::zeros);
+  arma::mat tau_curr(k,k,fill::zeros);
   
-  double lambda_a_post = (lambda_a+(p*(p+1)/2));
+  double lambda_a_post = (lambda_a+(k*(k+1)/2));
   double lambda_b_post;
   
   double lambda_curr = 0;
@@ -88,7 +88,7 @@ Rcpp::List Graphical_LASSO_Cpp(const arma::mat & data,
     if (Progress::check_abort()){
       Rcerr << "keyboard abort\n"; // abort using esc
       return(Rcpp::List::create(
-          Rcpp::Named("Sigma") = Sigma_mcmc,
+          //Rcpp::Named("Sigma") = Sigma_mcmc,
           Rcpp::Named("Omega") = Omega_mcmc,
           Rcpp::Named("lambda") = lambda_mcmc));
     }
@@ -107,7 +107,7 @@ Rcpp::List Graphical_LASSO_Cpp(const arma::mat & data,
     tau_curr = tau_curr + tau_curr.t(); // use symmertric to update lower tri
     
     
-    for(int j = 0 ; j < p ; ++j){
+    for(int j = 0 ; j < k ; ++j){
       perms_j = find(pertub_vec!=j);
       ind_j = ind_j.zeros();
       ind_j += j;
@@ -131,7 +131,7 @@ Rcpp::List Graphical_LASSO_Cpp(const arma::mat & data,
       mui = solve(-Ci,S_temp);
       
       // Sampling:
-      beta = mui+solve(CiChol,randn(p-1));
+      beta = mui+solve(CiChol,randn(k-1));
         
       // Replacing omega entries
       Omega.submat(perms_j,ind_j) = beta;
@@ -160,8 +160,8 @@ Rcpp::List Graphical_LASSO_Cpp(const arma::mat & data,
     // saving current state
     if( (i-n_burn_in)>=0 && (i+1-n_burn_in)%thin_by == 0 ){
       lambda_mcmc(i_save) = lambda_curr;
-      Sigma_mcmc.row(i_save) = vectorise(Sigma,1);
-      Omega_mcmc.row(i_save) = vectorise(Omega,1);
+      //Sigma_mcmc.row(i_save) = Sigma(trimatu_ind(size(Sigma)));
+      Omega_mcmc.row(i_save) = trans(Omega(trimatu_ind(size(Omega))));
       i_save++ ;
       
     }
@@ -170,7 +170,7 @@ Rcpp::List Graphical_LASSO_Cpp(const arma::mat & data,
   }
   
   return(Rcpp::List::create(
-      Rcpp::Named("Sigma") = Sigma_mcmc,
+      //Rcpp::Named("Sigma") = Sigma_mcmc,
       Rcpp::Named("Omega") = Omega_mcmc,
       Rcpp::Named("lambda") = lambda_mcmc));
   

@@ -103,13 +103,13 @@ arma::mat update_Omega_helper(const arma::mat & data,
   
   // Concentration matrix and it's dimension:
   arma::mat Omega = pinv(Sigma); // Moore-Penrose inverse
-  int d = Omega.n_rows;
-  arma::uvec pertub_vec = linspace<uvec>(0,d-1,d); 
+  //int d = Omega.n_rows;
+  arma::uvec pertub_vec = linspace<uvec>(0,k-1,k); 
   
   arma::uvec Omega_upper_tri = trimatu_ind(size(Omega),1);
   int n_upper_tri = Omega_upper_tri.n_elem;
   
-  arma::mat tau_curr(d,d,fill::zeros);
+  arma::mat tau_curr(k,k,fill::zeros);
   
   arma::uvec perms_j;
   arma::uvec ind_j(1,fill::zeros);
@@ -136,7 +136,7 @@ arma::mat update_Omega_helper(const arma::mat & data,
   
   tau_curr += tau_curr.t(); // use symmertric to update lower tri
   
-  for(int j = 0 ; j < d ; ++j){
+  for(int j = 0 ; j < k ; ++j){
     perms_j = find(pertub_vec!=j);
     ind_j = ind_j.zeros();
     ind_j += j;
@@ -159,7 +159,7 @@ arma::mat update_Omega_helper(const arma::mat & data,
     S_temp = S_temp(perms_j);
     mui = solve(-Ci,S_temp);
     
-    gamma = mui+solve(CiChol,randn(d-1));
+    gamma = mui+solve(CiChol,randn(k-1));
     
     // Replacing omega entries
     Omega.submat(perms_j,ind_j) = gamma;

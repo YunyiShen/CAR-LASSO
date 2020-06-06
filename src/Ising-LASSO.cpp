@@ -66,7 +66,7 @@ double logMH_Ising(const arma::mat & data,
 // main sampler
 
 // [[Rcpp::export]]
-Rcpp::List Ising_LASSO_Cpp(const arma::mat & data,
+Rcpp::List Ising_LASSO_Cpp(const arma::mat & data_,
                            const arma::mat & design,
                            const int n_iter, // how many iteractions?
                            const int n_burn_in, // burn in
@@ -86,6 +86,7 @@ Rcpp::List Ising_LASSO_Cpp(const arma::mat & data,
   arma::vec responses(2);
   responses(0) = min(min(data));
   responses(1) = max(max(data));
+  arma::mat data = data_.t(); // convert to column vector as sample
   int k = data.n_rows; // number of nodes
   int p = design.n_cols; //number of predictors
   int n = data.n_cols; // number of samples
