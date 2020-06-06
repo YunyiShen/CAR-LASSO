@@ -13,6 +13,7 @@ sourceCpp("./src/Probit-SRG-LASSO.cpp")
 sourceCpp("./src/Probit-Graphical-LASSO.cpp")
 sourceCpp("./src/SRG-LASSO.cpp")
 sourceCpp("./src/graphical-LASSO.cpp")
+source("./R/SRG-LASSO.R")
 
 
 #set.seed(42)
@@ -25,6 +26,9 @@ Sigma <- solve(Omega)
 
 Design <- matrix(rnorm(n*p,0,3),n,p)
 Design <- (Design-mean(Design))/sd(Design)
+colnames(Design) <- paste0("x",1:p)
+
+
 beta <- matrix(rnorm(p*k,0,0.1),p,k)
 mu <- rnorm(k)
 #mu
@@ -38,8 +42,15 @@ for( i in 1:n ){
   Z[i,] <- MASS::mvrnorm(1,Xbeta[i,]+mu,Sigma)
   Y[i,] <- 1 * ((rnorm(k,Z[i,],1))>0)
 }
+colnames(Y) <- paste0("y",1:k)
+colnames(Z) <- paste0("z",1:k)
 
+full_data <- data.frame(Y,Z,Design)
 
+formula_Z <- paste0(paste0("z",1:k,collapse = "+"),"~",paste0("x",1:p,collapse = "+"))
+formula_Z <- as.formula(formula_Z)
+
+test_R <- SRGlasso(formula_Z,full_data,verbos = T)
 
 
 test <- Proit_SRG_LASSO_Cpp(Y,  Design, n_iter = 2000, 
