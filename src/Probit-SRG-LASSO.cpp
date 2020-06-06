@@ -30,7 +30,7 @@ void update_Z_helper(arma::mat & Z_curr, // persumably large, thus will not copy
   
   for(int i = 0 ; i < n ; ++i){
     for(int j = 0 ; j < k ; ++j){
-      y_star(i) = rtn1(Z_curr(i,j),1,
+      y_star(j) = rtn1(Z_curr(i,j),1,
              data(i,j) == 1 ? 0 : -INFINITY, // if data(i,j)=1, then y_star >= 0
              data(i,j) == 0 ? 0 : INFINITY); // if data(i,j)=0 y_star<0
     }
@@ -113,7 +113,8 @@ List Proit_SRG_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as
           Rcpp::Named("beta") = beta_mcmc,
           Rcpp::Named("mu") = mu_mcmc,
           Rcpp::Named("Omega") = Omega_mcmc,
-          Rcpp::Named("lambda") = lambda_mcmc
+          Rcpp::Named("lambda") = lambda_mcmc,
+          Rcpp::Named("Z") = Z_mcmc
       ));
     }
     // block update start:
@@ -188,7 +189,8 @@ List Proit_SRG_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as
       Rcpp::Named("beta") = beta_mcmc,
       Rcpp::Named("mu") = mu_mcmc,
       Rcpp::Named("Omega") = Omega_mcmc,
-      Rcpp::Named("lambda") = lambda_mcmc
+      Rcpp::Named("lambda") = lambda_mcmc,
+      Rcpp::Named("Z") = Z_mcmc
   ));
 }
 
