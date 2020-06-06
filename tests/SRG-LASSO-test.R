@@ -10,6 +10,7 @@ n = 8000
 p = 1
 
 sourceCpp("./src/Probit-SRG-LASSO.cpp")
+sourceCpp("./src/Probit-Graphical-LASSO.cpp")
 sourceCpp("./src/SRG-LASSO.cpp")
 sourceCpp("./src/graphical-LASSO.cpp")
 
@@ -24,7 +25,7 @@ Sigma <- solve(Omega)
 
 Design <- matrix(rnorm(n*p,0,3),n,p)
 Design <- (Design-mean(Design))/sd(Design)
-beta <- matrix(rnorm(p*k,1.1,0.05),p,k)
+beta <- matrix(rnorm(p*k,0,0.1),p,k)
 mu <- rnorm(k)
 #mu
 
@@ -47,21 +48,30 @@ test <- Proit_SRG_LASSO_Cpp(Y,  Design, n_iter = 2000,
                             r_Omega = 1,delta_Omega = .1,
                             progress = T)
 
-#par(mfrow = c(1,2))
+par(mfrow = c(2,2))
 Omega_uptri <- Omega[upper.tri(Omega,T)]
-diff_probit <- apply(test$Omega,1,function(w,k){(w-k)/k},Omega_uptri)
+diff_probit <- apply(test$Omega,1,function(w,k){(w-k)},Omega_uptri)
 hist(diff_probit)
 
-SRG_test <- SRG_LASSO_Cpp(Y,  Design, n_iter = 2000, 
+SRG_test <- SRG_LASSO_Cpp(Z,  Design, n_iter = 2000, 
                           n_burn_in = 1000, thin_by = 10, 
                           r_beta = 1, delta_beta = .1,
                           r_Omega = 1,delta_Omega = .1,
                           progress = T)
 
-diff_SRG <- apply(SRG_test$Omega,1,function(w,k){(w-k)/k},Omega_uptri)
+diff_SRG <- apply(SRG_test$Omega,1,function(w,k){(w-k)},Omega_uptri)
 hist(diff_SRG)
 
+probit_Glasso <-Probit_Graphical_LASSO_Cpp(Y,2000,1000,10,1,.1,T)
+diff_pGlasso <- apply(probit_Glasso$Omega,1,function(w,k){(w-k)},Omega_uptri)
+
+hist(diff_pGlasso)
+
+
 Glasso <- Graphical_LASSO_Cpp(Z,2000,1000,10,1,.1,T)
-diff_Glasso <- apply(Glasso$Omega,1,function(w,k){(w-k)/k},c(Omega))
+diff_Glasso <- apply(Glasso$Omega,1,function(w,k){(w-k)},Omega_uptri)
+
 hist(diff_Glasso)
+
+
 
