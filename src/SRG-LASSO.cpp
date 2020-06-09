@@ -85,6 +85,8 @@ List SRG_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sam
       ));
     }
     // block update start:
+	  
+	// Update lambda_Omega
     Omega_delta_post = (delta_Omega+sum(sum(abs(Omega_curr)))/2);
     lambda_Omega = R::rgamma(Omega_r_post,1/Omega_delta_post);
     
@@ -125,7 +127,7 @@ List SRG_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sam
     lambda2_beta = R::rgamma(r_beta+k*p,1/(delta_beta+sum(tau2_curr)/2));
     
     
-    // Update lambda_Omega
+    
     
     
     
