@@ -198,13 +198,13 @@ arma::vec update_tau2_helper(const arma::mat & beta,
   arma::vec betavec = vectorise(beta);
   arma::vec invtau2(k*p);
   
-  double detSigma = 1/det(Omega);
+  //double detSigma = 1/det(Omega);
   //Rcout << "detOmega:" << 1/detSigma << endl;
-  detSigma = pow(detSigma,1/(k));
+  //detSigma = pow(detSigma,1/(k));
   
   
   
-  arma::vec mu_prime = sqrt(lambda2*detSigma/(betavec%betavec));
+  arma::vec mu_prime = sqrt(lambda2/(betavec%betavec));
   for(int i = 0 ; i < k*p ; ++i){
     invtau2(i) =  rinvGau(mu_prime(i),lambda2);
   }
