@@ -29,7 +29,7 @@ Design <- (Design-mean(Design))/sd(Design)
 colnames(Design) <- paste0("x",1:p)
 
 
-beta <- matrix(rnorm(p*k,0,0.1),p,k)
+beta <- matrix(rnorm(p*k,4,0.1),p,k)
 mu <- rnorm(k)
 #mu
 
