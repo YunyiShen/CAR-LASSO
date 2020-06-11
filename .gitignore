@@ -4,3 +4,4 @@
 *.o
 src/sandbox.cpp
 R/sandbox.R
+tests/*
