@@ -6,8 +6,8 @@ library(RcppProgress)
 rm(list = ls())
 
 k = 11
-n = 8000
-p = 1
+n = 220
+p = 2
 
 sourceCpp("./src/Probit-SRG-LASSO.cpp")
 sourceCpp("./src/Probit-Graphical-LASSO.cpp")
@@ -17,19 +17,24 @@ source("./R/SRG-LASSO.R")
 
 
 #set.seed(42)
-Omega <- rsparsematrix(k,k,0.5)
-Omega <- Omega*t(Omega)
-diag(Omega) <- diag(Omega) + k
+B <- rsparsematrix(k,k,0.3)
+omega <- diag(rgamma(k,1,.8))
+I <- diag(rep(1,k))
+Omega <- t(I-B) %*% omega %*% (I-B)
+#diag(Omega) <- diag(Omega) + k
 Omega <- as.matrix(Omega)
+image(Omega)
 
 Sigma <- solve(Omega)
 
-Design <- matrix(rnorm(n*p,0,3),n,p)
+Design <- matrix(rnorm(n*p,0,1),n,p)
 Design <- (Design-mean(Design))/sd(Design)
 colnames(Design) <- paste0("x",1:p)
 
 
-beta <- matrix(rnorm(p*k,4,0.1),p,k)
+beta <- matrix(rnorm(p*k,5,1),p,k)
+#beta[sample(p*k,floor(0.3*p*k))] = 0
+
 mu <- rnorm(k)
 #mu
 
@@ -50,7 +55,7 @@ full_data <- data.frame(Y,Z,Design)
 formula_Z <- paste0(paste0("z",1:k,collapse = "+"),"~",paste0("x",1:p,collapse = "+"))
 formula_Z <- as.formula(formula_Z)
 
-test_R <- SRGlasso(formula_Z,full_data,verbos = T)
+test_R <- SRGlasso(formula_Z,full_data,verbos = T,n_iter = 8000,n_burn_in = 1000)
 
 
 test <- Proit_SRG_LASSO_Cpp(Y,  Design, n_iter = 2000, 
@@ -59,19 +64,27 @@ test <- Proit_SRG_LASSO_Cpp(Y,  Design, n_iter = 2000,
                             r_Omega = 1,delta_Omega = .1,
                             progress = T)
 
-par(mfrow = c(2,2))
+par(mfrow = c(1,2))
 Omega_uptri <- Omega[upper.tri(Omega,T)]
-diff_probit <- apply(test$Omega,1,function(w,k){(w-k)},Omega_uptri)
+diff_probit <- apply(test$Omega,1,function(w,k){(w-k)/w},Omega_uptri)
 hist(diff_probit)
 
-SRG_test <- SRG_LASSO_Cpp(Z,  Design, n_iter = 2000, 
+SRG_test <- SRG_LASSO_Cpp(Z,  Design, n_iter = 5000, 
                           n_burn_in = 1000, thin_by = 10, 
-                          r_beta = 1, delta_beta = .1,
-                          r_Omega = 1,delta_Omega = .1,
+                          r_beta = 1, delta_beta = .01,
+                          r_Omega = 1,delta_Omega = .01,
                           progress = T)
 
-diff_SRG <- apply(SRG_test$Omega,1,function(w,k){(w-k)},Omega_uptri)
+diff_SRG <- apply(SRG_test$Omega,1,function(w,k){(w-k)/k},Omega_uptri)
 hist(diff_SRG)
+
+SRG_Graph <- 0 * Omega
+SRG_Graph[upper.tri(SRG_Graph,T)] = apply(SRG_test$Omega,2,median)
+SRG_Graph = SRG_Graph+t(SRG_Graph)
+diag(SRG_Graph) = 0.5 * diag(SRG_Graph)
+image((SRG_Graph-Omega))
+hist((SRG_Graph-Omega))
+#image(Omega)
 
 probit_Glasso <-Probit_Graphical_LASSO_Cpp(Y,2000,1000,10,1,.1,T)
 diff_pGlasso <- apply(probit_Glasso$Omega,1,function(w,k){(w-k)},Omega_uptri)
@@ -79,10 +92,18 @@ diff_pGlasso <- apply(probit_Glasso$Omega,1,function(w,k){(w-k)},Omega_uptri)
 hist(diff_pGlasso)
 
 
-Glasso <- Graphical_LASSO_Cpp(Z,2000,1000,10,1,.1,T)
-diff_Glasso <- apply(Glasso$Omega,1,function(w,k){(w-k)},Omega_uptri)
+
+
+Glasso <- Graphical_LASSO_Cpp(Z,5000,1000,10,1,.01,T)
+diff_Glasso <- apply(Glasso$Omega,1,function(w,k){(w-k)/k},Omega_uptri)
 
 hist(diff_Glasso)
 
-
+Glasso_Graph <- 0 * Omega
+Glasso_Graph[upper.tri(Glasso_Graph,T)] = apply(Glasso$Omega,2,median)
+Glasso_Graph = Glasso_Graph+t(Glasso_Graph)
+diag(Glasso_Graph) = 0.5 * diag(Glasso_Graph)
+image((Glasso_Graph-Omega))
+hist((Glasso_Graph-Omega))
+#image(Omega)
 

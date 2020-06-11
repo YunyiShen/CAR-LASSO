@@ -57,7 +57,7 @@ List SRG_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sam
   arma::mat centered_data = data;
   centered_data.each_row() -= mu_curr.t();
   arma::mat Omega_curr(k,k); // current value of Omega
-  Omega_curr = pinv(cov(data));
+  Omega_curr = inv(cov(data));
   arma::mat beta_curr = solve( design.t()*design,design.t()*(centered_data)); // current value of beta
   
   
