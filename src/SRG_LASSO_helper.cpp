@@ -28,6 +28,11 @@ using namespace arma;
  * 
  */
 
+/*
+ * Test in 0610, we assume Sigma * beta_{i,*}|Sigma,tau_{i,*} \sim N(0,D_{i})
+ * 
+ */
+
 // tested for dimension compatibility 20200603
 arma::mat update_beta_helper(const arma::mat & data,
                              const arma::mat & design,
@@ -39,8 +44,22 @@ arma::mat update_beta_helper(const arma::mat & data,
   arma::mat Y = data.t(); // convert to col vectors
   arma::vec mu_beta(k*p,fill::zeros);
   arma::mat Q_beta(k*p,k*p,fill::zeros);// percision matrix up to sigma^2 scaling
-  Q_beta.diag() += 1/tau2;
+  //Q_beta.diag() += 1/tau2;
+  arma::mat D_i(k,k,fill::zeros);
   arma::mat res;
+  
+  arma::uvec ind_para = linspace<uvec>(0,k-1,k);
+  
+  arma::mat chol_Omega = chol(Omega);
+  //arma::mat sqrt_Omega =  sqrtmat_sympd(Omega);
+  
+  for(int i = 0 ; i < p ; ++i){
+    D_i.zeros();
+    D_i.diag() = 1/tau2(ind_para * p + i);
+    //D_i = sqrt_Omega * D_i * sqrt_Omega;
+    D_i = chol_Omega.t() * D_i * chol_Omega;
+    Q_beta(ind_para * p + i,ind_para * p + i) = D_i;
+  }
   
   arma::sp_mat X_i;
   
@@ -195,7 +214,10 @@ arma::vec update_tau2_helper(const arma::mat & beta,
                              const double & lambda2,
                              const arma::mat & Omega,
                              int k, int p, int n){
-  arma::vec betavec = vectorise(beta);
+  //arma::mat sqrt_Omega =  sqrtmat_sympd(Omega);
+  arma::mat chol_Omega = chol(Omega);
+  arma::mat beta_temp = beta * chol_Omega;
+  arma::vec betavec = vectorise(beta_temp);
   arma::vec invtau2(k*p);
   
   //double detSigma = 1/det(Omega);
