@@ -59,7 +59,7 @@ arma::mat update_beta_helper(const arma::mat & data,
     //D_i = sqrt_Omega * D_i * sqrt_Omega;
     
     D_i = chol_Omega.t() * D_i * chol_Omega;
-    //Q_beta(ind_para * p + i,ind_para * p + i) = D_i;
+    Q_beta(ind_para * p + i,ind_para * p + i) = D_i;
   }
   
   arma::sp_mat X_i;
