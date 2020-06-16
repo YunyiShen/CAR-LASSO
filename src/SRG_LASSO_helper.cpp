@@ -50,14 +50,15 @@ arma::mat update_beta_helper(const arma::mat & data,
   
   arma::uvec ind_para = linspace<uvec>(0,k-1,k);
   
-  arma::mat chol_Omega = chol(Omega);
-  //arma::mat sqrt_Omega =  sqrtmat_sympd(Omega);
+  //arma::mat chol_Omega = chol(Omega);
+  arma::mat sqrt_Omega =  sqrtmat_sympd(Omega);
   
   for(int i = 0 ; i < p ; ++i){
     D_i.zeros();
     D_i.diag() = 1/tau2(ind_para * p + i);
-    //D_i = sqrt_Omega * D_i * sqrt_Omega;
-    D_i = chol_Omega.t() * D_i * chol_Omega;
+    D_i = sqrt_Omega * D_i * sqrt_Omega;
+    
+    //D_i = chol_Omega.t() * D_i * chol_Omega;
     Q_beta(ind_para * p + i,ind_para * p + i) = D_i;
   }
   
@@ -86,11 +87,12 @@ arma::vec update_mu_helper(const arma::mat & data,
                            const arma::mat & Omega, 
                            int k,int p,int n){
   arma::vec mu(k);
+  //Rcout << "mu" <<endl;
   arma::mat Sigma_mu = inv_sympd(Omega)/n;
   arma::mat YminusXbeta = data - design * beta;
   arma::vec mu_mu = trans(mean(YminusXbeta));
   
-  //Rcout << "mu" <<endl;
+  
   mu = mvnrnd(mu_mu, Sigma_mu);
   
   return(mu);
@@ -119,7 +121,7 @@ arma::mat update_Omega_helper(const arma::mat & data,
   
   //Rcout << "det cov of centered data: " << det(Sigma) << endl;
   //Rcout << "lambda of Omega: " << lambda_curr <<endl;
-  
+  //Rcout << "Omega" <<endl;
   // Concentration matrix and it's dimension:
   arma::mat Omega = pinv(Sigma); // Moore-Penrose inverse
   //int d = Omega.n_rows;
@@ -214,9 +216,9 @@ arma::vec update_tau2_helper(const arma::mat & beta,
                              const double & lambda2,
                              const arma::mat & Omega,
                              int k, int p, int n){
-  //arma::mat sqrt_Omega =  sqrtmat_sympd(Omega);
-  arma::mat chol_Omega = chol(Omega);
-  arma::mat beta_temp = beta * chol_Omega;
+  arma::mat sqrt_Omega =  sqrtmat_sympd(Omega);
+  //arma::mat chol_Omega = chol(Omega);
+  arma::mat beta_temp = beta * sqrt_Omega;
   arma::vec betavec = vectorise(beta_temp);
   arma::vec invtau2(k*p);
   
