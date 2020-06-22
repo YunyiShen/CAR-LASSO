@@ -40,5 +40,9 @@ arma::vec logPostZij_helper_Cpp(int i, int j,// which node
   
   res(0) -= 0.5 * (Z_curr(i,j)-mu_Zij)*(Z_curr(i,j)-mu_Zij)/sigma2_Zij;
   res(1) -= (Z_curr(i,j)-mu_Zij)/sigma2_Zij;
-  
+  return(res);
 }
+
+
+
+
