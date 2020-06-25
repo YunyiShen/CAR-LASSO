@@ -5,7 +5,7 @@
 #include <tgmath.h>
 using namespace Rcpp;
 using namespace arma;
-#include "Error.h"
+//#include "Error.h"
 #include <R.h>
 #include <Rmath.h>
 #include <Rdefines.h>
@@ -59,5 +59,33 @@ expon_(const double *x, const double *emax)            /* exponential without un
 {
   return (*x < -(*emax)) ? 0.0 : exp(*x);
 } 
+
+
+void update_Z_helper_Pois(arma::mat & Z_curr,
+                          const arma::mat & mu_Z,
+                          const arma::mat & Sigma_Z,// this is Sigma (cov) not Omega (percision)
+                          const arma::mat & y,
+                          int k, int p, int n, 
+                          int ns, int m, double emax // ars parameters
+);
+
+
+void update_Z_helper_Pois_reg(arma::mat & Z_curr, // persumably large, thus will not copy
+                              const arma::mat & data, 
+                              const arma::mat & design,
+                              const arma::vec & mu_curr,
+                              const arma::mat & beta_curr,
+                              const arma::mat & Omega_curr,
+                              int k, int p, int n, 
+                              int ns, int m, double emax // ars parameters
+);
+
+void update_Z_helper_Pois_gra(arma::mat & Z_curr, // persumably large, thus will not copy
+                              const arma::mat & data, 
+                              const arma::vec & mu_curr,
+                              const arma::mat & Omega_curr,
+                              int k, int p, int n, 
+                              int ns, int m, double emax // ars parameters
+);
 
 #endif

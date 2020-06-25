@@ -12,7 +12,7 @@
 #include <tgmath.h>
 using namespace Rcpp;
 using namespace arma;
-#include "Error.h"
+//#include "Error.h"
 #include <R.h>
 #include <Rmath.h>
 #include <Rdefines.h>
@@ -39,13 +39,13 @@ arma::vec logPostZij_helper_Cpp(int i, int j,// which node
   res(1) += y(i,j) - exp(Z_curr(i,j)); // d/dz logPost due to Poisson
   
   arma::uvec ind = linspace<uvec>(0,k-1,k);
-  arma::uvec ind_noi = find(ind!=i);
+  arma::uvec ind_noj = find(ind!=j);
   
-  double Sigmabb = Sigma_Z(i,i);
-  arma::mat Sigmac = Sigma_Z(ind_noi,find(ind==i));
-  arma::mat Sigmaa = Sigma_Z(ind_noi,ind_noi);
+  double Sigmabb = Sigma_Z(j,j);
+  arma::mat Sigmac = Sigma_Z(ind_noj,find(ind==j));
+  arma::mat Sigmaa = Sigma_Z(ind_noj,ind_noj);
   
-  double mu_Zij = mu_Z(i) + as_scalar( trans(Sigmac) * solve( Sigmaa ,trans(Z_curr(find(ind==j),ind_noi)-mu_Z(find(ind==j),ind_noi))));
+  double mu_Zij = mu_Z(i,j) + as_scalar( trans(Sigmac) * solve( Sigmaa ,trans(Z_curr(find(ind==j),ind_noj)-mu_Z(find(ind==j),ind_noj))));
   double sigma2_Zij = Sigmabb - as_scalar( trans(Sigmac) * solve(Sigmaa,Sigmac));
   
   //mu_Zij = as_scalar(mu_Zij);
@@ -843,6 +843,8 @@ void sample_(int *iwv,      double *rwv,
 //#ifdef __cplusplus
 //	}
 //#endif
+
+// [[Rcpp::export]]
 void update_Z_helper_Pois(arma::mat & Z_curr,
                           const arma::mat & mu_Z,
                           const arma::mat & Sigma_Z,// this is Sigma (cov) not Omega (percision)
@@ -869,6 +871,8 @@ void update_Z_helper_Pois(arma::mat & Z_curr,
       for(int ww = 0 ; ww < m ; ++ww){
         x[ww] = log(y(i,j)+.01) + (ww-floor(m/2)) * (4/m);
         Z_curr(i,j) = x[ww];
+        //Rcout << "i:" << i << "  j:" << j << "  ww:" << ww <<endl;
+        //Rcout << "flag" <<endl;
         h_hprime_temp = logPostZij_helper_Cpp(i,j,// which node
                                                Z_curr,
                                                mu_Z,
@@ -906,6 +910,35 @@ void update_Z_helper_Pois(arma::mat & Z_curr,
   return;
 }
 
+void update_Z_helper_Pois_reg(arma::mat & Z_curr, // persumably large, thus will not copy
+                              const arma::mat & data, 
+                              const arma::mat & design,
+                              const arma::vec & mu_curr,
+                              const arma::mat & beta_curr,
+                              const arma::mat & Omega_curr,
+                              int k, int p, int n, 
+                              int ns, int m, double emax // ars parameters
+){
+  arma::mat mu_Zmat = design * beta_curr;
+  mu_Zmat.each_row() += mu_curr.t(); // calculate the expectation of latent
+  arma::mat Sigma_Z = inv_sympd(Omega_Z);
+  update_Z_helper_Pois(Z_curr, mu_Zmat,Sigma_Z, data,
+                       k,p,n,ns,m,emax);
+  return;
+}
 
 
-
+void update_Z_helper_Pois_gra(arma::mat & Z_curr, // persumably large, thus will not copy
+                              const arma::mat & data, 
+                              const arma::vec & mu_curr,
+                              const arma::mat & Omega_curr,
+                              int k, int p, int n, 
+                              int ns, int m, double emax // ars parameters
+){
+  arma::mat mu_Zmat = 0 * Z_curr;
+  mu_Zmat.each_row() += mu_curr.t(); // calculate the expectation of latent
+  arma::mat Sigma_Z = inv_sympd(Omega_Z);
+  update_Z_helper_Pois(Z_curr, mu_Zmat,Sigma_Z, data,
+                       k,p,n,ns,m,emax);
+  return;
+}
