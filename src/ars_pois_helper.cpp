@@ -911,7 +911,7 @@ void update_Z_helper_Pois(arma::mat & Z_curr,
       int ifault = 0;
       //Rcout<< "before ars" << i << " " << j << "\n" << Z_curr(i,j) <<endl;
       for(int ww = 0 ; ww < m ; ++ww){
-        x[ww] = log(y(i,j)+.01) + ((double)ww-((double)m/2)) * (4*(y(i,j)+1)/(double)m);
+        x[ww] = (log(y(i,j)+.01)+mu_Zij)/2 + ((double)ww-((double)m/2)) * (4*(y(i,j)+abs(mu_Zij))/(double)m);
         //Rcout << log(y(i,j)+.01) + ((double)ww-((double)m/2)) * (4/(double)m) << "  " << x[ww] <<endl;
         //Z_curr(i,j) = x[ww];
         //Rcout << "ars working" <<endl;
