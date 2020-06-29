@@ -58,10 +58,10 @@ List Pois_SRG_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as 
 
   arma::vec mu_curr = trans( mean(data) ); // current value of mean
   arma::mat Omega_curr(k,k); // current value of Omega
-  Omega_curr = pinv(cov(data));
+  Omega_curr = inv(cov(log(data+.1)));
   arma::mat beta_curr(p,k,fill::zeros); // current value of beta
   
-  arma::mat Z_curr = 0 * data; // latent normal variable
+  arma::mat Z_curr = log(data+.1); // latent normal variable
   
   //arma::vec mean_uncertain(k); // for sampling mu
   
@@ -92,12 +92,12 @@ List Pois_SRG_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as 
     lambda_Omega = R::rgamma(Omega_r_post,1/Omega_delta_post);
     
     
-    // Update Latent Zs as truncated normal
-    
-    update_Z_helper_Pois_gra(Z_curr,
-                             data, mu_curr, Omega_curr,
+    // Update Latent Zs using ars
+    //Rcout << "current Z : \n" << Z_curr <<endl;
+    update_Z_helper_Pois_reg(Z_curr,
+                             data, design,mu_curr, beta_curr, Omega_curr,
                              k,p,n,ns,m,emax);
-    
+    //Rcout << "updated:\n" << Z_curr <<endl;
     //Update betas:
     beta_curr = update_beta_helper(Z_curr,design,mu_curr,
                                    tau2_curr,Omega_curr, 
@@ -105,6 +105,7 @@ List Pois_SRG_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as 
     
     
     // update Omega
+    //Rcout<<Z_curr<<endl;
     Omega_curr = update_Omega_helper(Z_curr, design, 
                                      mu_curr,beta_curr,
                                      lambda_Omega,
