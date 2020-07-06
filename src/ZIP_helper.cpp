@@ -11,19 +11,19 @@ using namespace arma;
  */
 void ZIP_update_Pois_latent_helper(mat & Pois_latent,
                                    const mat & data,
-                                   const mat & Z_pois,
-                                   const mat & Z_Prob,
+                                   const mat & Z_P,// Z for poiss
+                                   const mat & Z_ZI,// Z for probit (ZI)
                                    int k, int p, int n){
   for(int i = 0; i < n ; ++i){
     for(int j = 0 ; j < k ; ++j){
-      Pois_latent(i,j) = Z_prob(i,j)<=0 ? R::rpois(exp(Z_pois(i,j))) : data(i,j);
+      Pois_latent(i,j) = Z_ZI(i,j)<=0 ? R::rpois(exp(Z_P(i,j))) : data(i,j);
     }
   }
   return;
 }
 
 
-void ZIP_update_Z_Prob_helper(mat & Z_prob,
+void ZIP_update_Z_ZI_helper(mat & Z_ZI,
                               const mat & data,
                               const arma::mat & design,
                               const arma::vec & mu_curr,
@@ -46,7 +46,7 @@ void ZIP_update_Z_Prob_helper(mat & Z_prob,
   for(int i = 0; i < n ; ++i){
     for(int j = 0 ; j < k ; ++j){
       if(data(i,j)==0){
-        temp = Pois_latent(i,j)==0 ? (1.0 * R::rnorm(Z_prob(i,j),1) <= 0) : 0 ;
+        temp = Pois_latent(i,j)==0 ? (1.0 * R::rnorm(Z_ZI(i,j),1) <= 0) : 0 ;
       }
       else{
         temp = 1 ;
@@ -56,7 +56,7 @@ void ZIP_update_Z_Prob_helper(mat & Z_prob,
              temp == 0 ? 0 : INFINITY); // if data(i,j)=0 y_star<0
     }
     mu_Zi = Sigma_Z * (Omega_curr * trans(mu_Zmat.row(i))+y_star);
-    Z_prob.row(i) = trans( mvnrnd(mu_Zi,Sigma_Z));
+    Z_ZI.row(i) = trans( mvnrnd(mu_Zi,Sigma_Z));
   }
   return;
 }
