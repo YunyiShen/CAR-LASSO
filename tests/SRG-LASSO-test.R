@@ -6,7 +6,7 @@ library(RcppProgress)
 rm(list = ls())
 
 k = 11
-n = 220
+n = 2200
 p = 2
 
 sourceCpp("./src/Probit-SRG-LASSO.cpp")
@@ -18,7 +18,7 @@ source("./R/SRG-LASSO.R")
 
 #set.seed(42)
 B <- rsparsematrix(k,k,0.3)
-omega <- diag(rgamma(k,1,.8))
+omega <- diag(rgamma(k,10,.3))
 I <- diag(rep(1,k))
 Omega <- t(I-B) %*% omega %*% (I-B)
 #diag(Omega) <- diag(Omega) + k
@@ -32,7 +32,7 @@ Design <- (Design-mean(Design))/sd(Design)
 colnames(Design) <- paste0("x",1:p)
 
 
-beta <- matrix(rnorm(p*k,5,1),p,k)
+beta <- matrix(rnorm(p*k,0,1),p,k)
 #beta[sample(p*k,floor(0.3*p*k))] = 0
 
 mu <- rnorm(k)
@@ -44,7 +44,7 @@ Z <- matrix(NA,n,k)
 Y <- Z
 
 for( i in 1:n ){
-  Z[i,] <- MASS::mvrnorm(1,Xbeta[i,]+mu,Sigma)
+  Z[i,] <- MASS::mvrnorm(1,Sigma %*% (Xbeta[i,]+mu),Sigma)
   Y[i,] <- 1 * ((rnorm(k,Z[i,],1))>0)
 }
 colnames(Y) <- paste0("y",1:k)
@@ -75,14 +75,14 @@ SRG_test <- SRG_LASSO_Cpp(Z,  Design, n_iter = 5000,
                           r_Omega = 1,delta_Omega = .01,
                           progress = T)
 
-diff_SRG <- apply(SRG_test$Omega,1,function(w,k){(w-k)/k},Omega_uptri)
+diff_SRG <- apply(SRG_test$Omega,1,function(w,k){(w-k)},Omega_uptri)
 hist(diff_SRG)
 
 SRG_Graph <- 0 * Omega
 SRG_Graph[upper.tri(SRG_Graph,T)] = apply(SRG_test$Omega,2,median)
 SRG_Graph = SRG_Graph+t(SRG_Graph)
 diag(SRG_Graph) = 0.5 * diag(SRG_Graph)
-image((SRG_Graph-Omega))
+image((SRG_Graph))
 hist((SRG_Graph-Omega))
 #image(Omega)
 
