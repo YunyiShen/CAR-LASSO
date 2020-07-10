@@ -6,7 +6,7 @@ library(RcppProgress)
 rm(list = ls())
 
 k = 11
-n = 220
+n = 8000
 p = 2
 
 sourceCpp("./src/Probit-SRG-LASSO.cpp")
