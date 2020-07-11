@@ -97,7 +97,7 @@ List SRG_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sam
     
     
     // update Omega
-    Omega_curr = update_Omega_helper(data, design, 
+    update_Omega_helper(Omega_curr,data, design, 
                                      mu_curr,beta_curr,
                                      lambda_Omega,
                                      k,p,n);

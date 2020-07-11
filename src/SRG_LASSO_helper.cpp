@@ -102,7 +102,8 @@ arma::vec update_mu_helper(const arma::mat & data,
 
 // return Omega matrix
 // tested dimension 20200603
-arma::mat update_Omega_helper(const arma::mat & data,
+void update_Omega_helper(arma::mat & Omega,
+                           const arma::mat & data,
                               const arma::mat & design,
                               const arma::vec & mu,
                               const arma::mat & beta,
@@ -123,7 +124,7 @@ arma::mat update_Omega_helper(const arma::mat & data,
   //Rcout << "lambda of Omega: " << lambda_curr <<endl;
   //Rcout << "Omega" <<endl;
   // Concentration matrix and it's dimension:
-  arma::mat Omega = pinv(Sigma); // Moore-Penrose inverse
+  //arma::mat Omega = pinv(Sigma); // Moore-Penrose inverse
   //int d = Omega.n_rows;
   arma::uvec pertub_vec = linspace<uvec>(0,k-1,k); 
   
@@ -208,7 +209,7 @@ arma::mat update_Omega_helper(const arma::mat & data,
     
   }
   
-  return(Omega);
+  //return(Omega);
 }
 
 
