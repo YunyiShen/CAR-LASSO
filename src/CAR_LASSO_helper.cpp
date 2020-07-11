@@ -3,35 +3,24 @@
 #include <tgmath.h>
 using namespace Rcpp;
 using namespace arma;
-
+using namespace std;
 
 // [[Rcpp::depends(RcppProgress)]]
 #include <progress.hpp>
 #include <progress_bar.hpp>
 #include "helper.h"
+#include "GIG_helper.h"
 
+#include "CAR_LASSO_helper.h"
 /*
- * We would like to develope a Simulteneous Regressive Graphical LASSO, 
+ * We would like to develope a Conditional Auto Regression LASSO, 
  * Basic idea was to embed Graphical LASSO into a normal LASSO using the hirechical structure
  *   described by Wang (2012) and Park and Casella 2008
  * 
- * 
+ * Y~N(Sigma (Xbeta+mu),Sigma)
  */
 
 
-
-/*Full conditional dist'n of beta was normal with:
- *   
- * Sigma_beta = (\sum_i [X_i]^T\Omega[X_i] + D_{\tau}^{-1} )^{-1}
- * 
- * mu_beta = (\sum_i [X_i]^T\Omega[X_i] + D_{\tau}^{-1} )^{-1} (\sum_i [X_i]^T\Omega[(Z_i-\mu)]  )
- * 
- */
-
-/*
- * Test in 0610, we assume Sigma * beta_{i,*}|Sigma,tau_{i,*} \sim N(0,D_{i})
- * 
- */
 
 // tested for dimension compatibility 20200603
 arma::mat update_car_beta_helper(const arma::mat & data,
@@ -103,12 +92,12 @@ arma::vec update_car_mu_helper(const arma::mat & data,
 // return Omega matrix
 // tested dimension 20200603
 void update_car_Omega_helper(arma::mat Omega,
-                         const arma::mat & data,
-                              const arma::mat & design,
-                              const arma::vec & mu,
-                              const arma::mat & beta,
-                              const double & lambda_curr,
-                              int k, int p,int n){
+                             const arma::mat & data,
+                             const arma::mat & design,
+                             const arma::vec & mu,
+                             const arma::mat & beta,
+                             const double & lambda_curr,
+                             int k, int p,int n){
   //arma::mat Omega;
   arma::mat Y_tilde;
   
@@ -117,14 +106,8 @@ void update_car_Omega_helper(arma::mat Omega,
   
   
   arma::mat S = data.t() * data;
-  arma::mat U = expectation.t()
-  arma::mat Sigma = S; //cov(Y_tilde);
+  arma::mat U = expectation.t() * expectation;
   
-  //Rcout << "det cov of centered data: " << det(Sigma) << endl;
-  //Rcout << "lambda of Omega: " << lambda_curr <<endl;
-  //Rcout << "Omega" <<endl;
-  // Concentration matrix and it's dimension:
-  //int d = Omega.n_rows;
   arma::uvec pertub_vec = linspace<uvec>(0,k-1,k); 
   
   arma::uvec Omega_upper_tri = trimatu_ind(size(Omega),1);
@@ -133,22 +116,33 @@ void update_car_Omega_helper(arma::mat Omega,
   arma::mat tau_curr(k,k,fill::zeros);
   
   arma::uvec perms_j;
+  arma::uvec just_j;
   arma::uvec ind_j(1,fill::zeros);
   arma::vec tauI;
-  arma::mat Sigma11;
-  arma::mat Sigma12;
-  arma::mat S21;
-  arma::mat Omega11inv;
-  arma::mat Ci;
-  arma::mat CiChol;
-  arma::mat S_temp;
-  arma::mat mui;
-  arma::mat gamma;
-  double gamm_rn = 0;
-  arma::mat OmegaInvTemp;
+  
+  arma::mat S11;
+  arma::mat S12;
+  double S22;
+  
+  arma::mat U11;
+  arma::mat U12;
+  double U22;
+  
+  arma::mat Omega_11;
+  arma::mat inv_Omega_11;
+  
+  arma::mat omega_12;
+  arma::mat Sigma_omega_12(k-1,k-1,fill::zeros);
+  arma::mat Omega_omega_12(k-1,k-1,fill::zeros);
+  arma::mat mu_omega_12;
+  
+  double gamma;
+  double lambda_gamma,psi_gamma,chi_gamma;
+  
   
   
   tau_curr.zeros();
+  // update tau, using old Omega
   for(int j = 0 ; j < n_upper_tri ; ++j){
     tau_curr(Omega_upper_tri(j)) = 
       rinvGau(sqrt(lambda_curr*lambda_curr/(Omega(Omega_upper_tri(j))*Omega(Omega_upper_tri(j)))),
@@ -159,52 +153,45 @@ void update_car_Omega_helper(arma::mat Omega,
   
   for(int j = 0 ; j < k ; ++j){
     perms_j = find(pertub_vec!=j);
+    just_j = find(pertub_vec==j);
     ind_j = ind_j.zeros();
     ind_j += j;
-    tauI = tau_curr.col(j);
-    tauI = tauI(perms_j);
+    tauI = tau_curr(perms_j,just_j); // tau for this column
     
-    Sigma11 = Sigma(perms_j,perms_j);
-    Sigma12 = Sigma.col(j);
-    Sigma12 = Sigma12(perms_j);
+    S11 = S(perms_j,perms_j);
+    S12 = S(perms_j,just_j);
+    U11 = U(perms_j,perms_j);
+    U12 = U(perms_j,just_j);
+    Omega_11 = Omega(perms_j,perms_j);
+    inv_Omega_11 = inv_sympd(Omega_11);
     
-    S21 = S.row(j);
-    S21 = S21(perms_j);
+    // the current gamma
+    gamma = as_scalar( Omega(j,j)-Omega(just_j,perms_j)*inv_Omega_11*Omega(perms_j,just_j));
     
-    Omega11inv = Sigma11-Sigma12 * Sigma12.t() / Sigma(j,j);
-    Ci = (S(j,j)+lambda_curr) * Omega11inv;
-    Ci.diag() += 1/tauI;
-    CiChol = chol(Ci);
+    // update omega_12
+    Omega_omega_12 = (S(j,j)+lambda_curr)*inv_Omega_11+(1/gamma)*inv_Omega_11*U11*inv_Omega_11;
+    Omega_omega_12.diag() += tauI;
+    Sigma_omega_12 = inv_sympd(Omega_omega_12);
+    //Rcout << "flag" <<endl;
+    mu_omega_12 = S12+(1/gamma) * inv_Omega_11*U12;
+    mu_omega_12 = Sigma_omega_12 * mu_omega_12;
     
-    S_temp = S.col(j);
-    S_temp = S_temp(perms_j);
-    mui = solve(-Ci,S_temp);
+    omega_12 = mvnrnd(mu_omega_12, Sigma_omega_12);
     
-    gamma = mui+solve(CiChol,randn(k-1));
+    Omega(perms_j,just_j) = omega_12;
+    Omega(just_j,perms_j) = omega_12.t();
+    // flagged, after error
+    // update gamma
+    lambda_gamma = k/2+1;
+    psi_gamma = lambda_curr + S(j,j);
+    chi_gamma = U(j,j) + 
+      2*as_scalar(U12.t()*inv_Omega_11*omega_12)+
+      as_scalar(omega_12.t()*inv_Omega_11*U11*inv_Omega_11*omega_12);
     
-    // Replacing omega entries
-    Omega.submat(perms_j,ind_j) = gamma;
-    Omega.submat(ind_j,perms_j) = gamma.t();
+    gamma = rgig(lambda_gamma, chi_gamma, psi_gamma);
     
-    
-    
-    gamm_rn = R::rgamma(n/2+1,2/( as_scalar( S(0,0) )+lambda_curr));
-    Omega(j,j) = gamm_rn + as_scalar( gamma.t() * Omega11inv * gamma);
-    
-    
-    // Replacing sigma entries
-    OmegaInvTemp = Omega11inv * gamma;
-    Sigma.submat(perms_j,perms_j) = Omega11inv+(OmegaInvTemp * OmegaInvTemp.t())/gamm_rn ;
-    
-    //flagged
-    
-    Sigma(perms_j,ind_j) = -OmegaInvTemp/gamm_rn;
-    
-    
-    Sigma(ind_j,perms_j) = trans( -OmegaInvTemp/gamm_rn);
-    Sigma(j,j) = 1/gamm_rn ;
-    
-    
+    // update diagonal
+    Omega(j,j) = gamma + as_scalar( omega_12.t()*inv_Omega_11*omega_12);
     
   }
 }
