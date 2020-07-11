@@ -27,10 +27,10 @@ Design <- (Design-mean(Design))/sd(Design)
 colnames(Design) <- paste0("x",1:p)
 
 
-beta <- matrix(rnorm(p*k,3,1),p,k)
+beta <- matrix(rnorm(p*k,1,1),p,k)
 #beta[sample(p*k,floor(0.3*p*k))] = 0
 
-mu <- rnorm(k)
+mu <-  rnorm(k)
 #mu
 
 Xbeta <- Design %*% beta
