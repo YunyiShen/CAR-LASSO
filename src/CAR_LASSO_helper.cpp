@@ -34,7 +34,7 @@ using namespace arma;
  */
 
 // tested for dimension compatibility 20200603
-arma::mat update_beta_helper(const arma::mat & data,
+arma::mat update_car_beta_helper(const arma::mat & data,
                              const arma::mat & design,
                              const arma::vec & mu,
                              const arma::vec & tau2,
@@ -81,7 +81,7 @@ arma::mat update_beta_helper(const arma::mat & data,
 }
 
 // tested dimension 20200603
-arma::vec update_mu_helper(const arma::mat & data,
+arma::vec update_car_mu_helper(const arma::mat & data,
                            const arma::mat & design,
                            const arma::mat & beta,
                            const arma::mat & Omega, 
@@ -102,7 +102,7 @@ arma::vec update_mu_helper(const arma::mat & data,
 
 // return Omega matrix
 // tested dimension 20200603
-void update_Omega_helper(arma::mat Omega,
+void update_car_Omega_helper(arma::mat Omega,
                          const arma::mat & data,
                               const arma::mat & design,
                               const arma::vec & mu,
@@ -207,12 +207,10 @@ void update_Omega_helper(arma::mat Omega,
     
     
   }
-  
-  return(Omega);
 }
 
 
-arma::vec update_tau2_helper(const arma::mat & beta,
+arma::vec update_car_tau2_helper(const arma::mat & beta,
                              const double & lambda2,
                              const arma::mat & Omega,
                              int k, int p, int n){
@@ -236,20 +234,6 @@ arma::vec update_tau2_helper(const arma::mat & beta,
 }
 
 
-// [[Rcpp::export]]
-Rcpp::List Sigma_to_CAR_Cpp(const arma::mat & Sigma){
-  
-  arma::mat Q = inv_sympd(Sigma); // percision matrix
-  arma::mat R = -Sigma; // R matrix, see Ver Hoef et al. 2018
-  R.diag() *= 0;
-  arma::vec M = 1/Q.diag();
-  arma::mat invD(size(Q));
-  invD.diag() = M ;
-  return(Rcpp::List::create(
-      Rcpp::Named("C") = invD * R, // C matrix per Ver Hoef et al. 2018
-      Rcpp::Named("M") = M // diag of M matrix per Ver Hoef et al. 2018
-  ));
-}
 
 
 

@@ -1,5 +1,5 @@
-#ifndef SRG_HELPER_H
-#define SRG_HELPER_H
+#ifndef CAR_HELPER_H
+#define CAR_HELPER_H
 arma::mat update_beta_helper(const arma::mat & data,
                              const arma::mat & design,
                              const arma::vec & mu,
