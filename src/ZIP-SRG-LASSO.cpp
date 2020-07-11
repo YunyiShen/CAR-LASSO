@@ -141,7 +141,7 @@ List ZIP_SRG_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as a
     
     // update Omega
     //Rcout<<Z_curr<<endl;
-    Omega_P_curr = update_Omega_helper(Z_P_curr, design_P, 
+     update_Omega_helper(Omega_P_curr,Z_P_curr, design_P, 
                                      mu_P_curr,beta_P_curr,
                                      lambda_Omega_P,
                                      k,p_P,n);
@@ -186,7 +186,7 @@ List ZIP_SRG_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as a
     
     // update Omega
     //Rcout<<Z_curr<<endl;
-    Omega_ZI_curr = update_Omega_helper(Z_ZI_curr, design_ZI, 
+     update_Omega_helper(Omega_ZI_curr,Z_ZI_curr, design_ZI, 
                                        mu_ZI_curr,beta_ZI_curr,
                                        lambda_Omega_ZI,
                                        k,p_ZI,n);

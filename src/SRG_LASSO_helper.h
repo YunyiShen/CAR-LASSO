@@ -13,13 +13,13 @@ arma::vec update_mu_helper(const arma::mat & data,
                            const arma::mat & Omega, 
                            int k,int p,int n);
 
-void update_Omega_helper(arma::mat &Omega,
+void update_Omega_helper(arma::mat & Omega,
                          const arma::mat & data,
-                              const arma::mat & design,
-                              const arma::vec & mu,
-                              const arma::mat & beta,
-                              const double & lambda_curr,
-                              int k, int p,int n);
+                         const arma::mat & design,
+                         const arma::vec & mu,
+                         const arma::mat & beta,
+                         const double & lambda_curr,
+                         int k, int p,int n);
 
 arma::vec update_tau2_helper(const arma::mat & beta,
                              const double & lambda2,

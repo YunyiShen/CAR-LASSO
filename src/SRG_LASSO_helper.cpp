@@ -44,30 +44,30 @@ arma::mat update_beta_helper(const arma::mat & data,
   arma::mat Y = data.t(); // convert to col vectors
   arma::vec mu_beta(k*p,fill::zeros);
   arma::mat Q_beta(k*p,k*p,fill::zeros);// percision matrix up to sigma^2 scaling
-  Q_beta.diag() += 1/tau2;
+  //Q_beta.diag() += 1/tau2;
   arma::mat D_i(k,k,fill::zeros);
   arma::mat res;
   
   arma::uvec ind_para = linspace<uvec>(0,k-1,k);
   
-  arma::mat Sigma = inv_sympd(Omega);
+  arma::mat chol_Omega = chol(Omega);
   //arma::mat sqrt_Omega =  sqrtmat_sympd(Omega);
-  arma::mat chol_Omega =  chol(Omega);
-  //for(int i = 0 ; i < p ; ++i){
-  //  D_i.zeros();
-  //  D_i.diag() = 1/tau2(ind_para * p + i);
+  
+  for(int i = 0 ; i < p ; ++i){
+    D_i.zeros();
+    D_i.diag() = 1/tau2(ind_para * p + i);
     //D_i = sqrt_Omega * D_i * sqrt_Omega;
     
-  //  D_i = chol_Omega.t() * D_i * chol_Omega;
-  //  Q_beta(ind_para * p + i,ind_para * p + i) = D_i;
-  //}
+    D_i = chol_Omega.t() * D_i * chol_Omega;
+    Q_beta(ind_para * p + i,ind_para * p + i) = D_i;
+  }
   
   arma::sp_mat X_i;
   
   for(int i = 0 ; i < n ; ++i){
     X_i = getDesign_i_helper(design.row(i),k);// this function was in helper.cpp
-    Q_beta +=  X_i.t() * Sigma * X_i ;
-    mu_beta +=  X_i.t() * (Y.col(i)-Sigma * mu);
+    Q_beta +=  X_i.t() * Omega * X_i ;
+    mu_beta +=  X_i.t() * Omega * (Y.col(i)-mu);
   }
   
   
@@ -88,12 +88,12 @@ arma::vec update_mu_helper(const arma::mat & data,
                            int k,int p,int n){
   arma::vec mu(k);
   //Rcout << "mu" <<endl;
-  //arma::mat Sigma_mu = inv_sympd(Omega);
-  arma::mat YminusXbeta = data*Omega - design * beta;
+  arma::mat Sigma_mu = inv_sympd(Omega)/n;
+  arma::mat YminusXbeta = data - design * beta;
   arma::vec mu_mu = trans(mean(YminusXbeta));
   
   
-  mu = mvnrnd(mu_mu, Omega/n);
+  mu = mvnrnd(mu_mu, Sigma_mu);
   
   return(mu);
   
@@ -102,8 +102,8 @@ arma::vec update_mu_helper(const arma::mat & data,
 
 // return Omega matrix
 // tested dimension 20200603
-void update_Omega_helper(arma::mat Omega,
-                         const arma::mat & data,
+void update_Omega_helper(arma::mat & Omega,
+                           const arma::mat & data,
                               const arma::mat & design,
                               const arma::vec & mu,
                               const arma::mat & beta,
@@ -115,15 +115,16 @@ void update_Omega_helper(arma::mat Omega,
   arma::mat expectation = design * beta;
   expectation.each_row() += mu.t();
   
+  Y_tilde = data - expectation;
   
-  arma::mat S = data.t() * data;
-  arma::mat U = expectation.t()
-  arma::mat Sigma = S; //cov(Y_tilde);
+  arma::mat S = Y_tilde.t() * Y_tilde;
+  arma::mat Sigma = cov(Y_tilde);
   
   //Rcout << "det cov of centered data: " << det(Sigma) << endl;
   //Rcout << "lambda of Omega: " << lambda_curr <<endl;
   //Rcout << "Omega" <<endl;
   // Concentration matrix and it's dimension:
+  //arma::mat Omega = pinv(Sigma); // Moore-Penrose inverse
   //int d = Omega.n_rows;
   arma::uvec pertub_vec = linspace<uvec>(0,k-1,k); 
   
@@ -208,7 +209,7 @@ void update_Omega_helper(arma::mat Omega,
     
   }
   
-  return(Omega);
+  //return(Omega);
 }
 
 
