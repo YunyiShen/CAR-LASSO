@@ -118,7 +118,7 @@ void update_Omega_helper(arma::mat & Omega,
   Y_tilde = data - expectation;
   
   arma::mat S = Y_tilde.t() * Y_tilde;
-  arma::mat Sigma = cov(Y_tilde);
+  arma::mat Sigma = inv(Omega);
   
   //Rcout << "det cov of centered data: " << det(Sigma) << endl;
   //Rcout << "lambda of Omega: " << lambda_curr <<endl;
@@ -252,5 +252,100 @@ Rcpp::List Sigma_to_CAR_Cpp(const arma::mat & Sigma){
   ));
 }
 
+
+void update_Omega_helper_naive(arma::mat & Omega,
+                         const arma::mat & data,
+                         const arma::mat & design,
+                         const arma::vec & mu,
+                         const arma::mat & beta,
+                         const double & lambda_curr,
+                         int k, int p,int n){
+  //arma::mat Omega;
+  arma::mat Y_tilde;
+  
+  arma::mat expectation = design * beta;
+  expectation.each_row() += mu.t();
+  
+  Y_tilde = data - expectation;
+  
+  arma::mat S = Y_tilde.t() * Y_tilde;
+  
+  arma::uvec pertub_vec = linspace<uvec>(0,k-1,k); 
+  
+  arma::uvec Omega_upper_tri = trimatu_ind(size(Omega),1);
+  int n_upper_tri = Omega_upper_tri.n_elem;
+  
+  arma::mat tau_curr(k,k,fill::zeros);
+  
+  arma::uvec perms_j;
+  arma::uvec ind_j(1,fill::zeros);
+  arma::vec tauI;
+  arma::mat Omega11;
+  arma::mat Omega11inv;
+  arma::mat Omega12;
+  
+  arma::mat S11;
+  arma::mat S12;
+  
+  arma::mat Ci;
+  arma::mat invCi;
+  
+  arma::mat CiChol;
+  arma::mat S_temp;
+  arma::mat mui;
+  arma::mat gamma;
+  double gamm_rn = 0;
+  arma::mat OmegaInvTemp;
+  
+  
+  tau_curr.zeros();
+  for(int j = 0 ; j < n_upper_tri ; ++j){
+    tau_curr(Omega_upper_tri(j)) = 
+      rinvGau(sqrt(lambda_curr*lambda_curr/(Omega(Omega_upper_tri(j))*Omega(Omega_upper_tri(j)))),
+              lambda_curr*lambda_curr);
+  }
+  
+  tau_curr += tau_curr.t(); // use symmertric to update lower tri
+  
+  for(int j = 0 ; j < k ; ++j){
+    perms_j = find(pertub_vec!=j);
+    ind_j = ind_j.zeros();
+    ind_j += j;
+    tauI = tau_curr.col(j);
+    tauI = tauI(perms_j);
+    
+    Omega11 = Omega(perms_j,perms_j);
+    Omega12 = Omega(perms_j,ind_j);
+    S11 = S(perms_j,perms_j);
+    
+    S12 = S(perms_j,ind_j);
+    //S12 = S21(perms_j);
+    
+    Omega11inv = inv(Omega11);
+    
+    Ci = (S(j,j)+lambda_curr) * Omega11inv;
+    Ci.diag() += tauI;
+    invCi = inv(Ci);
+    //CiChol = chol(Ci);
+    
+    //S_temp = S.col(j);
+    //S_temp = S_temp(perms_j);
+    mui = -invCi*S12;
+    
+    gamma = mvnrnd(mui, invCi);
+    
+    // Replacing omega entries
+    Omega.submat(perms_j,ind_j) = gamma;
+    Omega.submat(ind_j,perms_j) = gamma.t();
+    
+    
+    
+    gamm_rn = R::rgamma(n/2+1,2/( as_scalar( S(j,j) )+lambda_curr));
+    Omega(j,j) = gamm_rn + as_scalar( gamma.t() * Omega11inv * gamma);
+    
+  }
+  
+  //return(Omega);
+}
 
 
