@@ -14,7 +14,7 @@ arma::vec update_car_mu_helper(const arma::mat & data,
                            const arma::mat & Omega, 
                            int k,int p,int n);
 
-void update_car_Omega_helper(arma::mat Omega,
+void update_car_Omega_helper(arma::mat & Omega,
                              const arma::mat & data,
                              const arma::mat & design,
                              const arma::vec & mu,
@@ -27,6 +27,7 @@ arma::vec update_car_tau2_helper(const arma::mat & beta,
                              const arma::mat & Omega,
                              int k, int p, int n);
 
-
+arma::mat getDesign_i_helper_dense(const arma::rowvec & X_i,//row vector of that sample
+                                   int k);
 
 #endif

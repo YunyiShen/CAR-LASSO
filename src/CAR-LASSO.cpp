@@ -58,13 +58,13 @@ List CAR_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sam
   centered_data.each_row() -= mu_curr.t();
   arma::mat Omega_curr(k,k); // current value of Omega
   Omega_curr = inv(cov(data));
-  arma::mat beta_curr = solve( design.t()*design,design.t()*(centered_data)); // current value of beta
+  arma::mat beta_curr = solve( design.t()*design,design.t()*(centered_data*Omega_curr)); // current value of beta
   
   
   //arma::vec mean_uncertain(k); // for sampling mu
   
   double lambda2_beta = R::rgamma(r_beta,1/delta_beta); // current value of squared LASSO parameter of \beta
-  double lambda_Omega = 0;//R::rgamma(r_Omega,1/delta_Omega); // current value of squared LASSO parameter of B
+  double lambda_Omega = R::rgamma(r_Omega,1/delta_Omega); // current value of squared LASSO parameter of B
   
   double Omega_r_post = (r_Omega+(k*(k+1)/2));
   double Omega_delta_post;
@@ -97,12 +97,13 @@ List CAR_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sam
     
     
     // update Omega
+    //cout << "flag1" << endl;
     update_car_Omega_helper(Omega_curr,data, design, 
                                      mu_curr,beta_curr,
                                      lambda_Omega,
                                      k,p,n);
     
-    
+    //cout << "flag2" <<endl;
     
     // Update mu
     
@@ -113,7 +114,7 @@ List CAR_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sam
     
     
       
-    //Rcout << "detOmega curr in main loop:" << det(Omega_curr) << endl;
+    //Rcout << "Omega curr in main loop:" << (Omega_curr) << endl;
     //Rcout << "sum beta in main loop:" <<sum(sum(beta_curr)) <<endl;
     //Rcout << "mean of mu in main loop:" << mean(mu_curr) <<endl;
   

@@ -6,8 +6,8 @@ library(RcppProgress)
 rm(list = ls())
 
 k = 11
-n = 2200
-p = 2
+n = 8000
+p = 1
 
 sourceCpp("./src/Probit-SRG-LASSO.cpp")
 sourceCpp("./src/Probit-Graphical-LASSO.cpp")
@@ -18,7 +18,7 @@ source("./R/SRG-LASSO.R")
 
 #set.seed(42)
 B <- rsparsematrix(k,k,0.3)
-omega <- diag(rgamma(k,10,.3))
+omega <- diag(rgamma(k,1,.1))
 I <- diag(rep(1,k))
 Omega <- t(I-B) %*% omega %*% (I-B)
 #diag(Omega) <- diag(Omega) + k
@@ -32,7 +32,7 @@ Design <- (Design-mean(Design))/sd(Design)
 colnames(Design) <- paste0("x",1:p)
 
 
-beta <- matrix(rnorm(p*k,0,1),p,k)
+beta <- matrix(rnorm(p*k,2,1),p,k)
 #beta[sample(p*k,floor(0.3*p*k))] = 0
 
 mu <- rnorm(k)
@@ -82,9 +82,9 @@ SRG_Graph <- 0 * Omega
 SRG_Graph[upper.tri(SRG_Graph,T)] = apply(SRG_test$Omega,2,median)
 SRG_Graph = SRG_Graph+t(SRG_Graph)
 diag(SRG_Graph) = 0.5 * diag(SRG_Graph)
-image((SRG_Graph))
-hist((SRG_Graph-Omega))
-#image(Omega)
+image((SRG_Graph)>1*sd(SRG_Graph[upper.tri(Omega)]))
+hist((SRG_Graph-Omega)/Omega)
+image(Omega>1*sd(Omega[upper.tri(Omega)]))
 
 probit_Glasso <-Probit_Graphical_LASSO_Cpp(Y,2000,1000,10,1,.1,T)
 diff_pGlasso <- apply(probit_Glasso$Omega,1,function(w,k){(w-k)},Omega_uptri)
@@ -103,7 +103,7 @@ Glasso_Graph <- 0 * Omega
 Glasso_Graph[upper.tri(Glasso_Graph,T)] = apply(Glasso$Omega,2,median)
 Glasso_Graph = Glasso_Graph+t(Glasso_Graph)
 diag(Glasso_Graph) = 0.5 * diag(Glasso_Graph)
-image((Glasso_Graph-Omega))
-hist((Glasso_Graph-Omega))
-#image(Omega)
+image((Glasso_Graph>sd(Glasso_Graph[upper.tri(Omega)])))
+hist((Glasso_Graph-Omega)/Omega)
+image(Omega)
 
