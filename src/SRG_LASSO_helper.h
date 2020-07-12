@@ -29,4 +29,12 @@ arma::vec update_tau2_helper(const arma::mat & beta,
 Rcpp::List Sigma_to_CAR_Cpp(const arma::mat & Sigma);
 
 
+void update_Omega_helper_naive(arma::mat & Omega,
+                               const arma::mat & data,
+                               const arma::mat & design,
+                               const arma::vec & mu,
+                               const arma::mat & beta,
+                               const double & lambda_curr,
+                               int k, int p,int n);
+
 #endif
