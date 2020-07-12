@@ -44,7 +44,7 @@ Z <- matrix(NA,n,k)
 Y <- Z
 
 for( i in 1:n ){
-  Z[i,] <- MASS::mvrnorm(1,Sigma %*% (Xbeta[i,]+mu),Sigma)
+  Z[i,] <- MASS::mvrnorm(1,Xbeta[i,]+mu,Sigma)
   Y[i,] <- 1 * ((rnorm(k,Z[i,],1))>0)
 }
 colnames(Y) <- paste0("y",1:k)

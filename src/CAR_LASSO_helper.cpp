@@ -170,7 +170,7 @@ void update_car_Omega_helper(arma::mat Omega,
     
     // update omega_12
     Omega_omega_12 = (S(j,j)+lambda_curr)*inv_Omega_11+(1/gamma)*inv_Omega_11*U11*inv_Omega_11;
-    Omega_omega_12.diag() += tauI;
+    Omega_omega_12.diag() += 1/tauI;
     Sigma_omega_12 = inv_sympd(Omega_omega_12);
     //Rcout << "flag" <<endl;
     mu_omega_12 = S12+(1/gamma) * inv_Omega_11*U12;
@@ -203,7 +203,7 @@ arma::vec update_car_tau2_helper(const arma::mat & beta,
                              int k, int p, int n){
   //arma::mat sqrt_Omega =  sqrtmat_sympd(Omega);
   arma::mat chol_Omega = chol(Omega);
-  arma::mat beta_temp = beta * chol_Omega;
+  arma::mat beta_temp = beta;
   arma::vec betavec = vectorise(beta_temp);
   arma::vec invtau2(k*p);
   
