@@ -51,7 +51,7 @@ n_burnin = 1000
 beta_save = list()
 beta_temp = beta
 for(i in 1:(n_iter+n_burnin)){
-  tau2 = update_car_tau2_helper(beta_temp,.2,Omega,k,p,n)
+  tau2 = update_car_tau2_helper(beta_temp,20,Omega,k,p,n)
   beta_temp = update_car_beta_helper(Z,Design,mu,tau2,Omega,k,p,n)
   
   if(i>n_burnin){
@@ -83,7 +83,7 @@ Omega_going_to_be_saved <- solve(cov(Z))
 
 for(i in 1:(n_iter+n_burnin)){
   update_car_Omega_helper(Omega_going_to_be_saved,Z,
-                          Design,mu,beta,.25,k,p,n)
+                          Design,mu,beta,.025,k,p,n)
   
   if(i>n_burnin){
     temp = Omega_going_to_be_saved

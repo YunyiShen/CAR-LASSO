@@ -33,6 +33,7 @@ arma::mat update_car_beta_helper(const arma::mat & data,
   arma::mat Y = data.t(); // convert to col vectors
   arma::vec mu_beta(k*p,fill::zeros);
   arma::mat Q_beta(k*p,k*p,fill::zeros);// percision matrix up to sigma^2 scaling
+  //Q_beta.diag() += 1/tau2;
   Q_beta.diag() += 1/tau2;
   arma::mat D_i(k,k,fill::zeros);
   arma::mat res;

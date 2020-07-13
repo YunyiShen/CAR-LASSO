@@ -27,7 +27,7 @@ Design <- (Design-mean(Design))/sd(Design)
 colnames(Design) <- paste0("x",1:p)
 
 
-beta <- matrix(rnorm(p*k,5,1),p,k)
+beta <- matrix(rnorm(p*k,0,1),p,k)
 #beta[sample(p*k,floor(0.3*p*k))] = 0
 
 mu <-  1+rnorm(k)
@@ -44,8 +44,8 @@ for( i in 1:n ){
 }
 
 
-CAR_test <- CAR_LASSO_Cpp(Z,  Design, n_iter = 5000, 
-                          n_burn_in = 0, thin_by = 1, 
+CAR_test <- CAR_LASSO_Cpp(Z,  Design, n_iter = 50000, 
+                          n_burn_in = 50000, thin_by = 50, 
                           r_beta = 1, delta_beta = .01,
                           r_Omega = 1,delta_Omega = .01,
                           progress = T)
