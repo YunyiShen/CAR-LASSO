@@ -17,10 +17,10 @@ arma::vec dLaplace_Cpp(const arma::vec & x, const double mu, const double lambda
  American Statistician. 30-2. 88-91.
  */	
 
-// 
-double rinvGau(double mu, const double & lambda){
+// [[Rcpp::export]]
+double rinvGau(double mu, double  lambda){
   mu = mu < 1e-12 ? 1e-12 : mu; // truncate mu
-  mu = lambda < 1e-12 ? 1e-12 : lambda;
+  lambda = lambda < 1e-12 ? 1e-12 : lambda;
   double b = 0.5 * mu / lambda;
   double a = mu * b;
   double c = 4.0 * mu * lambda;
