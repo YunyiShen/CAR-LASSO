@@ -6,16 +6,18 @@ library(RcppProgress)
 rm(list = ls())
 
 k = 11
-n = 8000
-p = 2
+n = 2200
+p = 1
 
 
 sourceCpp("./src/CAR-LASSO.cpp")
+sourceCpp("./src/graphical-LASSO.cpp")
 
-B <- rsparsematrix(k,k,0.3)
-omega <- diag(rgamma(k,10,.3))
+B <- rsparsematrix(k,k,0.1)
+omega <- diag(rgamma(k,3,.1))
 I <- diag(rep(1,k))
 Omega <- t(I-B) %*% omega %*% (I-B)
+#Omega <- omega
 #diag(Omega) <- diag(Omega) + k
 Omega <- as.matrix(Omega)
 image(Omega)
@@ -23,14 +25,14 @@ image(Omega)
 Sigma <- solve(Omega)
 
 Design <- matrix(rnorm(n*p,0,1),n,p)
-Design <- (Design-mean(Design))/sd(Design)
+#Design <- (Design-mean(Design))/sd(Design)
 colnames(Design) <- paste0("x",1:p)
 
 
-beta <- matrix(rnorm(p*k,0,1),p,k)
+beta <- matrix(rnorm(p*k,10,1),p,k)
 #beta[sample(p*k,floor(0.3*p*k))] = 0
 
-mu <-  1+rnorm(k)
+mu <-  rnorm(k)
 #mu
 
 Xbeta <- Design %*% beta
@@ -43,9 +45,10 @@ for( i in 1:n ){
   Y[i,] <- 1 * ((rnorm(k,Z[i,],1))>0)
 }
 
+par(mfrow = c(1,2))
 
-CAR_test <- CAR_LASSO_Cpp(Z,  Design, n_iter = 50000, 
-                          n_burn_in = 50000, thin_by = 50, 
+CAR_test <- CAR_LASSO_Cpp(Z,  Design, n_iter = 5000, 
+                          n_burn_in = 5000, thin_by = 50, 
                           r_beta = 1, delta_beta = .01,
                           r_Omega = 1,delta_Omega = .01,
                           progress = T)
@@ -60,6 +63,28 @@ image(Omega)
 hist((CAR_Graph-Omega)/Omega)
 
 
+Glasso <- Graphical_LASSO_Cpp(Z,5000,1000,10,1,.01,T)
+
+Glasso_Graph <- 0 * Omega
+Glasso_Graph[upper.tri(Glasso_Graph,T)] = apply(Glasso$Omega,2,median)
+Glasso_Graph = Glasso_Graph+t(Glasso_Graph)
+diag(Glasso_Graph) = 0.5 * diag(Glasso_Graph)
+image(Glasso_Graph)
 
 
+image((abs(Glasso_Graph)>.1*sd(Glasso_Graph[upper.tri(Omega)])))
+image((abs(CAR_Graph)>.1*sd(CAR_Graph[upper.tri(Omega)])))
 
+image((abs(Omega)>0*sd(Omega[upper.tri(Omega)]))-
+        (abs(CAR_Graph)>.2*sd(CAR_Graph[upper.tri(Omega)])))
+
+image((abs(Omega)>0*sd(Omega[upper.tri(Omega)]))-
+        (abs(Glasso_Graph)>.2*sd(Glasso_Graph[upper.tri(Omega)])))
+
+
+hist((Glasso_Graph-Omega)/Omega)
+image(Omega)
+
+
+image(CAR_Graph-Glasso_Graph)
+hist(CAR_Graph-Glasso_Graph)

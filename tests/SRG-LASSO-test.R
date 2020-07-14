@@ -6,7 +6,7 @@ library(RcppProgress)
 rm(list = ls())
 
 k = 11
-n = 8000
+n = 1100
 p = 1
 
 sourceCpp("./src/Probit-SRG-LASSO.cpp")
@@ -18,7 +18,7 @@ source("./R/SRG-LASSO.R")
 
 #set.seed(42)
 B <- rsparsematrix(k,k,0.3)
-omega <- diag(rgamma(k,1,.1))
+omega <- diag(rgamma(k,3,.1))
 I <- diag(rep(1,k))
 Omega <- t(I-B) %*% omega %*% (I-B)
 #diag(Omega) <- diag(Omega) + k

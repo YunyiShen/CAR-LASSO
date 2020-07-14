@@ -6,7 +6,7 @@ library(RcppProgress)
 rm(list = ls())
 
 k = 11
-n = 11000
+n = 8000
 p = 2
 
 
@@ -27,7 +27,7 @@ Design <- (Design-mean(Design))/sd(Design)
 colnames(Design) <- paste0("x",1:p)
 
 
-beta <- matrix(rnorm(p*k,0,1),p,k)
+beta <- matrix(rnorm(p*k,5,1),p,k)
 #beta[sample(p*k,floor(0.3*p*k))] = 0
 
 mu <-  rnorm(k)
@@ -44,20 +44,22 @@ for( i in 1:n ){
 }
 
 
-n_iter = 3000
-n_burnin = 1000
+n_iter = 500
+n_burnin = 100
 ## beta
 
 beta_save = list()
 beta_temp = beta
+lambda_temp = 0.2
 for(i in 1:(n_iter+n_burnin)){
-  tau2 = update_car_tau2_helper(beta_temp,20,Omega,k,p,n)
+  tau2 = update_car_tau2_helper(beta_temp,lambda_temp,Omega,k,p,n)
   beta_temp = update_car_beta_helper(Z,Design,mu,tau2,Omega,k,p,n)
-  
+  lambda_temp = rgamma(1,1+k*p,sum(tau2)/2+.1)
+  cat(lambda_temp,"\n")
   if(i>n_burnin){
     beta_save[[i-n_burnin]] = beta_temp
   }
-  cat(i,"\n")
+  #cat(i,"\n")
 }
 Reduce("+",beta_save)/n_iter
 
@@ -82,25 +84,27 @@ Omega_save = list()
 Omega_going_to_be_saved <- solve(cov(Z))
 
 for(i in 1:(n_iter+n_burnin)){
-  update_car_Omega_helper(Omega_going_to_be_saved,Z,
-                          Design,mu,beta,.025,k,p,n)
   
-  if(i>n_burnin){
+  
+  if(i>n_burnin & (i-n_burnin)%%1000 == 0){
     temp = Omega_going_to_be_saved
     temp[1,1] = 0
     temp[1,1] = Omega_going_to_be_saved[1,1]
-    Omega_save[[i-n_burnin]] = temp
+    Omega_save[[(i-n_burnin)/1000]] = temp
   }
+  update_car_Omega_helper(Omega_going_to_be_saved,Z,
+                          Design,mu,beta,.1,k,p,n)
   cat(i,"\n")
 }
-mean_Omega = Reduce("+",Omega_save)/n_iter
+mean_Omega = Reduce("+",Omega_save)/(n_iter/1000)
 image(mean_Omega)
 image(Omega)
 
 hist((mean_Omega-Omega)/Omega)
 hist((solve(cov(Z)))/Omega)
 
-
+require(coda)
+acf(mcmc(sapply(Omega_save,"[",1)))
 
 
 ## combine
