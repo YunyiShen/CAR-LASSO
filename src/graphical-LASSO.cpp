@@ -33,7 +33,7 @@ Rcpp::List Graphical_LASSO_Cpp(const arma::mat & data,
   arma::mat Sigma = cov(data);
   
   // Concentration matrix and it's dimension:
-  arma::mat Omega = pinv(Sigma); // Moore-Penrose inverse
+  arma::mat Omega = inv(Sigma); // Moore-Penrose inverse
   int k = Omega.n_rows;
   
   
@@ -119,8 +119,8 @@ Rcpp::List Graphical_LASSO_Cpp(const arma::mat & data,
       perms_j = find(pertub_vec!=j);
       ind_j = ind_j.zeros();
       ind_j += j;
-      tauI = tau_curr.col(j);
-      tauI = tauI(perms_j);
+      tauI = tau_curr(perms_j,ind_j);
+      //auI = tauI(perms_j);
       
       Omega11 = Omega(perms_j,perms_j);
       Omega12 = Omega(perms_j,ind_j);
