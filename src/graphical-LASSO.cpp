@@ -33,7 +33,7 @@ Rcpp::List Graphical_LASSO_Cpp(const arma::mat & data,
   arma::mat Sigma = cov(data);
   
   // Concentration matrix and it's dimension:
-  arma::mat Omega = pinv(Sigma); // Moore-Penrose inverse
+  arma::mat Omega = inv(Sigma); // Moore-Penrose inverse
   int k = Omega.n_rows;
   
   
@@ -65,20 +65,27 @@ Rcpp::List Graphical_LASSO_Cpp(const arma::mat & data,
   int n_upper_tri = Omega_upper_tri.n_elem;
   
   // some objects needed in block update
+  
   arma::uvec perms_j;
   arma::uvec ind_j(1,fill::zeros);
   arma::vec tauI;
-  arma::mat Sigma11;
-  arma::mat Sigma12;
-  arma::mat S21;
+  arma::mat Omega11;
   arma::mat Omega11inv;
+  arma::mat Omega12;
+  
+  arma::mat S11;
+  arma::mat S12;
+  
   arma::mat Ci;
+  arma::mat invCi;
+  
   arma::mat CiChol;
   arma::mat S_temp;
   arma::mat mui;
-  arma::mat beta;
-  double gamm;
+  arma::mat gamma;
+  double gamm_rn = 0;
   arma::mat OmegaInvTemp;
+  
   
   // progress bar
   Progress prog((n_iter+n_burn_in), progress); 
@@ -107,54 +114,47 @@ Rcpp::List Graphical_LASSO_Cpp(const arma::mat & data,
     tau_curr = tau_curr + tau_curr.t(); // use symmertric to update lower tri
     
     
+    
     for(int j = 0 ; j < k ; ++j){
       perms_j = find(pertub_vec!=j);
       ind_j = ind_j.zeros();
       ind_j += j;
-      tauI = tau_curr.col(j);
-      tauI = tauI(perms_j);
+      tauI = tau_curr(perms_j,ind_j);
+      //auI = tauI(perms_j);
       
-      Sigma11 = Sigma(perms_j,perms_j);
-      Sigma12 = Sigma.col(j);
-      Sigma12 = Sigma12(perms_j);
+      Omega11 = Omega(perms_j,perms_j);
+      Omega12 = Omega(perms_j,ind_j);
+      S11 = S(perms_j,perms_j);
       
-      S21 = S.row(j);
-      S21 = S21(perms_j);
+      S12 = S(perms_j,ind_j);
+      //S12 = S21(perms_j);
       
-      Omega11inv = Sigma11-Sigma12 * Sigma12.t() / Sigma(j,j);
+      Omega11inv = inv(Omega11);
+      
       Ci = (S(j,j)+lambda_curr) * Omega11inv;
-      Ci.diag() += 1/tauI;
-      CiChol = chol(Ci);
+      Ci.diag() += tauI;
+      invCi = inv(Ci);
+      //CiChol = chol(Ci);
       
-      S_temp = S.col(j);
-      S_temp = S_temp(perms_j);
-      mui = solve(-Ci,S_temp);
+      //S_temp = S.col(j);
+      //S_temp = S_temp(perms_j);
+      mui = -invCi*S12;
       
-      // Sampling:
-      beta = mui+solve(CiChol,randn(k-1));
-        
+      gamma = mvnrnd(mui, invCi);
+      
       // Replacing omega entries
-      Omega.submat(perms_j,ind_j) = beta;
-      Omega.submat(ind_j,perms_j) = beta.t();
+      Omega.submat(perms_j,ind_j) = gamma;
+      Omega.submat(ind_j,perms_j) = gamma.t();
       
       
       
-      gamm = R::rgamma(n/2+1,2/( as_scalar( S(0,0) )+lambda_curr));
-      Omega(j,j) = gamm + as_scalar( beta.t() * Omega11inv * beta);
-       
-      // Replacing sigma entries
-      OmegaInvTemp = Omega11inv * beta;
-      Sigma.submat(perms_j,perms_j) = Omega11inv+(OmegaInvTemp * OmegaInvTemp.t())/gamm ;
-      
-      //flagged
-      
-      Sigma(perms_j,ind_j) = -OmegaInvTemp/gamm;
-      
-       
-      Sigma(ind_j,perms_j) = trans( -OmegaInvTemp/gamm);
-      Sigma(j,j) = 1/gamm ;
+      gamm_rn = R::rgamma(n/2+1,2/( as_scalar( S(j,j) )+lambda_curr));
+      Omega(j,j) = gamm_rn + as_scalar( gamma.t() * Omega11inv * gamma);
       
     }
+    
+    
+    
     
     
     // saving current state

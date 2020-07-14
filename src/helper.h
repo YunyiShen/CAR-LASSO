@@ -9,7 +9,7 @@ arma::vec dLaplace_Cpp(const arma::vec & x,
                        bool take_log);
 
 // sample from inverse Gaussian 
-double rinvGau(double mu, const double & lambda);
+double rinvGau(double mu, double  lambda);
 
 // get blockwise diagnoal design matrix
 arma::sp_mat getDesign_i_helper(const arma::rowvec & X_i,//row vector of that sample
