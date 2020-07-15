@@ -40,4 +40,6 @@ Omega_postcpp[upper.tri(Omega_postcpp,T)] = Omega_posttemp
 Omega_postcpp = Omega_postcpp+t(Omega_postcpp)
 diag(Omega_postcpp) = diag(Omega_postcpp)/2
 
+(Omega-Omega_postcpp)/Omega
+
 (Omega_post-Omega_post_pkg)/Omega_post

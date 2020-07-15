@@ -32,7 +32,7 @@ Design <- (Design-mean(Design))/sd(Design)
 colnames(Design) <- paste0("x",1:p)
 
 
-beta <- matrix(rnorm(p*k,2,1),p,k)
+beta <- matrix(rnorm(p*k,0,1),p,k)
 #beta[sample(p*k,floor(0.3*p*k))] = 0
 
 mu <- rnorm(k)

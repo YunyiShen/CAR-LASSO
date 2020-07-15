@@ -6,7 +6,7 @@ library(RcppProgress)
 rm(list = ls())
 
 k = 11
-n = 2200
+n = 8000
 p = 1
 
 
@@ -14,7 +14,7 @@ sourceCpp("./src/CAR-LASSO.cpp")
 sourceCpp("./src/graphical-LASSO.cpp")
 
 B <- rsparsematrix(k,k,0.1)
-omega <- diag(rgamma(k,3,.1))
+omega <- diag(rgamma(k,5,.1))
 I <- diag(rep(1,k))
 Omega <- t(I-B) %*% omega %*% (I-B)
 #Omega <- omega
@@ -29,7 +29,7 @@ Design <- matrix(rnorm(n*p,0,1),n,p)
 colnames(Design) <- paste0("x",1:p)
 
 
-beta <- matrix(rnorm(p*k,10,1),p,k)
+beta <- matrix(rnorm(p*k,1,1),p,k)
 #beta[sample(p*k,floor(0.3*p*k))] = 0
 
 mu <-  rnorm(k)
@@ -48,7 +48,7 @@ for( i in 1:n ){
 par(mfrow = c(1,2))
 
 CAR_test <- CAR_LASSO_Cpp(Z,  Design, n_iter = 5000, 
-                          n_burn_in = 5000, thin_by = 50, 
+                          n_burn_in = 5000, thin_by = 10, 
                           r_beta = 1, delta_beta = .01,
                           r_Omega = 1,delta_Omega = .01,
                           progress = T)
