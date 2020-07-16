@@ -51,7 +51,7 @@ void ZIP_update_Z_ZI_helper(mat & Z_ZI,
       else{
         temp = 1 ;
       }
-      y_star(j) = rtn1(Z_prob(i,j),1,
+      y_star(j) = rtn1(Z_ZI(i,j),1,
              temp == 1 ? 0 : -INFINITY, // if data(i,j)=1, then y_star >= 0
              temp == 0 ? 0 : INFINITY); // if data(i,j)=0 y_star<0
     }

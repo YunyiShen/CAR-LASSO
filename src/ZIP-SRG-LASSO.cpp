@@ -14,7 +14,7 @@ using namespace arma;
 // [[Rcpp::export]]
 List ZIP_SRG_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sample
                         const arma::mat & design_P, // design matrix, each ROW as a sample
-                        const arma::mat & design_ZI
+                        const arma::mat & design_ZI,
                         const int n_iter, // how many iterations?
                         const int n_burn_in, // burn in
                         const int thin_by, // thinning?
@@ -53,8 +53,8 @@ List ZIP_SRG_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as a
   arma::mat mu_P_mcmc(n_save , k); // mean for node 1 to k
   mu_P_mcmc += NA_REAL;
   
-  arma::mat mu_P_mcmc(n_save , k); // mean for node 1 to k
-  mu_P_mcmc += NA_REAL;
+  arma::mat mu_ZI_mcmc(n_save , k); // mean for node 1 to k
+  mu_ZI_mcmc += NA_REAL;
   
   arma::mat lambda_mcmc(n_save , 4); //mu_P, S_P, beta_ZI,S_ZI // LASSO parameter for beta and B
   lambda_mcmc += NA_REAL;
@@ -76,8 +76,8 @@ List ZIP_SRG_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as a
   Omega_P_curr = inv(cov(log(data+.1)));
   Omega_ZI_curr = Omega_P_curr;
   
-  arma::mat beta_P_curr(p,k,fill::zeros); // current value of beta for Pois
-  arma::mat beta_ZI_curr(p,k,fill::zeros); // current value of beta for ZI
+  arma::mat beta_P_curr(p_P,k,fill::zeros); // current value of beta for Pois
+  arma::mat beta_ZI_curr(p_ZI,k,fill::zeros); // current value of beta for ZI
   
   arma::mat Z_P_curr = log(data+.1); // latent normal variable
   arma::mat Pois_latent = data;
@@ -85,10 +85,10 @@ List ZIP_SRG_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as a
   
   //arma::vec mean_uncertain(k); // for sampling mu
   
-  double lambda2_beta_P = R::rgamma(r_beta,1/delta_beta); // current value of squared LASSO parameter of \beta
+  double lambda2_beta_P = R::rgamma(r_beta_P,1/delta_beta_P); // current value of squared LASSO parameter of \beta
   double lambda_Omega_P = 0;//R::rgamma(r_Omega,1/delta_Omega); // current value of squared LASSO parameter of B
   
-  double lambda2_beta_ZI = R::rgamma(r_beta,1/delta_beta); // current value of squared LASSO parameter of \beta
+  double lambda2_beta_ZI = R::rgamma(r_beta_P,1/delta_beta_P); // current value of squared LASSO parameter of \beta
   double lambda_Omega_ZI = 0;//R::rgamma(r_Omega,1/delta_Omega); // current value of squared LASSO parameter of B
   
   double Omega_P_r_post = (r_Omega_P+(k*(k+1)/2));
@@ -112,19 +112,19 @@ List ZIP_SRG_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as a
           Rcpp::Named("beta_ZI") = beta_ZI_mcmc,
           Rcpp::Named("mu_ZI") = mu_ZI_mcmc,
           Rcpp::Named("Omega_ZI") = Omega_ZI_mcmc,
-          Rcpp::Named("lambda") = lambda_mcmc,
+          Rcpp::Named("lambda") = lambda_mcmc
           //Rcpp::Named("Z") = Z_mcmc
       ));
     }
     // block update start:
     Omega_P_delta_post = (delta_Omega_P+sum(sum(abs(Omega_P_curr)))/2);
-    lambda_P_Omega = R::rgamma(Omega_P_r_post,1/Omega_P_delta_post);
+    lambda_Omega_P = R::rgamma(Omega_P_r_post,1/Omega_P_delta_post);
     Omega_ZI_delta_post = (delta_Omega_ZI+sum(sum(abs(Omega_ZI_curr)))/2);
-    lambda_ZI_Omega = R::rgamma(Omega_ZI_r_post,1/Omega_ZI_delta_post);
+    lambda_Omega_ZI = R::rgamma(Omega_ZI_r_post,1/Omega_ZI_delta_post);
     
     ZIP_update_Pois_latent_helper(Pois_latent, data,
                                   Z_P_curr, Z_ZI_curr,
-                                  k, p_P, n)
+                                  k, p_P, n);
     
     // Update Latent Zs using ars
     //Rcout << "current Z : \n" << Z_curr <<endl;
@@ -168,7 +168,7 @@ List ZIP_SRG_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as a
     
     // Update lambda_beta
     
-    lambda2_P_beta = R::rgamma(r_beta_P+k*p_P,1/(delta_beta_P+sum(tau2_P_curr)/2));
+    lambda2_beta_P = R::rgamma(r_beta_P+k*p_P,1/(delta_beta_P+sum(tau2_P_curr)/2));
     
     
     // Start the ZI part //
@@ -208,7 +208,7 @@ List ZIP_SRG_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as a
     
     // Update lambda_beta
     
-    lambda2_ZI_beta = R::rgamma(r_beta_ZI+k*p_ZI,1/(delta_beta_ZI+sum(tau2_ZI_curr)/2));
+    lambda2_beta_ZI = R::rgamma(r_beta_ZI+k*p_ZI,1/(delta_beta_ZI+sum(tau2_ZI_curr)/2));
     
     
     
@@ -242,7 +242,7 @@ List ZIP_SRG_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as a
       Rcpp::Named("beta_ZI") = beta_ZI_mcmc,
       Rcpp::Named("mu_ZI") = mu_ZI_mcmc,
       Rcpp::Named("Omega_ZI") = Omega_ZI_mcmc,
-      Rcpp::Named("lambda") = lambda_mcmc,
+      Rcpp::Named("lambda") = lambda_mcmc
   ));
 }
 
