@@ -63,7 +63,7 @@ image(Omega)
 hist((CAR_Graph-Omega)/Omega)
 
 
-Glasso <- Graphical_LASSO_Cpp(Z,5000,1000,10,1,.01,T)
+Glasso <- Graphical_LASSO_Cpp(Z, 5000, 1000, 10, 1, .01, T)
 
 Glasso_Graph <- 0 * Omega
 Glasso_Graph[upper.tri(Glasso_Graph,T)] = apply(Glasso$Omega,2,median)
