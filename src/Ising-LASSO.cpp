@@ -84,8 +84,8 @@ Rcpp::List Ising_LASSO_Cpp(const arma::mat & data_,
                            bool progress,
                            bool verbos,int reportby){
   arma::vec responses(2);
-  responses(0) = min(min(data));
-  responses(1) = max(max(data));
+  responses(0) = min(min(data_));
+  responses(1) = max(max(data_));
   arma::mat data = data_.t(); // convert to column vector as sample
   int k = data.n_rows; // number of nodes
   int p = design.n_cols; //number of predictors
