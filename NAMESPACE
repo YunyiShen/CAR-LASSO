@@ -1,7 +1,9 @@
-export(CAR_LASSO_Cpp)
 import(Rcpp)
 import(RcppArmadillo)
 import(RcppProgress)
+useDynLib("SRGlasso", .registration = TRUE)
+export(CAR_LASSO_Cpp)
+
 #import(RcppEigen)
-#useDynLib(SRGlasso, .registration = TRUE)
+
 #useDynLib(SRGlasso)
