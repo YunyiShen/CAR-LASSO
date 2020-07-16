@@ -77,31 +77,33 @@ List CAR_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sam
     
     if (Progress::check_abort()){
       Rcerr << "keyboard abort\n";
-      return(Rcpp::List::create(
+      return(
+        Rcpp::List::create(
           Rcpp::Named("beta") = beta_mcmc,
           Rcpp::Named("mu") = mu_mcmc,
           Rcpp::Named("Omega") = Omega_mcmc,
           Rcpp::Named("lambda") = lambda_mcmc
-      ));
+        )
+      );
     }
     // block update start:
 	  
 	// Update lambda_Omega
-    Omega_delta_post = (delta_Omega+sum(sum(abs(Omega_curr)))/2);
-    lambda_Omega = R::rgamma(Omega_r_post,1/Omega_delta_post);
+    Omega_delta_post = (delta_Omega + sum(sum(abs(Omega_curr)))/2);
+    lambda_Omega = R::rgamma(Omega_r_post, 1/Omega_delta_post);
     
     //Update betas:
-    beta_curr = update_car_beta_helper(data,design,mu_curr,
-                                   tau2_curr,Omega_curr, 
-                                   k,p,n);
+    beta_curr = update_car_beta_helper(data, design, mu_curr,
+                                   tau2_curr, Omega_curr, 
+                                   k, p, n);
     
     
     // update Omega
     //cout << "flag1" << endl;
-    update_car_Omega_helper(Omega_curr,data, design, 
-                                     mu_curr,beta_curr,
+    update_car_Omega_helper(Omega_curr, data, design, 
+                                     mu_curr, beta_curr,
                                      lambda_Omega,
-                                     k,p,n);
+                                     k, p, n);
     
     //cout << "flag2" <<endl;
     
@@ -109,14 +111,9 @@ List CAR_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sam
     
     mu_curr = update_car_mu_helper(data,design,beta_curr,
                                Omega_curr, 
-                               k,p,n);
+                               k, p, n);
     
     
-    
-      
-    //Rcout << "Omega curr in main loop:" << (Omega_curr) << endl;
-    //Rcout << "sum beta in main loop:" <<sum(sum(beta_curr)) <<endl;
-    //Rcout << "mean of mu in main loop:" << mean(mu_curr) <<endl;
   
     // Update tau
     tau2_curr = update_car_tau2_helper(beta_curr,lambda2_beta,
@@ -148,11 +145,13 @@ List CAR_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sam
     
     prog.increment();
   }
-  return(Rcpp::List::create(
+  return(
+    Rcpp::List::create(
       Rcpp::Named("beta") = beta_mcmc,
       Rcpp::Named("mu") = mu_mcmc,
       Rcpp::Named("Omega") = Omega_mcmc,
       Rcpp::Named("lambda") = lambda_mcmc
-  ));
+    )
+  );
 }
 

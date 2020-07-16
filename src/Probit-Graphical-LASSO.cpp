@@ -175,7 +175,7 @@ Rcpp::List Probit_Graphical_LASSO_Cpp(const arma::mat & data,
       
       
       
-      gamm = R::rgamma(n/2+1,2/( as_scalar( S(0,0) )+lambda_curr));
+      gamm = R::rgamma(n/2+1,2/( as_scalar( S(j,j) )+lambda_curr));
       Omega(j,j) = gamm + as_scalar( beta.t() * Omega11inv * beta);
        
       // Replacing sigma entries
