@@ -6,7 +6,7 @@ library(RcppProgress)
 rm(list = ls())
 
 k = 11
-n = 8000
+n = 800
 p = 2
 
 
@@ -44,18 +44,19 @@ for( i in 1:n ){
 }
 
 
-n_iter = 500
-n_burnin = 100
+n_iter = 5000
+n_burnin = 1000
 ## beta
 
 beta_save = list()
 beta_temp = beta
 lambda_temp = 0.2
+set.seed(12345)
 for(i in 1:(n_iter+n_burnin)){
   tau2 = update_car_tau2_helper(beta_temp,lambda_temp,Omega,k,p,n)
-  beta_temp = update_car_beta_helper(Z,Design,mu,tau2,Omega,k,p,n)
+  beta_temp = update_car_beta_helper1(Z,Design,mu,tau2,Omega,k,p,n)
   lambda_temp = rgamma(1,1+k*p,sum(tau2)/2+.1)
-  cat(lambda_temp,"\n")
+  #cat(lambda_temp,"\n")
   if(i>n_burnin){
     beta_save[[i-n_burnin]] = beta_temp
   }

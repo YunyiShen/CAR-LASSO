@@ -5,15 +5,15 @@ library(RcppProgress)
 
 rm(list = ls())
 
-k = 11
-n = 8000
-p = 1
+k = 5
+n = 150
+p = 2
 
 
 sourceCpp("./src/CAR-LASSO.cpp")
 sourceCpp("./src/graphical-LASSO.cpp")
 
-B <- rsparsematrix(k,k,0.1)
+B <- rsparsematrix(k,k,0.2)
 omega <- diag(rgamma(k,5,.1))
 I <- diag(rep(1,k))
 Omega <- t(I-B) %*% omega %*% (I-B)
@@ -24,15 +24,15 @@ image(Omega)
 
 Sigma <- solve(Omega)
 
-Design <- matrix(rnorm(n*p,0,1),n,p)
+Design <- 1.0* (matrix(rnorm(n*p,0,1),n,p))
 #Design <- (Design-mean(Design))/sd(Design)
 colnames(Design) <- paste0("x",1:p)
 
 
-beta <- matrix(rnorm(p*k,1,1),p,k)
+beta <- matrix(rnorm(p*k,5,1),p,k)
 #beta[sample(p*k,floor(0.3*p*k))] = 0
 
-mu <-  rnorm(k)
+mu <-  1+rnorm(k)
 #mu
 
 Xbeta <- Design %*% beta
@@ -85,6 +85,11 @@ image((abs(Omega)>0*sd(Omega[upper.tri(Omega)]))-
 hist((Glasso_Graph-Omega)/Omega)
 image(Omega)
 
+mean(((Glasso_Graph-Omega))^2)
+
 
 image(CAR_Graph-Glasso_Graph)
 hist(CAR_Graph-Glasso_Graph)
+
+mean(((CAR_Graph-Omega)^2))
+
