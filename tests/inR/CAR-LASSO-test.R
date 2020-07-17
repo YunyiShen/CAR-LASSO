@@ -5,13 +5,14 @@ library(RcppProgress)
 
 rm(list = ls())
 
-k = 5
-n = 150
+k = 30
+n = 5000
 p = 2
 
 
 sourceCpp("./src/CAR-LASSO.cpp")
 sourceCpp("./src/graphical-LASSO.cpp")
+source("./R/misc.R")
 
 B <- rsparsematrix(k,k,0.2)
 omega <- diag(rgamma(k,5,.1))
@@ -55,7 +56,7 @@ CAR_test <- CAR_LASSO_Cpp(Z,  Design, n_iter = 5000,
 
 
 CAR_Graph <- 0 * Omega
-CAR_Graph[upper.tri(CAR_Graph,T)] = apply(CAR_test$Omega,2,median)
+CAR_Graph[upper.tri(CAR_Graph,T)] = apply(CAR_test$Omega,2,mean)
 CAR_Graph = CAR_Graph+t(CAR_Graph)
 diag(CAR_Graph) = 0.5 * diag(CAR_Graph)
 image((CAR_Graph))
@@ -66,7 +67,7 @@ hist((CAR_Graph-Omega)/Omega)
 Glasso <- Graphical_LASSO_Cpp(Z, 5000, 1000, 10, 1, .01, T)
 
 Glasso_Graph <- 0 * Omega
-Glasso_Graph[upper.tri(Glasso_Graph,T)] = apply(Glasso$Omega,2,median)
+Glasso_Graph[upper.tri(Glasso_Graph,T)] = apply(Glasso$Omega,2,mean)
 Glasso_Graph = Glasso_Graph+t(Glasso_Graph)
 diag(Glasso_Graph) = 0.5 * diag(Glasso_Graph)
 image(Glasso_Graph)
@@ -92,4 +93,8 @@ image(CAR_Graph-Glasso_Graph)
 hist(CAR_Graph-Glasso_Graph)
 
 mean(((CAR_Graph-Omega)^2))
+
+
+CAR_stein_loss <- stein_loss(CAR_Graph,Omega)
+Glasso_stein_loss <- stein_loss(Glasso_Graph,Omega)
 
