@@ -97,4 +97,10 @@ arma::sp_mat block_diag(const arma::mat & A, int d, int n){
   return(D);
 }
 
-
+// [[Rcpp::export]]
+double stein_loss_cpp(const arma::mat & Omega, const arma::mat & Omega_hat){
+  arma::mat prod_hat = solve(Omega_hat,Omega);
+  int p = Omega.n_cols;
+  double res = trace(prod_hat)-log(det(prod_hat))-p;
+  return(res);
+}
