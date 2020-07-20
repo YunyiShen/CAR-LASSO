@@ -30,7 +30,7 @@ Design <- 1.0* (matrix(rnorm(n*p,0,1),n,p))
 colnames(Design) <- paste0("x",1:p)
 
 
-beta <- matrix(rnorm(p*k,5,1),p,k)
+beta <- matrix(rnorm(p*k,1,1),p,k)
 #beta[sample(p*k,floor(0.3*p*k))] = 0
 
 mu <-  1+rnorm(k)
@@ -48,7 +48,7 @@ for( i in 1:n ){
 
 par(mfrow = c(1,2))
 
-CAR_test <- CAR_LASSO_Cpp(Z,  Design, n_iter = 5000, 
+CAR_test <- CAR_LASSO_Cpp(Z,  Design, n_iter = 25000, 
                           n_burn_in = 5000, thin_by = 10, 
                           r_beta = 1, delta_beta = .01,
                           r_Omega = 1,delta_Omega = .01,
@@ -56,20 +56,20 @@ CAR_test <- CAR_LASSO_Cpp(Z,  Design, n_iter = 5000,
 
 
 CAR_Graph <- 0 * Omega
-CAR_Graph[upper.tri(CAR_Graph,T)] = apply(CAR_test$Omega,2,mean)
-CAR_Graph = CAR_Graph+t(CAR_Graph)
-diag(CAR_Graph) = 0.5 * diag(CAR_Graph)
+CAR_Graph[upper.tri(CAR_Graph,T)] <- apply(CAR_test$Omega,2,mean)
+CAR_Graph <- CAR_Graph+t(CAR_Graph)
+diag(CAR_Graph) <- 0.5 * diag(CAR_Graph)
 image((CAR_Graph))
 image(Omega)
 hist((CAR_Graph-Omega)/Omega)
 
 
-Glasso <- Graphical_LASSO_Cpp(Z, 5000, 1000, 10, 1, .01, T)
+Glasso <- Graphical_LASSO_Cpp(Z, 25000, 5000, 10, 1, .01, T)
 
 Glasso_Graph <- 0 * Omega
 Glasso_Graph[upper.tri(Glasso_Graph,T)] = apply(Glasso$Omega,2,mean)
-Glasso_Graph = Glasso_Graph+t(Glasso_Graph)
-diag(Glasso_Graph) = 0.5 * diag(Glasso_Graph)
+Glasso_Graph <- Glasso_Graph+t(Glasso_Graph)
+diag(Glasso_Graph) <- 0.5 * diag(Glasso_Graph)
 image(Glasso_Graph)
 
 
@@ -95,6 +95,6 @@ hist(CAR_Graph-Glasso_Graph)
 mean(((CAR_Graph-Omega)^2))
 
 
-CAR_stein_loss <- stein_loss(CAR_Graph,Omega)
-Glasso_stein_loss <- stein_loss(Glasso_Graph,Omega)
+CAR_stein_loss <- stein_loss_cpp(CAR_Graph,Omega)
+Glasso_stein_loss <- stein_loss_cpp(Glasso_Graph,Omega)
 

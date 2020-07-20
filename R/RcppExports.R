@@ -13,6 +13,10 @@ CAR_LASSO_Cpp <- function(data, design, n_iter, n_burn_in, thin_by, r_beta, delt
     .Call(`_SRGlasso_CAR_LASSO_Cpp`, data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, progress)
 }
 
+update_car_beta_helper1 <- function(data, design, mu, tau2, Omega, k, p, n) {
+    .Call(`_SRGlasso_update_car_beta_helper1`, data, design, mu, tau2, Omega, k, p, n)
+}
+
 update_car_beta_helper <- function(data, design, mu, tau2, Omega, k, p, n) {
     .Call(`_SRGlasso_update_car_beta_helper`, data, design, mu, tau2, Omega, k, p, n)
 }
@@ -65,6 +69,14 @@ SRG_LASSO_Cpp <- function(data, design, n_iter, n_burn_in, thin_by, r_beta, delt
     .Call(`_SRGlasso_SRG_LASSO_Cpp`, data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, progress)
 }
 
+update_beta_helper <- function(data, design, mu, tau2, Omega, k, p, n) {
+    .Call(`_SRGlasso_update_beta_helper`, data, design, mu, tau2, Omega, k, p, n)
+}
+
+update_beta_helper1 <- function(data, design, mu, tau2, Omega, k, p, n) {
+    .Call(`_SRGlasso_update_beta_helper1`, data, design, mu, tau2, Omega, k, p, n)
+}
+
 Sigma_to_CAR_Cpp <- function(Sigma) {
     .Call(`_SRGlasso_Sigma_to_CAR_Cpp`, Sigma)
 }
@@ -95,6 +107,10 @@ Graphical_LASSO_Cpp <- function(data, n_iter, n_burn_in, thin_by, lambda_a, lamb
 
 rinvGau <- function(mu, lambda) {
     .Call(`_SRGlasso_rinvGau`, mu, lambda)
+}
+
+stein_loss_cpp <- function(Omega, Omega_hat) {
+    .Call(`_SRGlasso_stein_loss_cpp`, Omega, Omega_hat)
 }
 
 gig_mode <- function(lambda, omega) {
