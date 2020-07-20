@@ -28,7 +28,7 @@ arma::vec Auto_Poisson_Gibbs_Single_Cpp(const arma::sp_mat &graph, // graph
   
   for(int i = 0 ; i < nIter ; ++i){ // outer loop, for number of samples
     for(int j = 0 ; j < N ; ++j){
-      temp = R::rpois(exp(thresholds(j) + 0.5 * (Res.t() * graph.col(j)))); // Gibbs scan
+      temp = R::rpois(exp(thresholds(j) + 0.5 * as_scalar(Res.t() * graph.col(j)))); // Gibbs scan
       Res(i) = temp > Winsorized ? Winsorized : temp; // right censored 
     }
   }
@@ -43,7 +43,7 @@ arma::mat Auto_Poisson_Gibbs_Batch_Cpp(const int & Nsample, // number of samples
                                        const int & Winsorized, // right censor
                                        const int & nIter){  
   int N = graph.n_rows;
-  arma::mat Res(N,Nsample)
+  arma::mat Res(N,Nsample);
   for(int i = 0 ; i < Nsample ; ++i ){
     Res.col(i) = Auto_Poisson_Gibbs_Single_Cpp(graph,thresholds,Winsorized,nIter);
   }
@@ -78,7 +78,7 @@ double Auto_Poisson_Q_Cpp(const arma::mat Sample,
   int Nsample = Sample.n_cols;
   
   for(int i = 0 ; i < Nsample ; ++i){
-    Res += thr_contribution(i) + .5 * (Sample.col(i).t() * graph * Sample.col(i)); // Besag's Q function for (spatial) auto Poisson model 
+    Res += thr_contribution(i) + .5 * as_scalar(Sample.col(i).t() * graph * Sample.col(i)); // Besag's Q function for (spatial) auto Poisson model 
   }
   return(Res);
 }
@@ -95,7 +95,7 @@ double logLik_Normal_Response(const arma::vec & data,
   arma::vec mu = Design * beta_fix + composition.t() * beta_composition;
   double Res = 0;
   for(int i = 0 ; i < N ; ++i){
-    Res += R::dnorm(data(i) , mu(i) , true);
+    Res += R::dnorm(data(i) , mu(i) , sigma,true);
   }
   return(Res);
 }
