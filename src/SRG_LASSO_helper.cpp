@@ -1,5 +1,5 @@
 // [[Rcpp::depends(RcppArmadillo)]]
-#include <RcppArmadillo.h> // to use sparse matrix
+#include <RcppArmadillo.h> 
 #include <tgmath.h>
 using namespace Rcpp;
 using namespace arma;
@@ -249,7 +249,7 @@ void update_Omega_helper(arma::mat & Omega,
     
     
     
-    gamm_rn = R::rgamma(n/2+1,2/( as_scalar( S(0,0) )+lambda_curr));
+    gamm_rn = R::rgamma(n/2+1,2/( as_scalar( S(j,j) )+lambda_curr));
     Omega(j,j) = gamm_rn + as_scalar( gamma.t() * Omega11inv * gamma);
     
     
