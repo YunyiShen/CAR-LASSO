@@ -20,55 +20,6 @@ using namespace std;
  */
 
 
-
-// [[Rcpp::export]]
-arma::mat update_car_beta_helper1(const arma::mat & data,
-                             const arma::mat & design,
-                             const arma::vec & mu,
-                             const arma::vec & tau2,
-                             const arma::mat & Omega,
-                             int k, int p, int n){
-  
-
-  arma::mat Q_beta(k*p,k*p,fill::zeros);// percision matrix up to sigma^2 scaling
-  
-  arma::mat XtX = design.t() * design;
-  
-  
-  arma::mat res;
-  
-  arma::uvec ind_para = linspace<uvec>(0,k-1,k);
-  
-  arma::mat Sigma = inv_sympd(Omega);
-
-  arma::mat Y_tilde = data;
-  Y_tilde.each_row() -= mu.t() * Sigma;
-  arma::uvec ind_p = linspace<uvec>(0,p-1,p);
-  
-  
-  arma::mat mu_beta_mat = design.t() * Y_tilde;
-  arma::vec mu_beta = vectorise(mu_beta_mat);
-  
-  for(int i = 0 ; i < k ; ++i){
-    // update Q
-    for(int j = 0 ; j < k ; ++j){
-      Q_beta(ind_p + j * p, ind_p + i * p) = XtX * Sigma(i,j);
-    }
-  }
-  
-
-  Q_beta.diag() += 1/tau2;
-  
-  //Rcout << "beta" <<endl;
-  arma::mat Sigma_beta = inv(Q_beta);
-  
-  mu_beta = Sigma_beta*mu_beta;
-  res = mvnrnd(mu_beta, Sigma_beta);
-  res = reshape(res,p,k);
-  
-  return(res);
-}
-
 // [[Rcpp::export]]
 arma::mat update_car_beta_helper(const arma::mat & data,
                              const arma::mat & design,
