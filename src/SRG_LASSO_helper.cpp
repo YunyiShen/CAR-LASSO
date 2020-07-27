@@ -121,14 +121,15 @@ arma::mat update_beta_helper1(const arma::mat & data,
   arma::mat mu_beta_mat = design.t() * (Y_tilde * Omega);
   arma::vec mu_beta = vectorise(mu_beta_mat);
   
-  for(int i = 0 ; i < k ; ++i){
-    // update Q
-    for(int j = 0 ; j < k ; ++j){
-      Q_beta(ind_p + j * p, ind_p + i * p) += XtX * Omega(i,j);
-    }
-  }
+  //for(int i = 0 ; i < k ; ++i){
+  //  // update Q
+  //  for(int j = 0 ; j < k ; ++j){
+  //    Q_beta(ind_p + j * p, ind_p + i * p) += XtX * Omega(i,j);
+  //  }
+  //}
   
-  
+  Q_beta += kron(Omega,XtX);
+
   //Rcout << "beta" <<endl;
   arma::mat Sigma_beta = inv_sympd(Q_beta);
   mu_beta = Sigma_beta*mu_beta;
