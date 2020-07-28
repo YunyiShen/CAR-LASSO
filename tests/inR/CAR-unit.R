@@ -54,7 +54,7 @@ lambda_temp = 0.2
 set.seed(12345)
 for(i in 1:(n_iter+n_burnin)){
   tau2 = update_car_tau2_helper(beta_temp,lambda_temp,Omega,k,p,n)
-  beta_temp = update_car_beta_helper1(Z,Design,mu,tau2,Omega,k,p,n)
+  beta_temp = update_car_beta_helper(Z,Design,mu,tau2,Omega,k,p,n)
   lambda_temp = rgamma(1,1+k*p,sum(tau2)/2+.1)
   #cat(lambda_temp,"\n")
   if(i>n_burnin){

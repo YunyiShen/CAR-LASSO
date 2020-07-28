@@ -5,8 +5,8 @@ library(RcppProgress)
 
 rm(list = ls())
 
-k = 30
-n = 5000
+k = 11
+n = 8000
 p = 2
 
 
@@ -31,7 +31,7 @@ colnames(Design) <- paste0("x",1:p)
 
 
 beta <- matrix(rnorm(p*k,1,1),p,k)
-#beta[sample(p*k,floor(0.3*p*k))] = 0
+#beta[sample(p*k,floor(0.1*p*k))] = 0
 
 mu <-  1+rnorm(k)
 #mu
