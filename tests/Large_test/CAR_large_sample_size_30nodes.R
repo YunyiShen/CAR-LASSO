@@ -9,8 +9,8 @@ sourceCpp("./src/CAR-LASSO.cpp")
 sourceCpp("./src/graphical-LASSO.cpp")
 reslink <- "./tests/Large_test/Res/"
 
-ks <- c(10, 20, 30)
-ns <- 100 * 2^(2:7) 
+ks <- c(30)
+ns <- 500 * 2^(2:7) 
 p <- 2
 sp <- c(0.1,0.2,0.3)
 retry <- 5
@@ -39,7 +39,7 @@ for (k in ks) {
                     Omega <- t(I-B) %*% omega %*% (I-B)
                     Omega <- as.matrix(Omega)
                     cond_Omega <- kappa(Omega)
-                    if(cond_Omega<5e4 & det(Omega)>1) {
+                    if(cond_Omega<1e4 & det(Omega)>1) {
                         break
                     }
                 }
