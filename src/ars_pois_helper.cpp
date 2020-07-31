@@ -8,7 +8,7 @@
 //
 /* ********************************************************************************* */
 // [[Rcpp::depends(RcppArmadillo)]]
-#include <RcppArmadillo.h> // to use sparse matrix
+#include <RcppArmadillo.h> 
 #include <tgmath.h>
 using namespace Rcpp;
 using namespace arma;

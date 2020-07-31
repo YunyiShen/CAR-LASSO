@@ -1,5 +1,5 @@
 // [[Rcpp::depends(RcppArmadillo)]]
-#include <RcppArmadillo.h> // to use sparse matrix
+#include <RcppArmadillo.h> 
 #include <tgmath.h>
 using namespace Rcpp;
 using namespace arma;
@@ -18,66 +18,6 @@ using namespace std;
  * 
  * Y~N(Sigma (Xbeta+mu),Sigma)
  */
-
-
-
-// tested 20200712
-// [[Rcpp::export]]
-arma::mat update_car_beta_helper1(const arma::mat & data,
-                             const arma::mat & design,
-                             const arma::vec & mu,
-                             const arma::vec & tau2,
-                             const arma::mat & Omega,
-                             int k, int p, int n){
-  
-  arma::mat Y = data.t(); // convert to col vectors
-  arma::vec mu_beta(k*p,fill::zeros);
-  arma::mat Q_beta(k*p,k*p,fill::zeros);// percision matrix up to sigma^2 scaling
-  //Q_beta.diag() += 1/tau2;
-  Q_beta.diag() += 1/tau2;
-  arma::mat D_i(k,k,fill::zeros);
-  arma::mat res;
-  
-  arma::uvec ind_para = linspace<uvec>(0,k-1,k);
-  
-  arma::mat Sigma = inv_sympd(Omega);
-  //if(!Omega.is_symmetric()) stop("Omega in beta!");
-  //arma::mat sqrt_Omega =  sqrtmat_sympd(Omega);
-  //arma::mat chol_Omega =  chol(Omega);
-  //for(int i = 0 ; i < p ; ++i){
-  //  D_i.zeros();
-  //  D_i.diag() = 1/tau2(ind_para * p + i);
-    //D_i = sqrt_Omega * D_i * sqrt_Omega;
-    
-  //  D_i = chol_Omega.t() * D_i * chol_Omega;
-  //  Q_beta(ind_para * p + i,ind_para * p + i) = D_i;
-  //}
-  
-  arma::sp_mat X_i(k,k*p);
-  
-  //if(!Q_beta.is_symmetric()) {stop("Q_beta before adding!");}
-  
-  for(int i = 0 ; i < n ; ++i){
-    X_i.zeros();
-    X_i = getDesign_i_helper(design.row(i),k);// this function was in helper.cpp
-    //if(!Sigma.is_symmetric()) {stop("Sigma!");}
-    //arma::mat adder = ;
-    Q_beta +=  X_i.t() * (Sigma * X_i) ;
-    //if(!adder.is_symmetric()) {Rcout << mat(X_i)<<endl;Rcout<<Sigma<<endl;Rcout<<adder<<endl;stop("adder!");}
-    //if(!Q_beta.is_symmetric()) {stop("Q_beta during adding!");}
-    mu_beta +=  X_i.t() * (Y.col(i)-Sigma * mu);
-  }
-  
-  
-  //Rcout << "beta" <<endl;
-  arma::mat Sigma_beta = inv(Q_beta);
-  //if(!Q_beta.is_symmetric()) {stop("Q_beta after adding!");}
-  mu_beta = Sigma_beta*mu_beta;
-  res = mvnrnd(mu_beta, Sigma_beta);
-  res = reshape(res,p,k);
-  
-  return(res);
-}
 
 
 // [[Rcpp::export]]
@@ -108,13 +48,14 @@ arma::mat update_car_beta_helper(const arma::mat & data,
   arma::mat mu_beta_mat = design.t() * Y_tilde;
   arma::vec mu_beta = vectorise(mu_beta_mat);
   
-  for(int i = 0 ; i < k ; ++i){
+  //for(int i = 0 ; i < k ; ++i){
     // update Q
-    for(int j = 0 ; j < k ; ++j){
-      Q_beta(ind_p + j * p, ind_p + i * p) = XtX * Sigma(i,j);
-    }
-  }
+  //  for(int j = 0 ; j < k ; ++j){
+  //    Q_beta(ind_p + j * p, ind_p + i * p) = XtX * Sigma(i,j);
+  // }
+  //}
   
+  Q_beta = kron(Sigma,XtX);
 
   Q_beta.diag() += 1/tau2;
   
@@ -127,8 +68,6 @@ arma::mat update_car_beta_helper(const arma::mat & data,
   
   return(res);
 }
-
-
 
 
 // tested 20200712
