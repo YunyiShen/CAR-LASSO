@@ -7,7 +7,7 @@ using namespace arma;
 /*
  * Adopted form R package GIGrvg
  * 
- * 
+ * Generating random sample for Generalized Inverse Gaussian distribution
  */
 
 

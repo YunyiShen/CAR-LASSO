@@ -12,10 +12,12 @@ using namespace std;
 #include "GIG_helper.h"
 #include "CAR_LASSO_helper.h"
 /*
- * We would like to develope a Conditional Auto Regression LASSO, 
+ * Helper functions for Conditional Auto Regression LASSO, 
  * Basic idea was to embed Graphical LASSO into a normal LASSO using the hirechical structure
  *   described by Wang (2012) and Park and Casella 2008
+ * In this model average structure offer some extra information of conditional correlation
  * 
+ * A CAR can be reparameterize into a model s.t.: 
  * Y~N(Sigma (Xbeta+mu),Sigma)
  */
 
@@ -29,7 +31,7 @@ arma::mat update_car_beta_helper(const arma::mat & data,
                              int k, int p, int n){
   
 
-  arma::mat Q_beta(k*p,k*p,fill::zeros);// percision matrix up to sigma^2 scaling
+  arma::mat Q_beta(k*p,k*p,fill::zeros);
   
   arma::mat XtX = design.t() * design;
   
@@ -48,18 +50,11 @@ arma::mat update_car_beta_helper(const arma::mat & data,
   arma::mat mu_beta_mat = design.t() * Y_tilde;
   arma::vec mu_beta = vectorise(mu_beta_mat);
   
-  //for(int i = 0 ; i < k ; ++i){
-    // update Q
-  //  for(int j = 0 ; j < k ; ++j){
-  //    Q_beta(ind_p + j * p, ind_p + i * p) = XtX * Sigma(i,j);
-  // }
-  //}
-  
-  Q_beta = kron(Sigma,XtX);
+  Q_beta = kron(Sigma,XtX); // precision matrix of beta, more intuitive way was sum_i X_i^TSigmaX_i, but kron is faster
 
-  Q_beta.diag() += 1/tau2;
+  Q_beta.diag() += 1/tau2; // penalty due to Laplace prior
   
-  //Rcout << "beta" <<endl;
+  
   arma::mat Sigma_beta = inv(Q_beta);
   
   mu_beta = Sigma_beta*mu_beta;
@@ -78,8 +73,8 @@ arma::vec update_car_mu_helper(const arma::mat & data,
                            const arma::mat & Omega, 
                            int k,int p,int n){
   arma::vec mu(k);
-  //Rcout << "mu" <<endl;
-  //arma::mat Sigma_mu = inv_sympd(Omega);
+  
+  // mu was normal with mean Omega*data-Xbeta
   arma::mat YminusXbeta = data*Omega - design * beta;
   arma::vec mu_mu = trans(mean(YminusXbeta));
   
@@ -91,8 +86,7 @@ arma::vec update_car_mu_helper(const arma::mat & data,
 }
 
 
-// return Omega matrix
-// tested dimension 20200603
+// update Omega matrix using block method
 // [[Rcpp::export]]
 void update_car_Omega_helper(arma::mat & Omega,
                              const arma::mat & data,
@@ -166,26 +160,18 @@ void update_car_Omega_helper(arma::mat & Omega,
     U11 = U(perms_j,perms_j);
     U12 = U(perms_j,just_j);
     Omega_11 = Omega(perms_j,perms_j);
-    //if(!Omega_11.is_symmetric()) stop("It is Omega_11!");
-    
-    //Rcout << "flag1" <<endl;
-    //Rcout<<Omega_11<<endl;
+
     inv_Omega_11 = inv(Omega_11);
     
-    // the current gamma
+    // the current gamma=Omega_22-omega_12^T * Omega_{11}^{-1} * omega_{12}
     gamma = as_scalar( Omega(j,j)-Omega(just_j,perms_j)*inv_Omega_11*Omega(perms_j,just_j));
     
-    // update omega_12
+    // update omega_12, which is normal
     Omega_omega_12 = (S(j,j)+lambda_curr)*inv_Omega_11+(1/gamma)*inv_Omega_11*U11*inv_Omega_11;
     Omega_omega_12.diag() += tauI;
-    //Rcout << "flag1" << endl;
-    
-    //Rcout << "flag2" << endl; 
-    //Rcout<<Omega_omega_12 <<endl;
+
     Sigma_omega_12 = inv(Omega_omega_12);
-    //if(!Omega_omega_12.is_symmetric()) stop("Omega_omega_12!");
     
-    //Rcout << "flag" <<endl;
     mu_omega_12 = (S12-(1/gamma) * inv_Omega_11*U12);
     mu_omega_12 = - Sigma_omega_12 * mu_omega_12;
     
@@ -193,43 +179,37 @@ void update_car_Omega_helper(arma::mat & Omega,
     
     Omega(perms_j,just_j) = omega_12;
     Omega(just_j,perms_j) = omega_12.t();
-    // flagged, after error
-    // update gamma
+    
+    // update gamma, follow GIG 
     lambda_gamma = n/2+1;
     psi_gamma = lambda_curr + S(j,j);
     chi_gamma = U(j,j) - 
       2*as_scalar(U12.t()*inv_Omega_11*omega_12)+
       as_scalar(omega_12.t()*inv_Omega_11*U11*inv_Omega_11*omega_12);
     
-    gamma = rgig(lambda_gamma, chi_gamma, psi_gamma);
+    gamma = rgig(lambda_gamma, chi_gamma, psi_gamma); // function in GIG_helper.cpp
     
-    // update diagonal
+    // update diagonal using determinant
     Omega(j,j) = gamma + as_scalar( omega_12.t()*inv_Omega_11*omega_12);
     
   }
   return;
 }
 
+// update 1/tau^2, this is for beta, 
+// tau in Omega was updated within update_Omega
 // [[Rcpp::export]]
 arma::vec update_car_tau2_helper(const arma::mat & beta,
                              const double & lambda2,
                              const arma::mat & Omega,
                              int k, int p, int n){
-  //arma::mat sqrt_Omega =  sqrtmat_sympd(Omega);
-  //arma::mat chol_Omega = chol(Omega);
-  //arma::mat beta_temp = beta;
   arma::vec betavec = vectorise(beta);
   arma::vec invtau2(k*p);
-  
-  //double detSigma = 1/det(Omega);
-  //Rcout << "detOmega:" << 1/detSigma << endl;
-  //detSigma = pow(detSigma,1/(k));
-  
   
   
   arma::vec mu_prime = sqrt(lambda2/(betavec%betavec));
   for(int i = 0 ; i < k*p ; ++i){
-    invtau2(i) =  rinvGau(mu_prime(i),lambda2);
+    invtau2(i) =  rinvGau(mu_prime(i),lambda2); 
   }
   return(1/invtau2);
 }
