@@ -19,6 +19,28 @@ using namespace arma;
  * matrix specifying a Gaussian Graphical Model
  */
 
+
+/* 
+Input:
+  @ data: a matrix with column as nodes and row as samples
+  @ n_iter: number of saved sampling iterations in the Gibbs sampler
+  @ n_burn_in: number of burn in before sampling
+  @ thin_by: subsampling steps, integer
+  @ r_Omega: shape parameter for shrinkage parameter lambda
+  @ delta_Omega: RATE parameter for lambda prior
+  @ progress: whether to show a progress bar from C++
+
+Output:
+  A list with component:
+  @ Omega: a matrix with each row as an MCMC sample, 
+    columns are the upper diagnol entries of precision matrix Omega
+  @ lambda: a matrix with only row columns, first was for beta, second was for Omega
+    each row was an MCMC sample of shrinkage parameter lambda
+
+
+*/
+
+
 // [[Rcpp::export]]
 Rcpp::List Graphical_LASSO_Cpp(const arma::mat & data,
                            const int n_iter,

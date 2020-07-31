@@ -12,12 +12,41 @@ using namespace arma;
 #include "CAR_LASSO_helper.h"
 
 /*
- * We would like to develope a Simulteneous Regressive Graphical LASSO, 
+ * Helper functions for Conditional Auto Regression LASSO, 
  * Basic idea was to embed Graphical LASSO into a normal LASSO using the hirechical structure
  *   described by Wang (2012) and Park and Casella 2008
+ * In this model average structure offer some extra information of conditional correlation
  * 
- * 
+ * A CAR can be reparameterize into a model s.t.: 
+ * Y~N(Sigma (Xbeta+mu),Sigma)
  */
+
+/* 
+Input:
+  @ data: a matrix with column as nodes and row as samples
+  @ design: a design matrix of common input to the network, should have same # of rows as data
+  @ n_iter: number of saved sampling iterations in the Gibbs sampler
+  @ n_burn_in: number of burn in before sampling
+  @ thin_by: subsampling steps, integer
+  @ r_beta, r_Omega: shape parameter for shrinkage parameter lambda of beta and Omega
+  @ delta_beta, delta_Omega: RATE parameter for lambda prior
+  @ progress: whether to show a progress bar from C++
+
+Output:
+  A list with component:
+  @ beta: a matrix with each row as an MCMC sample, 
+    columns are the vectorization of beta, 
+    while beta matrix has p row and k columns
+  @ mu: a matrix with each row as an MCMC sample, columns are intercept vectors
+  @ Omega: a matrix with each row as an MCMC sample, 
+    columns are the upper diagnol entries of precision matrix Omega
+  @ lambda: a matrix with only row columns, first was for beta, second was for Omega
+    each row was an MCMC sample of shrinkage parameter lambda
+
+
+*/
+
+
 
 // [[Rcpp::export]]
 List CAR_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sample
@@ -27,9 +56,9 @@ List CAR_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sam
                    const int thin_by, // thinning?
                    const double r_beta, // prior on lambda of beta
                    const double delta_beta,
-                   const double r_Omega,
+                   const double r_Omega, // prior on lambda of Omega
                    const double delta_Omega,
-                   bool progress){
+                   bool progress) {// whether to report progress
   int k = data.n_cols; // number of nodes
   int p = design.n_cols; //number of predictors
   int n = data.n_rows; // number of samples
@@ -61,7 +90,7 @@ List CAR_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sam
   arma::mat beta_curr = solve( design.t()*design,design.t()*(centered_data*Omega_curr)); // current value of beta
   
   
-  //arma::vec mean_uncertain(k); // for sampling mu
+  
   
   double lambda2_beta = R::rgamma(r_beta,1/delta_beta); // current value of squared LASSO parameter of \beta
   double lambda_Omega = R::rgamma(r_Omega,1/delta_Omega); // current value of squared LASSO parameter of B
@@ -99,13 +128,13 @@ List CAR_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sam
     
     
     // update Omega
-    //cout << "flag1" << endl;
+    
     update_car_Omega_helper(Omega_curr, data, design, 
                                      mu_curr, beta_curr,
                                      lambda_Omega,
                                      k, p, n);
     
-    //cout << "flag2" <<endl;
+    
     
     // Update mu
     
@@ -115,7 +144,7 @@ List CAR_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sam
     
     
   
-    // Update tau
+    // Update tau2 for beta
     tau2_curr = update_car_tau2_helper(beta_curr,lambda2_beta,
                                    Omega_curr,k,p,n);
     
