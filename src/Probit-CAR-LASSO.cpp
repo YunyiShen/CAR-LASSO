@@ -50,8 +50,8 @@ List Proit_CAR_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as
   arma::mat lambda_mcmc(n_save , 2); // LASSO parameter for beta and B
   lambda_mcmc += NA_REAL;
   
-  arma::mat Z_mcmc(n_save , k*n); // latent normal 
-  Z_mcmc += NA_REAL;
+  //arma::mat Z_mcmc(n_save , k*n); // latent normal 
+  //Z_mcmc += NA_REAL; // we may not have enough memory to save all latent variables for now.
   
   arma::vec tau2_curr = randg<arma::vec> (k*p,distr_param(r_beta,delta_beta)); // current latent variable tau^2, for prior of beta
 
@@ -82,8 +82,8 @@ List Proit_CAR_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as
           Rcpp::Named("beta") = beta_mcmc,
           Rcpp::Named("mu") = mu_mcmc,
           Rcpp::Named("Omega") = Omega_mcmc,
-          Rcpp::Named("lambda") = lambda_mcmc,
-          Rcpp::Named("Z") = Z_mcmc
+          Rcpp::Named("lambda") = lambda_mcmc//,
+          //Rcpp::Named("Z") = Z_mcmc
       ));
     }
     // block update start:
@@ -158,8 +158,8 @@ List Proit_CAR_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as
       Rcpp::Named("beta") = beta_mcmc,
       Rcpp::Named("mu") = mu_mcmc,
       Rcpp::Named("Omega") = Omega_mcmc,
-      Rcpp::Named("lambda") = lambda_mcmc,
-      Rcpp::Named("Z") = Z_mcmc
+      Rcpp::Named("lambda") = lambda_mcmc//,
+      //Rcpp::Named("Z") = Z_mcmc // it is not a good idea to sace all latent normal
   ));
 }
 
