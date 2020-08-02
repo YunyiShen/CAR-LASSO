@@ -11,8 +11,8 @@ using namespace arma;
 #include "Probit_helper.h"
 
 /*
- * We would like to develope a Probit Simulteneous Regressive Graphical LASSO for binary response, 
- * Basic idea was to embed Graphical LASSO into a normal LASSO using the hirechical structure
+ * We would like to develope a Probit CAR LASSO for binary response, 
+ * Basic idea was to embed a modified version of Graphical LASSO into a normal LASSO using the hirechical structure
  *   described by Wang (2012) and Park and Casella 2008
  * 
  * 
@@ -93,7 +93,7 @@ List Proit_CAR_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as
     
     // Update Latent Zs as truncated normal
     
-    update_Z_helper(Z_curr, data,design,mu_curr,beta_curr,
+    update_Z_helper_CAR(Z_curr, data,design,mu_curr,beta_curr,
                              Omega_curr,k,p,n);
     
     //Update betas:
@@ -140,7 +140,7 @@ List Proit_CAR_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as
     // saving the state
     if( (i-n_burn_in)>=0 && (i+1-n_burn_in)%thin_by ==0 ){
       
-      Z_mcmc.row(i_save) = trans(vectorise(Z_curr));
+      //Z_mcmc.row(i_save) = trans(vectorise(Z_curr));
       beta_mcmc.row(i_save) = trans(vectorise(beta_curr));
       Omega_mcmc.row(i_save) = trans( Omega_curr(trimatu_ind( size(Omega_curr) )));
       mu_mcmc.row(i_save) = mu_curr.t();

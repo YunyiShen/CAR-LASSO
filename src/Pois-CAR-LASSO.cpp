@@ -19,7 +19,7 @@ using namespace arma;
  */
 
 // [[Rcpp::export]]
-List Pois_SRG_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sample
+List Pois_CAR_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sample
                    const arma::mat & design, // design matrix, each ROW as a sample
                    const int n_iter, // how many iterations?
                    const int n_burn_in, // burn in
@@ -63,7 +63,7 @@ List Pois_SRG_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as 
   
   arma::mat Z_curr = log(data+.1); // latent normal variable
   
-  //arma::vec mean_uncertain(k); // for sampling mu
+  
   
   double lambda2_beta = R::rgamma(r_beta,1/delta_beta); // current value of squared LASSO parameter of \beta
   double lambda_Omega = 0;//R::rgamma(r_Omega,1/delta_Omega); // current value of squared LASSO parameter of B
@@ -83,8 +83,7 @@ List Pois_SRG_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as 
           Rcpp::Named("beta") = beta_mcmc,
           Rcpp::Named("mu") = mu_mcmc,
           Rcpp::Named("Omega") = Omega_mcmc,
-          Rcpp::Named("lambda") = lambda_mcmc//,
-          //Rcpp::Named("Z") = Z_mcmc
+          Rcpp::Named("lambda") = lambda_mcmc
       ));
     }
     // block update start:
@@ -93,8 +92,8 @@ List Pois_SRG_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as 
     
     
     // Update Latent Zs using ars
-    //Rcout << "current Z : \n" << Z_curr <<endl;
-    update_Z_helper_Pois_reg(Z_curr,
+    // TODO: write a CAR based helper, since the prior changed
+    update_Z_helper_Pois_CAR(Z_curr,
                              data, design,mu_curr, beta_curr, Omega_curr,
                              k,p,n,ns,m,emax);
     //Rcout << "updated:\n" << Z_curr <<endl;
@@ -121,10 +120,6 @@ List Pois_SRG_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as 
     
     
     
-      
-    //Rcout << "detOmega curr in main loop:" << det(Omega_curr) << endl;
-    //Rcout << "sum beta in main loop:" <<sum(sum(beta_curr)) <<endl;
-    //Rcout << "mean of mu in main loop:" << mean(mu_curr) <<endl;
   
     // Update tau
     tau2_curr = update_tau2_helper(beta_curr,lambda2_beta,
@@ -143,7 +138,7 @@ List Pois_SRG_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as 
     // saving the state
     if( (i-n_burn_in)>=0 && (i+1-n_burn_in)%thin_by ==0 ){
       
-      //Z_mcmc.row(i_save) = trans(vectorise(Z_curr));
+      
       beta_mcmc.row(i_save) = trans(vectorise(beta_curr));
       Omega_mcmc.row(i_save) = trans( Omega_curr(trimatu_ind( size(Omega_curr) )));
       mu_mcmc.row(i_save) = mu_curr.t();
@@ -161,8 +156,7 @@ List Pois_SRG_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as 
       Rcpp::Named("beta") = beta_mcmc,
       Rcpp::Named("mu") = mu_mcmc,
       Rcpp::Named("Omega") = Omega_mcmc,
-      Rcpp::Named("lambda") = lambda_mcmc//,
-      //Rcpp::Named("Z") = Z_mcmc
+      Rcpp::Named("lambda") = lambda_mcmc
   ));
 }
 

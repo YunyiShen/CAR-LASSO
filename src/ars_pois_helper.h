@@ -80,6 +80,16 @@ void update_Z_helper_Pois_reg(arma::mat & Z_curr, // persumably large, thus will
                               int ns, int m, double emax // ars parameters
 );
 
+void update_Z_helper_Pois_CAR(arma::mat & Z_curr, // persumably large, thus will not copy
+                              const arma::mat & data, 
+                              const arma::mat & design,
+                              const arma::vec & mu_curr,
+                              const arma::mat & beta_curr,
+                              const arma::mat & Omega_curr,
+                              int k, int p, int n, 
+                              int ns, int m, double emax // ars parameters
+);
+
 void update_Z_helper_Pois_gra(arma::mat & Z_curr, // persumably large, thus will not copy
                               const arma::mat & data, 
                               const arma::vec & mu_curr,
