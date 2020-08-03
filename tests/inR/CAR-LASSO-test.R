@@ -5,13 +5,14 @@ library(RcppProgress)
 
 rm(list = ls())
 
-k = 11
-n = 8000
+k = 10
+n = 100
 p = 2
 
 
 sourceCpp("./src/CAR-LASSO.cpp")
 sourceCpp("./src/graphical-LASSO.cpp")
+sourceCpp("./src/SRG-LASSO.cpp")
 source("./R/misc.R")
 
 B <- rsparsematrix(k,k,0.2)
@@ -30,7 +31,7 @@ Design <- 1.0* (matrix(rnorm(n*p,0,1),n,p))
 colnames(Design) <- paste0("x",1:p)
 
 
-beta <- matrix(rnorm(p*k,1,1),p,k)
+beta <- matrix(rnorm(p*k,5,1),p,k)
 #beta[sample(p*k,floor(0.1*p*k))] = 0
 
 mu <-  1+rnorm(k)
@@ -62,6 +63,21 @@ diag(CAR_Graph) <- 0.5 * diag(CAR_Graph)
 image((CAR_Graph))
 image(Omega)
 hist((CAR_Graph-Omega)/Omega)
+
+
+SRG_test <- SRG_LASSO_Cpp(Z,  Design, n_iter = 25000, 
+                          n_burn_in = 5000, thin_by = 10, 
+                          r_beta = 1, delta_beta = .01,
+                          r_Omega = 1,delta_Omega = .01,
+                          progress = T)
+
+
+SRG_Graph <- 0 * Omega
+SRG_Graph[upper.tri(SRG_Graph,T)] <- apply(SRG_test$Omega,2,mean)
+SRG_Graph <- SRG_Graph+t(SRG_Graph)
+diag(SRG_Graph) <- 0.5 * diag(SRG_Graph)
+
+
 
 
 Glasso <- Graphical_LASSO_Cpp(Z, 25000, 5000, 10, 1, .01, T)
@@ -96,5 +112,6 @@ mean(((CAR_Graph-Omega)^2))
 
 
 CAR_stein_loss <- stein_loss_cpp(CAR_Graph,Omega)
+SRG_stein_loss <- stein_loss_cpp(SRG_Graph,Omega)
 Glasso_stein_loss <- stein_loss_cpp(Glasso_Graph,Omega)
 

@@ -91,7 +91,7 @@ List SRG_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sam
     lambda_Omega = R::rgamma(Omega_r_post,1/Omega_delta_post);
     
     //Update betas:
-    beta_curr = update_beta_helper(data,design,mu_curr,
+    beta_curr = update_beta_helper1(data,design,mu_curr,
                                    tau2_curr,Omega_curr, 
                                    k,p,n);
     

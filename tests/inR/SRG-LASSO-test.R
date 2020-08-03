@@ -5,9 +5,9 @@ library(RcppProgress)
 
 rm(list = ls())
 
-k = 11
-n = 1100
-p = 1
+k = 10
+n = 50
+p = 2
 
 sourceCpp("./src/Probit-SRG-LASSO.cpp")
 sourceCpp("./src/Probit-Graphical-LASSO.cpp")
@@ -32,8 +32,8 @@ Design <- (Design-mean(Design))/sd(Design)
 colnames(Design) <- paste0("x",1:p)
 
 
-beta <- matrix(rnorm(p*k,0,1),p,k)
-#beta[sample(p*k,floor(0.3*p*k))] = 0
+beta <- matrix(rnorm(p*k,10,1),p,k)
+beta[sample(p*k,floor(0.3*p*k))] = 0
 
 mu <- rnorm(k)
 #mu
@@ -69,9 +69,9 @@ Omega_uptri <- Omega[upper.tri(Omega,T)]
 diff_probit <- apply(test$Omega,1,function(w,k){(w-k)/w},Omega_uptri)
 hist(diff_probit)
 
-SRG_test <- SRG_LASSO_Cpp(Z,  Design, n_iter = 5000, 
+SRG_test <- SRG_LASSO_Cpp(Z,  Design, n_iter = 25000, 
                           n_burn_in = 1000, thin_by = 10, 
-                          r_beta = 1, delta_beta = .01,
+                          r_beta = 100, delta_beta = .01,
                           r_Omega = 1,delta_Omega = .01,
                           progress = T)
 

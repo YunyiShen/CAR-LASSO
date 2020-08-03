@@ -101,15 +101,17 @@ arma::mat update_beta_helper1(const arma::mat & data,
   
   arma::uvec ind_para = linspace<uvec>(0,k-1,k);
   
-  arma::mat chol_Omega = chol(Omega);
+  //arma::mat chol_Omega = chol(Omega);
   //arma::mat sqrt_Omega =  sqrtmat_sympd(Omega);
-  
+  arma::mat Sigma = inv(Omega);
   for(int i = 0 ; i < p ; ++i){
     D_i.zeros();
     D_i.diag() = 1/tau2(ind_para * p + i);
     //D_i = sqrt_Omega * D_i * sqrt_Omega;
     
-    D_i = chol_Omega.t() * D_i * chol_Omega;
+    //D_i = chol_Omega.t() * D_i * chol_Omega;
+    //D_i = Omega * D_i * Omega;
+    D_i.diag() /= ((Sigma.diag()%Sigma.diag()));
     Q_beta(ind_para * p + i,ind_para * p + i) = D_i;
   }
 
@@ -279,8 +281,12 @@ arma::vec update_tau2_helper(const arma::mat & beta,
                              const arma::mat & Omega,
                              int k, int p, int n){
   //arma::mat sqrt_Omega =  sqrtmat_sympd(Omega);
-  arma::mat chol_Omega = chol(Omega);
-  arma::mat beta_temp = beta * chol_Omega;
+  //arma::mat chol_Omega = chol(Omega);
+  arma::mat Sigma = inv(Omega);
+  //arma::mat beta_temp = beta * Omega;
+  //arma::mat beta_temp = beta * chol_Omega;
+  arma::mat beta_temp = beta;
+  beta_temp.each_row() /=  (trans(Sigma.diag()));
   arma::vec betavec = vectorise(beta_temp);
   arma::vec invtau2(k*p);
   
@@ -291,6 +297,7 @@ arma::vec update_tau2_helper(const arma::mat & beta,
   
   
   arma::vec mu_prime = sqrt(lambda2/(betavec%betavec));
+  
   for(int i = 0 ; i < k*p ; ++i){
     invtau2(i) =  rinvGau(mu_prime(i),lambda2);
   }
