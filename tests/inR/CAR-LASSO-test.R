@@ -6,7 +6,7 @@ library(RcppProgress)
 rm(list = ls())
 
 k = 10
-n = 100
+n = 1000
 p = 2
 
 
@@ -16,7 +16,7 @@ sourceCpp("./src/SRG-LASSO.cpp")
 source("./R/misc.R")
 
 B <- rsparsematrix(k,k,0.2)
-omega <- diag(rgamma(k,5,.1))
+omega <- diag(rgamma(k,3,.1))
 I <- diag(rep(1,k))
 Omega <- t(I-B) %*% omega %*% (I-B)
 #Omega <- omega
@@ -31,8 +31,8 @@ Design <- 1.0* (matrix(rnorm(n*p,0,1),n,p))
 colnames(Design) <- paste0("x",1:p)
 
 
-beta <- matrix(rnorm(p*k,5,1),p,k)
-#beta[sample(p*k,floor(0.1*p*k))] = 0
+beta <- matrix(rnorm(p*k,2,1),p,k)
+#beta[sample(p*k,floor(0.3*p*k))] = 0
 
 mu <-  1+rnorm(k)
 #mu

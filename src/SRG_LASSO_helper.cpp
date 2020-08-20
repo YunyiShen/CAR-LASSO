@@ -394,10 +394,7 @@ void update_Omega_helper_naive(arma::mat & Omega,
     Ci = (S(j,j)+lambda_curr) * Omega11inv;
     Ci.diag() += tauI;
     invCi = inv(Ci);
-    //CiChol = chol(Ci);
     
-    //S_temp = S.col(j);
-    //S_temp = S_temp(perms_j);
     mui = -invCi*S12;
     
     gamma = mvnrnd(mui, invCi);
