@@ -16,7 +16,7 @@ using namespace std;
 //   \partial{l}^2/\partial{\beta_{ij}}\partial{beta}
 //   result was a p by k matrix of above partial derivitives, useful in FI
 //   need to be vectorized when constructing the FI
-// [[Rcpp::export]]
+
 arma::mat sec_dev_betaij_beta( const arma::mat & design, // a row vector of design
                               const arma::mat & Sigma, // the cov mat
                               int i, int j){
@@ -92,7 +92,8 @@ arma::mat sec_dev_Omegasl_Omega(const arma::mat & design,
     arma::mat Sigma_s_times_l = Sigma.col(s) * Sigma.row(l);
     arma::mat Sigma_l_times_s = Sigma.col(l) * Sigma.row(s);
     arma::mat temp;
-    // FIXME: redo the math
+    // FIXME: simpliy the math, it was currently (probably) 
+    //   the simpliest analytical form, but not for computation
     if(s == l){
         temp = -Sigma_s_times_l - .5 * Sigma * muXbeta.t() * Sigma_s_times_l -
                .5 * Sigma_s_times_l * muXbeta.t() * Sigma -
@@ -148,7 +149,8 @@ arma::mat CAR_FI(const arma::mat & design,
     arma::uvec beta_ind = arma::linspace<arma::uvec>(0, k * p - 1 , k * p);
     arma::uvec mu_ind = k * p + arma::linspace<arma::uvec>(0, k - 1 , k );
     arma::uvec Omega_uptri_ind = (p + 1) * k + 
-                                arma::linspace<arma::uvec>(0, .5 * k * (k+1) - 1 , .5 * k * (k+1) );
+                                arma::linspace<arma::uvec>(0, .5 * k * (k+1) - 1 , 
+                                                           .5 * k * (k+1) );
     arma::uvec ind_temp(1,fill::zeros);
     // These are not the most efficient loops, but good for now during developing 
     // First get beta parts, by column (so same with vectorise()): 
@@ -170,7 +172,8 @@ arma::mat CAR_FI(const arma::mat & design,
     // other part for mu, basically just Omega
     for(int j = 0 ; j < k ; ++j){
         ind_temp(0) = j + k * p ; // work on this column
-        FI_mat(Omega_uptri_ind,ind_temp) = sec_dev_muj_Omega(design, Sigma,beta,mu,j);
+        FI_mat(Omega_uptri_ind,ind_temp) = 
+                sec_dev_muj_Omega(design, Sigma,beta,mu,j);
     }
     //Rcout << "flag" <<endl;
     // flaged pass
@@ -180,8 +183,8 @@ arma::mat CAR_FI(const arma::mat & design,
     for(int l = 0 ; l < k ; ++l){
         for(int s = 0 ; s <= l ; ++s){
             ind_temp(0) += 1;
-            //Rcout <<  sec_dev_Omegasl_Omega(design, Sigma, beta, mu, s, l) <<endl;
-            FI_mat(Omega_uptri_ind,ind_temp) = sec_dev_Omegasl_Omega(design, Sigma, beta, mu, s, l);
+            FI_mat(Omega_uptri_ind,ind_temp) = sec_dev_Omegasl_Omega(design,
+                                            Sigma, beta, mu, s, l);
         }
     }
     
@@ -189,6 +192,32 @@ arma::mat CAR_FI(const arma::mat & design,
     FI_mat(beta_ind,mu_ind) = arma::trans(FI_mat(mu_ind,beta_ind));
     FI_mat(beta_ind,Omega_uptri_ind) = arma::trans(FI_mat(Omega_uptri_ind,beta_ind));
     FI_mat(mu_ind,Omega_uptri_ind) = arma::trans(FI_mat(Omega_uptri_ind,mu_ind));
-    return(-FI_mat);
+    return(-FI_mat);// FI is negative Hessian (for exponential family)
+}
+
+
+// [[Rcpp::export]]
+arma::mat CAR_FI_graph(const arma::mat & design, 
+                 const arma::mat & Omega,
+                 const arma::mat & beta,
+                 const arma::vec & mu,
+                 int k, int p){
+    int dimension = .5 * k * (k+1);
+    arma::mat FI_mat(dimension,dimension,fill::zeros);
+    arma::mat Sigma = inv(Omega);
+
+    // These are not the most efficient loops, but good for now during developing 
+    // now Omega part
+    //  from (p+1) * k to [(p+1) * k + .5 * k * (k+1) - 1]
+    int ind_temp = 0;
+    for(int l = 0 ; l < k ; ++l){
+        for(int s = 0 ; s <= l ; ++s){
+            ind_temp += 1;
+            FI_mat.col(ind_temp) = sec_dev_Omegasl_Omega(design,
+                                            Sigma, beta, mu, s, l);
+        }
+    }
+    
+    return(-FI_mat);// FI is negative Hessian (for exponential family)
 }
 
