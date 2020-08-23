@@ -5,9 +5,9 @@ library(RcppProgress)
 
 rm(list = ls())
 
-k = 10
-n = 1000
-p = 2
+k = 5
+n = 150
+p = 5
 
 
 sourceCpp("./src/CAR-LASSO.cpp")
@@ -50,7 +50,7 @@ for( i in 1:n ){
 par(mfrow = c(1,2))
 
 CAR_test <- CAR_LASSO_Cpp(Z,  Design, n_iter = 25000, 
-                          n_burn_in = 5000, thin_by = 10, 
+                          n_burn_in = 5000, thin_by = 50, 
                           r_beta = 1, delta_beta = .01,
                           r_Omega = 1,delta_Omega = .01,
                           progress = T)

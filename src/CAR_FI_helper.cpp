@@ -10,6 +10,7 @@ using namespace Rcpp;
 using namespace arma;
 using namespace std;
 
+
 // For coders: ALL THE INDECES START FROM 0!!
 
 // This function calculate the second derivitave: 
@@ -209,7 +210,7 @@ arma::mat CAR_FI_graph(const arma::mat & design,
     // These are not the most efficient loops, but good for now during developing 
     // now Omega part
     //  from (p+1) * k to [(p+1) * k + .5 * k * (k+1) - 1]
-    int ind_temp = 0;
+    int ind_temp = -1;
     for(int l = 0 ; l < k ; ++l){
         for(int s = 0 ; s <= l ; ++s){
             ind_temp += 1;
