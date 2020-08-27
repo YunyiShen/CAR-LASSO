@@ -38,5 +38,11 @@ arma::mat CAR_FI_graph(const arma::mat & design,
                  const arma::mat & beta,
                  const arma::vec & mu,
                  int k, int p);
+
+arma::mat CAR_FI_beta(const arma::mat & design, 
+                 const arma::mat & Omega,
+                 const arma::mat & beta,
+                 const arma::vec & mu,
+                 int k, int p);
                  
 #endif

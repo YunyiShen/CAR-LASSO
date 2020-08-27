@@ -222,3 +222,36 @@ arma::mat CAR_FI_graph(const arma::mat & design,
     return(-FI_mat);// FI is negative Hessian (for exponential family)
 }
 
+
+// [[Rcpp::export]]
+arma::mat CAR_FI_beta(const arma::mat & design, 
+                 const arma::mat & Omega,
+                 const arma::mat & beta,
+                 const arma::vec & mu,
+                 int k, int p){
+    int dimension = k * p + k ;
+    arma::mat FI_mat(dimension,dimension,fill::zeros);
+    arma::mat Sigma = inv(Omega);
+
+    // These are not the most efficient loops, but good for now during developing 
+    
+    //  from (p+1) * k to [(p+1) * k + .5 * k * (k+1) - 1]
+    arma::uvec ind_temp(1,fill::zeros);
+    // positions for each parameter set:
+    arma::uvec beta_ind = arma::linspace<arma::uvec>(0, k * p - 1 , k * p);
+    arma::uvec mu_ind = k * p + arma::linspace<arma::uvec>(0, k - 1 , k );
+    for(int j = 0; j < k ; ++j){
+        for(int i = 0 ; i < p ; ++i){
+            ind_temp(0) = j * p + i; // we will work on this column 
+            FI_mat(beta_ind,ind_temp) = sec_dev_betaij_beta(design, Sigma, i, j);
+            FI_mat(mu_ind,ind_temp) = sec_dev_betaij_mu(design, Sigma, i, j);
+        }
+    }
+    
+    // now we fill the mu part, 
+    //  from k*p to (p+1) * k - 1 column
+    FI_mat(mu_ind,mu_ind) = -Sigma;
+    FI_mat(beta_ind,mu_ind) = arma::trans(FI_mat(mu_ind,beta_ind));
+    return(-FI_mat);// FI is negative Hessian (for exponential family)
+}
+
