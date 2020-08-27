@@ -375,7 +375,7 @@ struct beta_tr_worker : public Worker{
         arma::vec mu_temp(k,fill::zeros);
         double val;
         double sign;
-        int dimension = k * p + k + .5 * k * (k+1);   
+        int dimension = k * p + k ;   
         arma::uvec uppertri_graph = trimatu_ind(size(Omega_temp));
         arma::mat FI_mat(dimension,dimension,fill::zeros);
         // loop over all posterior samples
