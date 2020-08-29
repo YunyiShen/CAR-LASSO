@@ -37,7 +37,7 @@ Prior_Info_det <- function(design_vec,CAR_sample,k,p,nrep,pan_scale=.1,pan_amp=.
     designmat <- Reduce(rbind,designmat)
     designmat <- c(designmat)
 
-    infomat <- FI_mat_batch(designmat,Omega_hat,beta_hat,mu_hat,k,p)
+    infomat <- FI_mat_batch(designmat,Omega_hat,beta_hat,mu_hat,k,p) + Emp_info_prior
     return(-log(det(infomat))+ 
         sum(pan_amp * exp(pan_scale * designmat^2)))
 }
