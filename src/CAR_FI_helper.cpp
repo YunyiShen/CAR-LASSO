@@ -10,6 +10,10 @@ using namespace Rcpp;
 using namespace arma;
 using namespace std;
 
+// [[Rcpp::depends(RcppParallel)]]
+#include <RcppParallel.h>
+using namespace RcppParallel;
+
 
 // For coders: ALL THE INDECES START FROM 0!!
 
@@ -254,4 +258,62 @@ arma::mat CAR_FI_beta(const arma::mat & design,
     FI_mat(beta_ind,mu_ind) = arma::trans(FI_mat(mu_ind,beta_ind));
     return(-FI_mat);// FI is negative Hessian (for exponential family)
 }
+
+
+// para version calculating FI with multiple design vectors
+
+struct FI_worker: public Worker{
+    // inputs
+    const arma::mat & Design;
+    const arma::mat & Omega;
+    const arma::mat & beta;
+    const arma::vec & mu;
+    const int & k;
+    const int & p;
+    const int & dim;
+    //output 
+    arma::mat FI;
+
+    //construct
+    FI_worker(const arma::mat & Design,
+            const arma::mat & Omega,
+            const arma::mat & beta,
+            const arma::vec & mu,
+            const int & k,
+            const int & p,
+            const int & dim):
+        Design(Design), Omega(Omega),
+        beta(beta), mu(mu),
+        k(k), p(p), dim(dim), FI( arma::zeros(dim,dim)) {}
+    
+    FI_worker(const FI_worker & fi_worker, Split) : 
+        Design(fi_worker.Design), Omega(fi_worker.Omega),
+        beta(fi_worker.beta), mu(fi_worker.mu),
+        k(fi_worker.k), p(fi_worker.p), dim(fi_worker.dim),
+        FI( arma::zeros(fi_worker.dim, fi_worker.dim)) {}
+
+    void operator()(std::size_t begin, std::size_t end){
+        for(int i = begin ; i < end ; ++i){
+            FI += CAR_FI(Design.row(i),Omega,beta,mu,k,p);
+        }
+    }
+
+    void join(const FI_worker & rhs){
+        FI += rhs.FI;
+    }
+};
+
+
+// [[Rcpp::export]]
+arma::mat CAR_FI_para(const arma::mat & Design,
+                    const arma::mat & Omega,
+                    const arma::mat & beta,
+                    const arma::vec & mu,
+                    int k, int p){
+    int dim = (p+1) * k + .5 * (k + 1) * k;
+    FI_worker fi(Design,Omega,beta,mu,k,p,dim);
+    parallelReduce(0, Design.n_rows, fi);
+    return(fi.FI);
+}
+
 
