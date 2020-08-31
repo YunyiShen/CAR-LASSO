@@ -6,6 +6,12 @@ library(ggplot2)
 library(reshape2)
 library(optimParallel)
 library(RcppParallel)
+library(BB)
+library(GenSA)
+
+sourceCpp("./src/CAR-LASSO.cpp")
+sourceCpp("./src/CAR_active_learning_helper_para.cpp")
+sourceCpp("./src/CAR_FI_helper.cpp")
 
 get_graph <- function(CAR_sample,k){
   Omega <- matrix(0,k,k)
@@ -15,16 +21,9 @@ get_graph <- function(CAR_sample,k){
   return(Omega)
 }
 
-FI_mat_batch <- function(design_vec,Omega,beta,mu,k,p){
-    design <- matrix(design_vec,ncol = p)
-    design_list <- lapply(1:nrow(design),function(i,w){t(w[i,])},design)
 
-    temp <- lapply(design_list,CAR_FI,Omega,beta,mu,k,p)
-    temp <- Reduce("+",temp)
-    return(temp)
-}
-
-Prior_Info_det <- function(design_vec,CAR_sample,k,p,nrep,pan_scale=.1,pan_amp=.01){
+Prior_Info_det <- function(design_vec,CAR_sample,k,pp,nrep,pan_scale=.1,pan_amp=.01){
+    p = pp
     Omega_hat <- get_graph(CAR_sample,k)
     beta_hat <- matrix(colMeans(CAR_sample$beta),nrow = p)
     mu_hat <- colMeans(CAR_sample$mu)
@@ -35,12 +34,30 @@ Prior_Info_det <- function(design_vec,CAR_sample,k,p,nrep,pan_scale=.1,pan_amp=.
     designmat <- matrix(design_vec,ncol = p)
     designmat <- lapply(1:nrep,function(i) designmat)
     designmat <- Reduce(rbind,designmat)
-    designmat <- c(designmat)
 
-    infomat <- FI_mat_batch(designmat,Omega_hat,beta_hat,mu_hat,k,p) + Emp_info_prior
-    return(-log(det(infomat))+ 
-        sum(pan_amp * exp(pan_scale * designmat^2)))
+    infomat <- CAR_FI_para(designmat,Omega_hat,beta_hat,mu_hat,k,p=p) + Emp_info_prior
+    return(-log(det(infomat[1:((p+1)*k),1:((p+1)*k)]))+ 
+        sum(pan_amp * exp(pan_scale * designmat^2))/length(designmat))
 }
+
+Prior_Info_tr <- function(design_vec,CAR_sample,k,pp,nrep,pan_scale=.1,pan_amp=.01){
+  p = pp
+  Omega_hat <- get_graph(CAR_sample,k)
+  beta_hat <- matrix(colMeans(CAR_sample$beta),nrow = p)
+  mu_hat <- colMeans(CAR_sample$mu)
+  Emp_cov_prior <- cov(Reduce(cbind,CAR_sample[1:3]))
+  
+  Emp_info_prior <- solve(Emp_cov_prior)
+  
+  designmat <- matrix(design_vec,ncol = p)
+  designmat <- lapply(1:nrep,function(i) designmat)
+  designmat <- Reduce(rbind,designmat)
+  
+  infomat <- CAR_FI_para(designmat,Omega_hat,beta_hat,mu_hat,k,p=p) + Emp_info_prior
+  return(log(sum(diag(solve(infomat))))+ 
+           sum(pan_amp * exp(pan_scale * designmat^2))/length(designmat))
+}
+
 
 
 log_l2_upt_dist <- function(Omega_hat,Omega){
@@ -57,29 +74,34 @@ log_l2_dist <- function(beta_hat,beta){
 }
 
 
-k <- 6
-n_init <- 50 # initial data points
-p <- 4
+k <- 12
+n_init <- 200 # initial data points
+p <- 12
 
 n_step <- 15
 n_rep_step <- 1 # number of repeats
-n_new <- 20 # number of new experiments each time
+n_new <- 30 # number of new experiments each time
 n_new_each_step <- n_rep_step * n_new
 
-sourceCpp("./src/CAR-LASSO.cpp")
-sourceCpp("./src/CAR_active_learning_helper_para.cpp")
 
 # get true parameters
-set.seed(12345)
-B <- rsparsematrix(k,k,0.2)
-omega <- diag(rgamma(k,3,.1))
-I <- diag(rep(1,k))
-Omega <- t(I-B) %*% omega %*% (I-B)
-Omega <- as.matrix(Omega)
+#set.seed(12345)
+deg = T
+while(deg){
+  B <- rsparsematrix(k,k,0.2)
+  omega <- diag(rgamma(k,5,.1))
+  I <- diag(rep(1,k))
+  Omega <- t(I-B) %*% omega %*% (I-B)
+  Omega <- as.matrix(Omega)
+  Sigma <- solve(Omega)
+  deg = kappa(Sigma)>1e4
+}
+cat(kappa(Sigma),"\n")
 
-Sigma <- solve(Omega)
-beta <- matrix(rnorm(k*p,0,5),p,k)
-mu <- matrix(rnorm(k,0,5))
+
+#beta <- matrix(rnorm(k*p,0,2),p,k)
+beta <- as.matrix(rsparsematrix(p,k,0.5))
+mu <- matrix(rnorm(k,0,1))
 
 
 design_init <- matrix(rnorm(p * n_init), ncol = p)
@@ -121,6 +143,8 @@ res2 <- data.frame(step = 0:n_step,
                    AL_uncon = NA, rep = NA, rand = NA)
 #res1[1,2:5] <- stein_loss_cpp(graph_init,Omega)
 res1[1,2:5] <- log_l2_dist(colMeans(sample_init$beta),c(beta))
+#res2[1,2:5] <- log_l2_dist(graph_init[upper.tri(Omega,T)],
+#                           Omega[upper.tri(Omega,T)])
 res2[1,2:5] <- stein_loss_cpp(graph_init,Omega)
 par(mfrow = c(1,2))
 #X11()
@@ -149,11 +173,13 @@ for(i in 1:n_step+1){
   graph_rep <- get_graph(sample_rep,k)
   res1$rep[i] <- log_l2_dist(colMeans(sample_rep$beta),c(beta))
     #stein_loss_cpp(graph_rep,Omega)
+  #res2$rep[i] <- log_l2_dist(graph_rep[upper.tri(Omega,T)],
+  #           Omega[upper.tri(Omega,T)])
   res2$rep[i] <- stein_loss_cpp(graph_rep,Omega)
   
   # random
   cat("  random:\n")
-  design_temp <- matrix(rnorm(n_new*p),ncol = p)
+  design_temp <- matrix(rnorm(n_new*p,0,1),ncol = p)
   design_temp <- lapply(1:n_rep_step,function(i){design_temp})
   design_temp <- Reduce(rbind, design_temp)
   Xbeta_temp <- design_temp %*% beta
@@ -172,20 +198,29 @@ for(i in 1:n_step+1){
   graph_rand <- get_graph(sample_rand,k)
   res1$rand[i] <- log_l2_dist(colMeans(sample_rand$beta),c(beta))
     #stein_loss_cpp(graph_rand,Omega)
+  #res2$rand[i] <- log_l2_dist(graph_rand[upper.tri(Omega,T)],
+  #                           Omega[upper.tri(Omega,T)])
   res2$rand[i] <- stein_loss_cpp(graph_rand,Omega)
   
   
   # AL_con
-  cat("  active learning w/ constrain:\n")
-  AL_design_con <- optim(par = rnorm(n_new * p),
-                         fn = Prior_Info_det, 
+  cat("  active learning:\n")
+  guess <- rnorm(n_new * p,0,1)
+  AL_design_con <- BBoptim(par = guess,
+                         fn = Prior_Info_tr,
+                         #lower = -3 + 0*guess,upper = 3+0*guess,
                          CAR_sample = sample_AL_con,
-                         k = k, p = p,
-                         nrep = n_rep_step,pan_amp = .05,
-                         control = list(maxit = 3000)
+                         k = k, 
+                         pp = p,
+                         nrep = n_rep_step,
+                         pan_amp = 1*5e-3,
+                        #control = list(max.call = 1e5,
+                         #               verbose = T,
+                          #             nb.stop.improvement = 1e-5,
+                           #             simple.function = T)
                          #,method = "L-BFGS-B"
-                         #,lower = -3,upper = 3
-                         ,method = "SANN"
+                         #,method = 1
+                         #,method = "SANN"
                          )
   AL_design_con <- matrix(AL_design_con$par,ncol = p)
   cat(AL_design_con,"\n")
@@ -208,6 +243,8 @@ for(i in 1:n_step+1){
   graph_AL_con <- get_graph(sample_AL_con,k)
   res1$AL_con[i] <- log_l2_dist(colMeans(sample_AL_con$beta),c(beta))
     #stein_loss_cpp(graph_AL_con,Omega)
+  #res2$AL_con[i] <- log_l2_dist(graph_AL_con[upper.tri(Omega,T)],
+  #                           Omega[upper.tri(Omega,T)])
   res2$AL_con[i] <- stein_loss_cpp(graph_AL_con,Omega)
   
   
@@ -242,10 +279,10 @@ for(i in 1:n_step+1){
   #dev.off()
   #X11()
   plot(res1$step,res1$AL_con,type = "l",col = "darkred",
-       ylim = c(0.9*min(res1[,2:5],na.rm = T),
-                1.1*max(res1[,2:5],na.rm = T)),
+       ylim = c(min(res1[,2:5]-.25,na.rm = T),
+                max(res1[,2:5]+.25,na.rm = T)),
        xlab = "steps",
-       ylab = "L2 loss beta")
+       ylab = "log L2 loss beta")
   #lines(res$step,res$AL_uncon)
   lines(res1$step,res1$rand,col = "blue")
   lines(res1$step,res1$rep,col = "#058505")
@@ -267,5 +304,5 @@ for(i in 1:n_step+1){
   #       col=c("darkred", "blue" , "#058505"), 
   #       lty=1, box.lty=1)
   write.csv(res1,"./tests/inR/active_learning_test1.csv")
-  write.csv(res2,"./tests/inR/active_learning_test1.csv")
+  write.csv(res2,"./tests/inR/active_learning_test2.csv")
 }
