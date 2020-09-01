@@ -38,7 +38,7 @@ void update_car_Omega_adp_helper(arma::mat & Omega,
   arma::uvec Omega_upper_tri = trimatu_ind(size(Omega),1);
   arma::uvec Omega_upper_tri_full = trimatu_ind(size(Omega));
 
-  arma::mat lambda_temp = Omega.zeros();
+  arma::mat lambda_temp = zeros(size(Omega));
   lambda_temp(Omega_upper_tri_full) = lambda_curr;
 
   int n_upper_tri = Omega_upper_tri.n_elem;
@@ -75,7 +75,7 @@ void update_car_Omega_adp_helper(arma::mat & Omega,
   // update tau, using old Omega
   for(int j = 0 ; j < n_upper_tri ; ++j){
     tau_curr(Omega_upper_tri(j)) = 
-      rinvGau(sqrt(lambda_temp(Omega_upper_tri(j))*lambda_curr(Omega_upper_tri(j))/
+      rinvGau(sqrt(lambda_temp(Omega_upper_tri(j))*lambda_temp(Omega_upper_tri(j))/
             (Omega(Omega_upper_tri(j))*Omega(Omega_upper_tri(j)))),
               lambda_temp(Omega_upper_tri(j))*lambda_temp(Omega_upper_tri(j)));
   }
@@ -96,12 +96,12 @@ void update_car_Omega_adp_helper(arma::mat & Omega,
     Omega_11 = Omega(perms_j,perms_j);
 
     inv_Omega_11 = inv(Omega_11);
-    
+    //Rcout << "flag" << endl;
     // the current gamma=Omega_22-omega_12^T * Omega_{11}^{-1} * omega_{12}
     gamma = as_scalar( Omega(j,j)-Omega(just_j,perms_j)*inv_Omega_11*Omega(perms_j,just_j));
     
     // update omega_12, which is normal
-    Omega_omega_12 = (S(j,j)+lambda_curr)*inv_Omega_11+(1/gamma)*inv_Omega_11*U11*inv_Omega_11;
+    Omega_omega_12 = (S(j,j)+lambda_temp(j,j))*inv_Omega_11+(1/gamma)*inv_Omega_11*U11*inv_Omega_11;
     Omega_omega_12.diag() += tauI;
 
     Sigma_omega_12 = inv(Omega_omega_12);

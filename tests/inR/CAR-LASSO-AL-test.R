@@ -8,7 +8,7 @@ library(optimParallel)
 library(RcppParallel)
 
 rm(list = ls())
-
+setThreadOptions(numThreads = defaultNumThreads() - 2)
 get_graph <- function(CAR_sample,k){
   Omega <- matrix(0,k,k)
   Omega[upper.tri(Omega,T)] = apply(CAR_sample$Omega,2,mean)
@@ -200,9 +200,9 @@ for(i in 1:n_step+1){
                          k = k, p = p, n_new = n_new, n_old = nrow(design_AL_con),
                          nrep = n_rep_step,
                          control = list(maxit = 3000,fnscale = -1)
-                         #,method = "L-BFGS-B"
+                         ,method = "L-BFGS-B"
                          #,lower = -3,upper = 3
-                         ,method = "SANN"
+                         #,method = "SANN"
                          )
   AL_design_con <- matrix(AL_design_con$par,ncol = p)
   cat(AL_design_con,"\n")

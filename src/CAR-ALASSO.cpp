@@ -115,7 +115,7 @@ List CAR_ALASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sa
       );
     }
     // block update start:
-	  
+	// flaged
 	// Update lambda_Omega
     update_car_lambda_Omega_adp_helper(lambda_Omega,
                                        Omega_curr,
@@ -127,7 +127,7 @@ List CAR_ALASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sa
                                    tau2_curr, Omega_curr, 
                                    k, p, n);
     
-    
+    // flaged
     // update Omega
     
     update_car_Omega_adp_helper(Omega_curr, data, design, 
@@ -135,7 +135,7 @@ List CAR_ALASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sa
                                      lambda_Omega,
                                      k, p, n);
     
-    
+    //Rcout << "flag" <<endl;
     
     // Update mu
     
