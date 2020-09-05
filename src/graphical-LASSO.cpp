@@ -155,14 +155,14 @@ Rcpp::List Graphical_LASSO_Cpp(const arma::mat & data,
       
       Ci = (S(j,j)+lambda_curr) * Omega11inv;
       Ci.diag() += tauI;
-      invCi = inv(Ci);
-      //CiChol = chol(Ci);
+      //invCi = inv(Ci);
+      CiChol = chol(Ci);
       
       //S_temp = S.col(j);
       //S_temp = S_temp(perms_j);
-      mui = -invCi*S12;
-      
-      gamma = mvnrnd(mui, invCi);
+      mui = - solve(Ci,S12);
+      gamma = solve(CiChol,randn(size(mui))) + mui;
+      //gamma = mvnrnd(mui, invCi);
       
       // Replacing omega entries
       Omega.submat(perms_j,ind_j) = gamma;
