@@ -35,7 +35,7 @@ using namespace arma;
 
 // tested for dimension compatibility 20200603
 // [[Rcpp::export]]
-arma::mat update_beta_helper(const arma::mat & data,
+arma::mat update_beta1_helper(const arma::mat & data,
                              const arma::mat & design,
                              const arma::vec & mu,
                              const arma::vec & tau2,
@@ -82,7 +82,7 @@ arma::mat update_beta_helper(const arma::mat & data,
 }
 
 // [[Rcpp::export]]
-arma::mat update_beta_helper1(const arma::mat & data,
+arma::mat update_beta_helper(const arma::mat & data,
                              const arma::mat & design,
                              const arma::vec & mu,
                              const arma::vec & tau2,
