@@ -7,6 +7,7 @@ library(bayesm)
 rm(list = ls())
 
 sourceCpp("./src/CAR-LASSO.cpp")
+sourceCpp("./src/SRG-LASSO.cpp")
 sourceCpp("./src/graphical-LASSO.cpp")
 sourceCpp("./src/CAR-ALASSO.cpp")
 source("./R/misc.R")
@@ -18,7 +19,7 @@ ps <- c(10,5)
 
 set.seed(42)
 
-n_exp <- length(ks) * length(ns) * length(ps) * 4
+n_exp <- length(ks) * length(ns) * length(ps) * 5
 systimet <- (system.time(1+1))
 res <- data.frame(matrix(NA,n_exp,9))
 colnames(res) <- c("k","n","p","algo",names(systimet))
@@ -47,6 +48,20 @@ for(k in ks){
         Z[j,] <- MASS::mvrnorm(1,Sigma %*% (Xbeta[j,]+mu),Sigma)
       }
       
+      cat("SRG:\n")
+      temp <- system.time(SRG_test <- SRG_LASSO_Cpp(Z,  Design, n_iter = 20, 
+                          n_burn_in = 1000, thin_by = 10, 
+                          r_beta = 1, delta_beta = .01,
+                          r_Omega = 1,delta_Omega = .01,
+                          progress = T))
+      
+      temp
+      
+      res$algo[i_exp] <- "SRG_LASSO"
+      res[i_exp, 1:3] <- c(k,n,p)
+      res[i_exp, 5:9] <- as.numeric(temp)
+      i_exp <- i_exp + 1
+
       cat("CAR:\n")
       temp <- system.time(CAR_LASSO_Cpp(Z,  Design, n_iter = 1000, 
                           n_burn_in = 100, thin_by = 1, 
