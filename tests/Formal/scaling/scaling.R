@@ -136,7 +136,7 @@ ggplot(res,
   geom_point() +
   geom_line()+
   xlab("number of nodes")+
-  ylab("CPU time/s")+
+  ylab("CPU time(s)/1k samples")+
   guides(color=guide_legend(nrow=2,byrow=TRUE))+
   labs(color = "Algorithm") +
   
