@@ -16,7 +16,7 @@ ns <- c( 500,1000 )
 ps <- c(10,5)
 
 
-set.seed(983)
+set.seed(42)
 
 n_exp <- length(ks) * length(ns) * length(ps) * 4
 systimet <- (system.time(1+1))
@@ -28,7 +28,7 @@ for(k in ks){
   for(n in ns){
     for(p in ps){
       cat("k=",k,"n=",n,"p=",p,"\n")
-      B <- rsparsematrix(k,k,0.2)
+      B <- 3*rsparsematrix(k,k,0.2)
       omega <- diag(rgamma(k,3,.1))
       I <- diag(rep(1,k))
       Omega <- t(I-B) %*% omega %*% (I-B)
@@ -53,6 +53,7 @@ for(k in ks){
                           r_beta = 1, delta_beta = .01,
                           r_Omega = 1,delta_Omega = .01,
                           progress = T))
+      temp
       
       res$algo[i_exp] <- "CAR_LASSO"
       res[i_exp, 1:3] <- c(k,n,p)
@@ -66,7 +67,7 @@ for(k in ks){
                           r_Omega = rep(1,.5*(k+1)*k),
                           delta_Omega = rep(.01,.5*(k+1)*k),
                           progress = T))
-
+      temp
       res$algo[i_exp] <- "CAR_ALASSO"
       res[i_exp, 1:3] <- c(k,n,p)
       res[i_exp, 5:9] <- as.numeric(temp)
@@ -76,6 +77,7 @@ for(k in ks){
       temp <- system.time(Graphical_LASSO_Cpp(Z, 1000, 
                           100, 10, 1, .01, T))
 
+      temp
       res$algo[i_exp] <- "GLASSO"
       res[i_exp, 1:3] <- c(k,n,p)
       res[i_exp, 5:9] <- as.numeric(temp)
@@ -86,6 +88,7 @@ for(k in ks){
                 rmultireg(Z,cbind(1,Design),
                 0*rbind(1,beta),diag(0.001,p+1,p+1),3,3*diag(2,k,k))))
 
+      temp
       res$algo[i_exp] <- "multireg"
       res[i_exp, 1:3] <- c(k,n,p)
       res[i_exp, 5:9] <- as.numeric(temp)
