@@ -36,7 +36,6 @@ arma::mat update_car_beta_helper(const arma::mat & data,
   arma::mat XtX = design.t() * design;
   
   
-  arma::mat res;
   
   arma::uvec ind_para = linspace<uvec>(0,k-1,k);
   
@@ -54,11 +53,15 @@ arma::mat update_car_beta_helper(const arma::mat & data,
 
   Q_beta.diag() += 1/tau2; // penalty due to Laplace prior
   
+  //arma::mat res;
+  //arma::mat Sigma_beta = inv(Q_beta);
   
-  arma::mat Sigma_beta = inv(Q_beta);
-  
-  mu_beta = Sigma_beta*mu_beta;
-  res = mvnrnd(mu_beta, Sigma_beta);
+  //mu_beta = Sigma_beta*mu_beta;
+  //res = mvnrnd(mu_beta, Sigma_beta);
+  arma::mat res(size(mu_beta),fill::randn);
+  arma::mat chol_Q = arma::chol(Q_beta);
+  res = arma::solve(chol_Q,res) + arma::solve(Q_beta,mu_beta);
+
   res = reshape(res,p,k);
   
   return(res);
@@ -130,6 +133,7 @@ void update_car_Omega_helper(arma::mat & Omega,
   
   arma::mat omega_12;
   arma::mat Sigma_omega_12(k-1,k-1,fill::zeros);
+  arma::mat chol_Omega_omega_12;
   arma::mat Omega_omega_12(k-1,k-1,fill::zeros);
   arma::mat mu_omega_12;
   
@@ -162,20 +166,26 @@ void update_car_Omega_helper(arma::mat & Omega,
     Omega_11 = Omega(perms_j,perms_j);
 
     inv_Omega_11 = inv(Omega_11);
-    
+    //inv_Omega_11 += inv_Omega_11.t();
+    //inv_Omega_11/=2;
     // the current gamma=Omega_22-omega_12^T * Omega_{11}^{-1} * omega_{12}
     gamma = as_scalar( Omega(j,j)-Omega(just_j,perms_j)*inv_Omega_11*Omega(perms_j,just_j));
     
     // update omega_12, which is normal
     Omega_omega_12 = (S(j,j)+lambda_curr)*inv_Omega_11+(1/gamma)*inv_Omega_11*U11*inv_Omega_11;
     Omega_omega_12.diag() += tauI;
+    // substitute inv-mvnrnd to chol
+    //Sigma_omega_12 = inv(Omega_omega_12);
+    
+    //mu_omega_12 = (S12-(1/gamma) * inv_Omega_11*U12);
+    //mu_omega_12 = - Sigma_omega_12 * mu_omega_12;
+    
+    //omega_12 = mvnrnd(mu_omega_12, Sigma_omega_12);
+    chol_Omega_omega_12 = chol(Omega_omega_12);
+    mu_omega_12 = (S12-(1/gamma) * solve(Omega_11,U12));
+    mu_omega_12 = - solve(Omega_omega_12,mu_omega_12);
+    omega_12 = solve(chol_Omega_omega_12,randn(size(mu_omega_12))) + mu_omega_12;
 
-    Sigma_omega_12 = inv(Omega_omega_12);
-    
-    mu_omega_12 = (S12-(1/gamma) * inv_Omega_11*U12);
-    mu_omega_12 = - Sigma_omega_12 * mu_omega_12;
-    
-    omega_12 = mvnrnd(mu_omega_12, Sigma_omega_12);
     
     Omega(perms_j,just_j) = omega_12;
     Omega(just_j,perms_j) = omega_12.t();

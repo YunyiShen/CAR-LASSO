@@ -64,6 +64,7 @@ void update_car_Omega_adp_helper(arma::mat & Omega,
   arma::mat omega_12;
   arma::mat Sigma_omega_12(k-1,k-1,fill::zeros);
   arma::mat Omega_omega_12(k-1,k-1,fill::zeros);
+  arma::mat chol_Omega_omega_12;
   arma::mat mu_omega_12;
   
   double gamma;
@@ -104,12 +105,17 @@ void update_car_Omega_adp_helper(arma::mat & Omega,
     Omega_omega_12 = (S(j,j)+lambda_temp(j,j))*inv_Omega_11+(1/gamma)*inv_Omega_11*U11*inv_Omega_11;
     Omega_omega_12.diag() += tauI;
 
-    Sigma_omega_12 = inv(Omega_omega_12);
+    //Sigma_omega_12 = inv(Omega_omega_12);
     
-    mu_omega_12 = (S12-(1/gamma) * inv_Omega_11*U12);
-    mu_omega_12 = - Sigma_omega_12 * mu_omega_12;
+    //mu_omega_12 = (S12-(1/gamma) * inv_Omega_11*U12);
+    //mu_omega_12 = - Sigma_omega_12 * mu_omega_12;
     
-    omega_12 = mvnrnd(mu_omega_12, Sigma_omega_12);
+    //omega_12 = mvnrnd(mu_omega_12, Sigma_omega_12);
+    chol_Omega_omega_12 = chol(Omega_omega_12);
+    mu_omega_12 = (S12-(1/gamma) * solve(Omega_11,U12));
+    mu_omega_12 = - solve(Omega_omega_12,mu_omega_12);
+    omega_12 = solve(chol_Omega_omega_12,randn(size(mu_omega_12))) + mu_omega_12;
+
     
     Omega(perms_j,just_j) = omega_12;
     Omega(just_j,perms_j) = omega_12.t();
