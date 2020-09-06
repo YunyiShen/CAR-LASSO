@@ -60,17 +60,17 @@ for(k in ks){
                 settings_link, "beta_k", k, "_p", p , "_s",s, ".csv"
             ))
             beta <- as.matrix(beta)
-            design <- read.csv(paste0(
+            Design <- read.csv(paste0(
                 settings_link, "design_p",p,"_n",n,".csv"
             ))
-            design <- as.matrix(design)
+            Design <- as.matrix(Design)
 
             for(mod in sigma_models){
                 graph_tmp <- do.call(paste0("g_model",mod),list(k=k))
                 Omega <- graph_tmp$Omega
                 Sigma <- graph_tmp$Sigma
                 
-                for(i in 1:rep){
+                for(i in 1:nrep){
                     Z <- makedata(Sigma,design,beta,n)
 
                     # CAR
@@ -126,7 +126,7 @@ for(k in ks){
                     i_res_loss <- i_res_loss + 1
 
                     # multireg
-                    sample_multireg <- multireg_Sample(Z,design,k,p)
+                    sample_multireg <- multireg_Sample(Z,Design,k,p)
                     res_loss[i_res_loss,1:6] <- c(k,p,n,s,mod,i)
                     res_loss$algo[i_res_loss] <- "multireg"
                     res_loss$logL2beta[i_res_loss] <- log_l2(beta,sample_multireg$beta)
