@@ -18,9 +18,9 @@ res_graph_beta_file <- "./tests/Formal/Accurancy/results/graph_beta_CAR.csv"
 
 ks <- c(100,30)
 ss <- c(.2,.5)
-ps <- c(10,50)
+ps <- c(10,5)
 
-nrep <- 50
+nrep <- 2
 sigma_models <- 1:6
 
 thr <- c( 1e-2, 1e-3 )
@@ -51,7 +51,7 @@ i_res_loss <- 1
 i_res_graph_Omega <- 1
 i_res_graph_beta <- 1
 
-for(k in ks){
+for(k in ks) {
     n <- 50 * (k==30) + 200 * (k==100)
     for(p in ps){
         for(s in ss){
@@ -71,9 +71,11 @@ for(k in ks){
                 Sigma <- graph_tmp$Sigma
                 
                 for(i in 1:nrep){
-                    Z <- makedata(Sigma,design,beta,n)
+                    cat("k =",k,",p =",p,",s =",s,",mod =",mod,",rep =",i,"\n")
+                    Z <- makedata(Sigma,Design,beta,n)
 
                     # CAR
+                    cat("CAR:\n")
                     sample_CAR <- CAR_LASSO_Cpp(Z,  Design, n_iter = 10000, 
                           n_burn_in = 5000, thin_by = 10, 
                           r_beta = 1, delta_beta = .01,
@@ -91,6 +93,7 @@ for(k in ks){
                     i_res_loss <- i_res_loss + 1
 
                     # A-CAR
+                    cat("CAR-A:\n")
                     sample_CAR_A <- CAR_ALASSO_Cpp(Z,  Design, n_iter = 10000, 
                           n_burn_in = 5000, thin_by = 10, 
                           r_beta = 1+0*beta, delta_beta = .01 + 0 * beta,
@@ -109,6 +112,7 @@ for(k in ks){
                     i_res_loss <- i_res_loss + 1
 
                     # SRG
+                    cat("SRG:\n")
                     sample_SRG <- SRG_LASSO_Cpp(Z,  Design, n_iter = 10000, 
                           n_burn_in = 5000, thin_by = 10, 
                           r_beta = 1, delta_beta = .01,
@@ -126,6 +130,7 @@ for(k in ks){
                     i_res_loss <- i_res_loss + 1
 
                     # multireg
+                    cat("multireg:\n")
                     sample_multireg <- multireg_Sample(Z,Design,k,p)
                     res_loss[i_res_loss,1:6] <- c(k,p,n,s,mod,i)
                     res_loss$algo[i_res_loss] <- "multireg"
@@ -228,7 +233,7 @@ for(k in ks){
                         get_counts_beta(abs(sample_multireg$beta)>thr[2],beta!=0)
                     write.csv(res_graph_beta,res_graph_beta_file)
                     i_res_graph_beta <- i_res_graph_beta + 1
-                    
+
                 }
             }   
         }
