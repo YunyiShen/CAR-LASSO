@@ -17,6 +17,9 @@ using namespace arma;
  * introduced in Wang (2012). Samples from the conditional distribution of a 
  * permuted column/row for simulating the posterior distribution for the concentration 
  * matrix specifying a Gaussian Graphical Model
+ * 
+ * No intercept, not adaptive
+ * 
  */
 
 
@@ -34,7 +37,7 @@ Output:
   A list with component:
   @ Omega: a matrix with each row as an MCMC sample, 
     columns are the upper diagnol entries of precision matrix Omega
-  @ lambda: a matrix with only row columns, first was for beta, second was for Omega
+  @ lambda: a matrix with only one column, 
     each row was an MCMC sample of shrinkage parameter lambda
 
 

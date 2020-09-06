@@ -11,13 +11,44 @@ using namespace arma;
 //#include "helper.h"
 #include "SRG_LASSO_helper.h"
 
+
 /*
- * We would like to develope a Simulteneous Regressive Graphical LASSO, 
+ * Main sampling functions for Regressive and Graphical LASSO, 
  * Basic idea was to embed Graphical LASSO into a normal LASSO using the hirechical structure
  *   described by Wang (2012) and Park and Casella 2008
  * 
+ * This one was not adaptive, i.e. lambda_Omega was a fixed for all entries of Omega and 
+ *   similar for betas
  * 
+ * Model was: 
+ * Y~N(Xbeta+mu,Sigma)
  */
+
+/* 
+Input:
+  @ data: a matrix with column as nodes and row as samples
+  @ design: a design matrix of common input to the network, should have same # of rows as data
+  @ n_iter: number of saved sampling iterations in the Gibbs sampler
+  @ n_burn_in: number of burn in before sampling
+  @ thin_by: subsampling steps, integer
+  @ r_beta, r_Omega: shape parameter for shrinkage parameter lambda of beta and Omega
+  @ delta_beta, delta_Omega: RATE parameter for lambda prior
+  @ progress: whether to show a progress bar from C++
+
+Output:
+  A list with component:
+  @ beta: a matrix with each row as an MCMC sample, 
+    columns are the vectorization of beta, 
+    while beta matrix has p row and k columns
+  @ mu: a matrix with each row as an MCMC sample, columns are intercept vectors
+  @ Omega: a matrix with each row as an MCMC sample, 
+    columns are the upper diagnol entries of precision matrix Omega
+  @ lambda: a matrix with only two columns, first was for beta, second was for Omega
+    each row was an MCMC sample of shrinkage parameter lambda
+
+
+*/
+
 
 // [[Rcpp::export]]
 List SRG_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sample
