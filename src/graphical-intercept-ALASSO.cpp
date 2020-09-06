@@ -13,7 +13,7 @@ using namespace arma;
 
 
 /*
- * Implements the block Gibbs sampler for the Bayesian graphical lasso
+ * Implements the block Gibbs sampler for the Bayesian adaptive graphical lasso
  * introduced in Wang (2012). Samples from the conditional distribution of a 
  * permuted column/row for simulating the posterior distribution for the concentration 
  * matrix specifying a Gaussian Graphical Model
@@ -37,20 +37,19 @@ Output:
   A list with component:
   @ Omega: a matrix with each row as an MCMC sample, 
     columns are the upper diagnol entries of precision matrix Omega
-  @ lambda: a matrix with only one column, 
-    each row was an MCMC sample of shrinkage parameter lambda
+  @ lambda: a matrix with only row as MCMC sample of shrinkage parameter lambda
 
 
 */
 
 
 // [[Rcpp::export]]
-Rcpp::List Intercept_Graphical_LASSO_Cpp(const arma::mat & data,
+Rcpp::List Intercept_Graphical_ALASSO_Cpp(const arma::mat & data,
                            const int n_iter,
                            const int n_burn_in,
                            const int thin_by,
-                           const double lambda_a, // Gamma prior for LASSO parameter
-                           const double lambda_b,
+                           const arma::vec & lambda_a, // Gamma prior for LASSO parameter
+                           const arma::vec & lambda_b,
                            bool progress){// Gamma prior for LASSO parameter
   // Sum of product matrix, covariance matrix, n
   int n = data.n_rows;
@@ -71,7 +70,7 @@ Rcpp::List Intercept_Graphical_LASSO_Cpp(const arma::mat & data,
   arma::mat Omega_mcmc(n_store,floor( k * (k+1)/2 ) ,fill::zeros);
   Omega_mcmc += NA_REAL;
   
-  arma::vec lambda_mcmc(n_store, fill::zeros);
+  arma::vec lambda_mcmc(n_store, floor( k * (k+1)/2 ), fill::zeros);
   lambda_mcmc + NA_REAL;
 
   arma::mat mu_mcmc(n_store, k, fill::zeros);
@@ -86,10 +85,13 @@ Rcpp::List Intercept_Graphical_LASSO_Cpp(const arma::mat & data,
   arma::mat data_centered = data;
   //data_centered.each_col() -= mu_curr;
 
-  double lambda_a_post = (lambda_a+(k*(k+1)/2));
   double lambda_b_post;
   
-  double lambda_curr = 0;
+  arma::vec lambda_curr(size(lambda_a),fill::zeros);
+  arma::uvec Omega_upper_tri_full = trimatu_ind(size(Omega));
+
+  arma::mat lambda_temp = zeros(size(Omega));
+  lambda_temp(Omega_upper_tri_full) = lambda_curr;
   
   arma::uvec Omega_upper_tri = trimatu_ind(size(Omega),1);
   int n_upper_tri = Omega_upper_tri.n_elem;
@@ -140,15 +142,19 @@ Rcpp::List Intercept_Graphical_LASSO_Cpp(const arma::mat & data,
     arma::mat S = data_centered.t() * data_centered;
     arma::mat Sigma = cov(data_centered);
     // update LASSO parameter lambda
-    lambda_b_post = (lambda_b+sum(sum(abs(Omega)))/2);
-    lambda_curr = R::rgamma(lambda_a_post,1/lambda_b_post);
+    for(int j = 0 ; j < Omega_upper_tri_full.n_elem ; ++j){
+        lambda_b_post = abs(Omega(Omega_upper_tri_full(i))) + lambda_b(i);
+        lambda_curr(i) = R::rgamma(1 + lambda_a(i),1/ lambda_b_post);
+    }
+
+    lambda_temp(Omega_upper_tri_full) = lambda_curr;
     
     // update latent tau (it is symmertric so we only work on upper tri)
     tau_curr.zeros();
     for(int j = 0 ; j < n_upper_tri ; ++j){
       tau_curr(Omega_upper_tri(j)) = 
-        rinvGau(sqrt(lambda_curr*lambda_curr/(Omega(Omega_upper_tri(j))*Omega(Omega_upper_tri(j)))),
-                      lambda_curr*lambda_curr);
+        rinvGau(sqrt(lambda_temp(Omega_upper_tri(j))*lambda_temp(Omega_upper_tri(j))/(Omega(Omega_upper_tri(j))*Omega(Omega_upper_tri(j)))),
+                      lambda_temp(Omega_upper_tri(j))*lambda_temp(Omega_upper_tri(j)));
     }
     tau_curr = tau_curr + tau_curr.t(); // use symmertric to update lower tri
     
@@ -170,16 +176,14 @@ Rcpp::List Intercept_Graphical_LASSO_Cpp(const arma::mat & data,
       
       Omega11inv = inv(Omega11);
       
-      Ci = (S(j,j)+lambda_curr) * Omega11inv;
+      Ci = (S(j,j)+lambda_temp(j,j)) * Omega11inv;
       Ci.diag() += tauI;
-      invCi = inv(Ci);
-      //CiChol = chol(Ci);
+      CiChol = chol(Ci);
       
       //S_temp = S.col(j);
       //S_temp = S_temp(perms_j);
-      mui = -invCi*S12;
-      
-      gamma = mvnrnd(mui, invCi);
+      mui = - solve(Ci,S12);
+      gamma = solve(CiChol,randn(size(mui))) + mui;
       
       // Replacing omega entries
       Omega.submat(perms_j,ind_j) = gamma;
@@ -187,7 +191,7 @@ Rcpp::List Intercept_Graphical_LASSO_Cpp(const arma::mat & data,
       
       
       
-      gamm_rn = R::rgamma(n/2+1,2/( as_scalar( S(j,j) )+lambda_curr));
+      gamm_rn = R::rgamma(n/2+1,2/( as_scalar( S(j,j) )+lambda_temp(j,j)));
       Omega(j,j) = gamm_rn + as_scalar( gamma.t() * Omega11inv * gamma);
       
     }
@@ -198,7 +202,7 @@ Rcpp::List Intercept_Graphical_LASSO_Cpp(const arma::mat & data,
     
     // saving current state
     if( (i-n_burn_in)>=0 && (i+1-n_burn_in)%thin_by == 0 ){
-      lambda_mcmc(i_save) = lambda_curr;
+      lambda_mcmc.row(i_save) = lambda_curr.t();
       //Sigma_mcmc.row(i_save) = Sigma(trimatu_ind(size(Sigma)));
       Omega_mcmc.row(i_save) = trans(Omega(trimatu_ind(size(Omega))));
       mu_mcmc.row(i_save) = mu_curr.t();
