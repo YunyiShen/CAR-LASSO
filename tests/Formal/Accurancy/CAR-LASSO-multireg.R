@@ -23,6 +23,8 @@ ps <- c(10,5)
 nrep <- 50
 sigma_models <- 1:6
 
+retry <- 5
+
 thr <- c( 1e-2, 1e-3 )
 
 n_res_loss <- length(ks) * length(ss) * 
@@ -76,12 +78,15 @@ for(k in ks) {
 
                     # CAR
                     cat("CAR:\n")
-                    sample_CAR <- CAR_LASSO_Cpp(Z,  Design, n_iter = 10000, 
-                          n_burn_in = 5000, thin_by = 10, 
-                          r_beta = 1, delta_beta = .01,
-                          r_Omega = 1,delta_Omega = .01,
-                          progress = T)
-                    
+                    for(jj in 1:retry){
+                        sample_CAR <- tryCatch( CAR_LASSO_Cpp(Z,  Design, n_iter = 10000, 
+                              n_burn_in = 5000, thin_by = 10, 
+                              r_beta = 1, delta_beta = .01,
+                              r_Omega = 1,delta_Omega = .01,
+                              progress = T),error = function(e){return(list())} )
+                        if(length(sample_CAR)>0) break
+                        else cat("retry ",jj,"\n")
+                    }
                     Omega_CAR <- get_graph(sample_CAR,k)
                     beta_CAR <- get_beta(sample_CAR,p)
 
@@ -94,12 +99,16 @@ for(k in ks) {
 
                     # A-CAR
                     cat("CAR-A:\n")
-                    sample_CAR_A <- CAR_ALASSO_Cpp(Z,  Design, n_iter = 10000, 
-                          n_burn_in = 5000, thin_by = 10, 
-                          r_beta = 1+0*beta, delta_beta = .01 + 0 * beta,
-                          r_Omega = rep(1,.5*(k+1)*k),
-                          delta_Omega = rep(.01,.5*(k+1)*k),
-                          progress = T)
+                    for(jj in 1:retry){
+                        sample_CAR_A <- tryCatch( CAR_ALASSO_Cpp(Z,  Design, n_iter = 10000, 
+                            n_burn_in = 5000, thin_by = 10, 
+                            r_beta = 1+0*beta, delta_beta = .01 + 0 * beta,
+                            r_Omega = rep(1,.5*(k+1)*k),
+                            delta_Omega = rep(.01,.5*(k+1)*k),
+                            progress = T),error = function(e){return(list())} )
+                        if(length(sample_CAR_A)>0) break
+                        else cat("retry ",jj,"\n")
+                    }
                     
                     Omega_CAR_A <- get_graph(sample_CAR_A,k)
                     beta_CAR_A <- get_beta(sample_CAR_A,p)
@@ -113,11 +122,15 @@ for(k in ks) {
 
                     # SRG
                     cat("SRG:\n")
-                    sample_SRG <- SRG_LASSO_Cpp(Z,  Design, n_iter = 10000, 
-                          n_burn_in = 5000, thin_by = 10, 
-                          r_beta = 1, delta_beta = .01,
-                          r_Omega = 1,delta_Omega = .01,
-                          progress = T)
+                    for(jj in 1:retry){
+                        sample_SRG <- tryCatch( SRG_LASSO_Cpp(Z,  Design, n_iter = 10000, 
+                            n_burn_in = 5000, thin_by = 10, 
+                            r_beta = 1, delta_beta = .01,
+                            r_Omega = 1,delta_Omega = .01,
+                            progress = T),error = function(e){return(list())})
+                        if(length(sample_SRG)>0) break
+                        else cat("retry ",jj,"\n")
+                    }
                     
                     Omega_SRG <- get_graph(sample_SRG,k)
                     beta_SRG <- get_beta(sample_SRG,p)
@@ -131,7 +144,12 @@ for(k in ks) {
 
                     # multireg
                     cat("multireg:\n")
-                    sample_multireg <- multireg_Sample(Z,Design,k,p)
+                    for(jj in 1:retry){
+                        sample_multireg <- tryCatch( multireg_Sample(Z,Design,k,p),
+                                            error = function(e){return(list())} )
+                        if(length(sample_multireg)>0) break
+                        else cat("retry ",jj,"\n")
+                    }
                     res_loss[i_res_loss,1:6] <- c(k,p,n,s,mod,i)
                     res_loss$algo[i_res_loss] <- "multireg"
                     res_loss$logL2beta[i_res_loss] <- log_l2(beta,sample_multireg$beta)
