@@ -20,7 +20,7 @@ ks <- c(100,30)
 ss <- c(.2,.5)
 ps <- c(10,5)
 
-nrep <- 2
+nrep <- 50
 sigma_models <- 1:6
 
 thr <- c( 1e-2, 1e-3 )
