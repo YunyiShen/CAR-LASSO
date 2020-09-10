@@ -26,6 +26,9 @@ void update_car_Omega_adp_helper(arma::mat & Omega,
   //arma::mat Omega;
   //arma::mat Y_tilde;
   
+  //arma::mat Sigma_diag(size(Omega),fill::zeros);
+  //Sigma_diag.diag() = 1/sqrt(Omega.diag());
+
   arma::mat expectation = design * beta;
   expectation.each_row() += mu.t();
   
@@ -36,10 +39,12 @@ void update_car_Omega_adp_helper(arma::mat & Omega,
   arma::uvec pertub_vec = linspace<uvec>(0,k-1,k); 
   
   arma::uvec Omega_upper_tri = trimatu_ind(size(Omega),1);
-  arma::uvec Omega_upper_tri_full = trimatu_ind(size(Omega));
+  //arma::uvec Omega_upper_tri_full = trimatu_ind(size(Omega));
 
   arma::mat lambda_temp = zeros(size(Omega));
-  lambda_temp(Omega_upper_tri_full) = lambda_curr;
+  lambda_temp(Omega_upper_tri) = lambda_curr;
+  //lambda_temp.diag() *= 0;
+  //Rcout << lambda_temp << endl;
 
   int n_upper_tri = Omega_upper_tri.n_elem;
   
@@ -82,7 +87,9 @@ void update_car_Omega_adp_helper(arma::mat & Omega,
   }
   
   tau_curr += tau_curr.t(); // use symmertric to update lower tri
-  
+  //tau_curr *= Sigma_diag; // a test
+
+  //Rcout << tau_curr << endl;
   for(int j = 0 ; j < k ; ++j){
     perms_j = find(pertub_vec!=j);
     just_j = find(pertub_vec==j);
@@ -102,7 +109,8 @@ void update_car_Omega_adp_helper(arma::mat & Omega,
     gamma = as_scalar( Omega(j,j)-Omega(just_j,perms_j)*inv_Omega_11*Omega(perms_j,just_j));
     
     // update omega_12, which is normal
-    Omega_omega_12 = (S(j,j)+lambda_temp(j,j))*inv_Omega_11+(1/gamma)*inv_Omega_11*U11*inv_Omega_11;
+    //Omega_omega_12 = (S(j,j)+lambda_temp(j,j))*inv_Omega_11+(1/gamma)*inv_Omega_11*U11*inv_Omega_11;
+    Omega_omega_12 = (S(j,j))*inv_Omega_11+(1/gamma)*inv_Omega_11*U11*inv_Omega_11;
     Omega_omega_12.diag() += tauI;
 
     //Sigma_omega_12 = inv(Omega_omega_12);
@@ -122,7 +130,8 @@ void update_car_Omega_adp_helper(arma::mat & Omega,
     
     // update gamma, follow GIG 
     lambda_gamma = n/2+1;
-    psi_gamma = lambda_temp(j,j) + S(j,j);
+    //psi_gamma = lambda_temp(j,j) + S(j,j);
+    psi_gamma = S(j,j);
     chi_gamma = U(j,j) - 
       2*as_scalar(U12.t()*inv_Omega_11*omega_12)+
       as_scalar(omega_12.t()*inv_Omega_11*U11*inv_Omega_11*omega_12);
@@ -143,14 +152,21 @@ arma::vec update_car_tau2_adp_helper(const arma::mat & beta,
                              const arma::vec & lambda2,
                              const arma::mat & Omega,
                              int k, int p, int n){
+  
+  //arma::mat Omega_diag = 0 * Omega;
+  //Omega_diag.diag() = sqrt( Omega.diag());
+  //arma::mat beta_temp = beta * Omega_diag;
   arma::vec betavec = vectorise(beta);
   arma::vec invtau2(k*p);
   
   
-  arma::vec mu_prime = sqrt(lambda2/(betavec%betavec));
+  //arma::vec mu_prime = sqrt(lambda2/(betavec%betavec));
+  double mu_prime = 0;
   for(int i = 0 ; i < k*p ; ++i){
-    invtau2(i) =  rinvGau(mu_prime(i),lambda2(i)); 
+    mu_prime = sqrt(lambda2(i))/ abs(betavec(i));
+    invtau2(i) =  rinvGau(mu_prime,lambda2(i)); 
   }
+
   return(1/invtau2);
 }
 
@@ -161,9 +177,9 @@ void update_car_lambda_Omega_adp_helper(arma::vec & lambda_curr,
                                         const arma::vec & delta
                                         ){
     double delta_post = 0;
-    arma::uvec Omega_upper_tri_full = trimatu_ind(size(Omega));
-    for(int i = 0 ; i < Omega_upper_tri_full.n_elem ; ++i){
-        delta_post = abs(Omega(Omega_upper_tri_full(i))) + delta(i);
+    arma::uvec Omega_upper_tri = trimatu_ind(size(Omega),1);
+    for(int i = 0 ; i < Omega_upper_tri.n_elem ; ++i){
+        delta_post = abs(Omega(Omega_upper_tri(i))) + delta(i);
         lambda_curr(i) = R::rgamma(1 + r(i),1/ delta_post);
     }
     return;
@@ -178,8 +194,8 @@ void update_car_lambda2_beta_adp_helper(arma::vec & lambda2_curr,
                                         ){
     double delta_post = 0;
     for(int i = 0 ; i < lambda2_curr.n_elem ; ++i){
-        delta_post = tau2(i) + delta(i);
-        lambda2_curr(i) = R::rgamma(1 + r(i),1/ delta_post);
+        delta_post = tau2(i)/2 + delta(i);
+        lambda2_curr(i) = R::rgamma(r(i) + 1,1/delta_post);
     }
     return;
 }

@@ -70,7 +70,7 @@ Rcpp::List Intercept_Graphical_ALASSO_Cpp(const arma::mat & data,
   arma::mat Omega_mcmc(n_store,floor( k * (k+1)/2 ) ,fill::zeros);
   Omega_mcmc += NA_REAL;
   
-  arma::vec lambda_mcmc(n_store, floor( k * (k+1)/2 ), fill::zeros);
+  arma::mat lambda_mcmc(n_store, floor( k * (k-1)/2 ), fill::zeros);
   lambda_mcmc + NA_REAL;
 
   arma::mat mu_mcmc(n_store, k, fill::zeros);
@@ -86,15 +86,16 @@ Rcpp::List Intercept_Graphical_ALASSO_Cpp(const arma::mat & data,
   //data_centered.each_col() -= mu_curr;
 
   double lambda_b_post;
-  
+  // flaged
   arma::vec lambda_curr(size(lambda_a),fill::zeros);
-  arma::uvec Omega_upper_tri_full = trimatu_ind(size(Omega));
-
-  arma::mat lambda_temp = zeros(size(Omega));
-  lambda_temp(Omega_upper_tri_full) = lambda_curr;
-  
+  //arma::uvec Omega_upper_tri_full = trimatu_ind(size(Omega));
   arma::uvec Omega_upper_tri = trimatu_ind(size(Omega),1);
   int n_upper_tri = Omega_upper_tri.n_elem;
+  // flaged
+  arma::mat lambda_temp = zeros(size(Omega));
+  lambda_temp(Omega_upper_tri) = lambda_curr;
+  //flaged
+  
   
   // some objects needed in block update
   
@@ -142,12 +143,12 @@ Rcpp::List Intercept_Graphical_ALASSO_Cpp(const arma::mat & data,
     arma::mat S = data_centered.t() * data_centered;
     arma::mat Sigma = cov(data_centered);
     // update LASSO parameter lambda
-    for(int j = 0 ; j < Omega_upper_tri_full.n_elem ; ++j){
-        lambda_b_post = abs(Omega(Omega_upper_tri_full(i))) + lambda_b(i);
-        lambda_curr(i) = R::rgamma(1 + lambda_a(i),1/ lambda_b_post);
+    for(int j = 0 ; j < Omega_upper_tri.n_elem ; ++j){
+        lambda_b_post = abs(Omega(Omega_upper_tri(j))) + lambda_b(j);
+        lambda_curr(j) = R::rgamma(1 + lambda_a(j),1/ lambda_b_post);
     }
 
-    lambda_temp(Omega_upper_tri_full) = lambda_curr;
+    lambda_temp(Omega_upper_tri) = lambda_curr;
     
     // update latent tau (it is symmertric so we only work on upper tri)
     tau_curr.zeros();
@@ -177,6 +178,7 @@ Rcpp::List Intercept_Graphical_ALASSO_Cpp(const arma::mat & data,
       Omega11inv = inv(Omega11);
       
       Ci = (S(j,j)+lambda_temp(j,j)) * Omega11inv;
+      Ci = (S(j,j)) * Omega11inv;
       Ci.diag() += tauI;
       CiChol = chol(Ci);
       
@@ -191,7 +193,8 @@ Rcpp::List Intercept_Graphical_ALASSO_Cpp(const arma::mat & data,
       
       
       
-      gamm_rn = R::rgamma(n/2+1,2/( as_scalar( S(j,j) )+lambda_temp(j,j)));
+      //gamm_rn = R::rgamma(n/2+1,2/( as_scalar( S(j,j) )+lambda_temp(j,j)));
+      gamm_rn = R::rgamma(n/2+1,2/( as_scalar( S(j,j) )));
       Omega(j,j) = gamm_rn + as_scalar( gamma.t() * Omega11inv * gamma);
       
     }

@@ -69,7 +69,7 @@ Rcpp::List Graphical_ALASSO_Cpp(const arma::mat & data,
   arma::mat Omega_mcmc(n_store,floor( k * (k+1)/2 ) ,fill::zeros);
   Omega_mcmc += NA_REAL;
   
-  arma::mat lambda_mcmc(n_store,floor( k * (k+1)/2 ),fill::zeros);
+  arma::mat lambda_mcmc(n_store,floor( k * (k-1)/2 ),fill::zeros);
   lambda_mcmc + NA_REAL;
   
   int i_save = 0;
@@ -82,12 +82,13 @@ Rcpp::List Graphical_ALASSO_Cpp(const arma::mat & data,
   
   arma::vec lambda_curr(size(lambda_a),fill::zeros);
   arma::uvec Omega_upper_tri_full = trimatu_ind(size(Omega));
-
-  arma::mat lambda_temp = zeros(size(Omega));
-  lambda_temp(Omega_upper_tri_full) = lambda_curr;
-  
   arma::uvec Omega_upper_tri = trimatu_ind(size(Omega),1);
   int n_upper_tri = Omega_upper_tri.n_elem;
+
+  arma::mat lambda_temp = zeros(size(Omega));
+  lambda_temp(Omega_upper_tri) = lambda_curr;
+  
+  
   
   // some objects needed in block update
   
@@ -127,12 +128,12 @@ Rcpp::List Graphical_ALASSO_Cpp(const arma::mat & data,
     
     // update LASSO parameter lambda
     
-    for(int j = 0 ; j < Omega_upper_tri_full.n_elem ; ++j){
-        lambda_b_post = abs(Omega(Omega_upper_tri_full(i))) + lambda_b(i);
-        lambda_curr(i) = R::rgamma(1 + lambda_a(i),1/ lambda_b_post);
+    for(int j = 0 ; j < Omega_upper_tri.n_elem ; ++j){
+        lambda_b_post = abs(Omega(Omega_upper_tri(j))) + lambda_b(j);
+        lambda_curr(j) = R::rgamma(1 + lambda_a(j),1/ lambda_b_post);
     }
 
-    lambda_temp(Omega_upper_tri_full) = lambda_curr;
+    lambda_temp(Omega_upper_tri) = lambda_curr;
     // update latent tau (it is symmertric so we only work on upper tri)
     tau_curr.zeros();
     for(int j = 0 ; j < n_upper_tri ; ++j){
