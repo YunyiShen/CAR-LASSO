@@ -14,15 +14,15 @@ res_loss_file <- "./tests/Formal/Accurancy/results/loss_Glasso.csv"
 res_graph_Omega_file <- "./tests/Formal/Accurancy/results/graph_Omega_Glasso.csv"
 
 
-#ks <- c(100,30)
-ks <- c(30)
-#ss <- c(.2,.5)
-ss <- c(.2)
-#ps <- c(10,5)
-ps <- c(5)
+ks <- c(100,30)
+#ks <- c(30)
+ss <- c(.2,.5)
+#ss <- c(.2)
+ps <- c(10,5)
+#ps <- c(5)
 
-nrep <- 1
-sigma_models <- 1
+nrep <- 50
+sigma_models <- 1:6
 
 retry <- 5
 
