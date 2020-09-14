@@ -58,3 +58,19 @@ get_counts_beta <- function(beta_hat,beta){
 log_l2 <- function(a,b){
     log(sum((a-b)^2))
 }
+
+multireg_mu0_Sample <- function(data, Design, k, p, n_sample = 10000){
+    sample_multireg <- lapply(1:n_sample,function(i) 
+        rmultireg(data,cbind(1,Design),
+            matrix(0,p+1,k),
+            diag(1e10,p+1,p+1),
+            3,3*diag(2,k,k))
+        )
+    Beta_multireg <- lapply(sample_multireg,function(w) t(solve(w$Sigma,t(w$B[-1,]))))
+    Omega_multireg <- lapply(sample_multireg,function(w) w$Sigma)
+    Omega_multireg <- lapply(Omega_multireg,solve)
+
+    Beta_hat <- Reduce("+",Beta_multireg)/n_sample
+    multireg_Graph <- Reduce("+",Omega_multireg)/n_sample
+    return(list(beta = Beta_hat, Omega = multireg_Graph))
+}
