@@ -7,7 +7,7 @@ using namespace arma;
 
 #include <progress.hpp>
 #include <progress_bar.hpp>
-#include "SRG_LASSO_helper.h"
+#include "CAR_LASSO_helper.h"
 #include "ars_pois_helper.h"
 
 /*
@@ -98,14 +98,14 @@ List Pois_CAR_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as 
                              k,p,n,ns,m,emax);
     //Rcout << "updated:\n" << Z_curr <<endl;
     //Update betas:
-    beta_curr = update_beta_helper(Z_curr,design,mu_curr,
+    //Update betas:
+    beta_curr = update_car_beta_helper(Z_curr,design,mu_curr,
                                    tau2_curr,Omega_curr, 
                                    k,p,n);
     
     
     // update Omega
-    //Rcout<<Z_curr<<endl;
-    update_Omega_helper(Omega_curr,Z_curr, design, 
+    update_car_Omega_helper(Omega_curr,Z_curr, design, 
                                      mu_curr,beta_curr,
                                      lambda_Omega,
                                      k,p,n);
@@ -114,15 +114,19 @@ List Pois_CAR_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as 
     
     // Update mu
     
-    mu_curr = update_mu_helper(Z_curr,design,beta_curr,
+    mu_curr = update_car_mu_helper(Z_curr,design,beta_curr,
                                Omega_curr, 
                                k,p,n);
     
     
     
+      
+    //Rcout << "detOmega curr in main loop:" << det(Omega_curr) << endl;
+    //Rcout << "sum beta in main loop:" <<sum(sum(beta_curr)) <<endl;
+    //Rcout << "mean of mu in main loop:" << mean(mu_curr) <<endl;
   
     // Update tau
-    tau2_curr = update_tau2_helper(beta_curr,lambda2_beta,
+    tau2_curr = update_car_tau2_helper(beta_curr,lambda2_beta,
                                    Omega_curr,k,p,n);
     
     
@@ -131,7 +135,6 @@ List Pois_CAR_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as 
     lambda2_beta = R::rgamma(r_beta+k*p,1/(delta_beta+sum(tau2_curr)/2));
     
     
-    // Update lambda_Omega
     
     
     

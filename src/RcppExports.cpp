@@ -34,6 +34,26 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// CAR_ALASSO_Cpp
+List CAR_ALASSO_Cpp(const arma::mat& data, const arma::mat& design, const int n_iter, const int n_burn_in, const int thin_by, const arma::mat r_beta, const arma::mat delta_beta, const arma::vec r_Omega, const arma::vec delta_Omega, bool progress);
+RcppExport SEXP _SRGlasso_CAR_ALASSO_Cpp(SEXP dataSEXP, SEXP designSEXP, SEXP n_iterSEXP, SEXP n_burn_inSEXP, SEXP thin_bySEXP, SEXP r_betaSEXP, SEXP delta_betaSEXP, SEXP r_OmegaSEXP, SEXP delta_OmegaSEXP, SEXP progressSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat& >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type design(designSEXP);
+    Rcpp::traits::input_parameter< const int >::type n_iter(n_iterSEXP);
+    Rcpp::traits::input_parameter< const int >::type n_burn_in(n_burn_inSEXP);
+    Rcpp::traits::input_parameter< const int >::type thin_by(thin_bySEXP);
+    Rcpp::traits::input_parameter< const arma::mat >::type r_beta(r_betaSEXP);
+    Rcpp::traits::input_parameter< const arma::mat >::type delta_beta(delta_betaSEXP);
+    Rcpp::traits::input_parameter< const arma::vec >::type r_Omega(r_OmegaSEXP);
+    Rcpp::traits::input_parameter< const arma::vec >::type delta_Omega(delta_OmegaSEXP);
+    Rcpp::traits::input_parameter< bool >::type progress(progressSEXP);
+    rcpp_result_gen = Rcpp::wrap(CAR_ALASSO_Cpp(data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, progress));
+    return rcpp_result_gen;
+END_RCPP
+}
 // CAR_LASSO_Cpp
 List CAR_LASSO_Cpp(const arma::mat& data, const arma::mat& design, const int n_iter, const int n_burn_in, const int thin_by, const double r_beta, const double delta_beta, const double r_Omega, const double delta_Omega, bool progress);
 RcppExport SEXP _SRGlasso_CAR_LASSO_Cpp(SEXP dataSEXP, SEXP designSEXP, SEXP n_iterSEXP, SEXP n_burn_inSEXP, SEXP thin_bySEXP, SEXP r_betaSEXP, SEXP delta_betaSEXP, SEXP r_OmegaSEXP, SEXP delta_OmegaSEXP, SEXP progressSEXP) {
@@ -54,21 +74,130 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// update_car_beta_helper1
-arma::mat update_car_beta_helper1(const arma::mat& data, const arma::mat& design, const arma::vec& mu, const arma::vec& tau2, const arma::mat& Omega, int k, int p, int n);
-RcppExport SEXP _SRGlasso_update_car_beta_helper1(SEXP dataSEXP, SEXP designSEXP, SEXP muSEXP, SEXP tau2SEXP, SEXP OmegaSEXP, SEXP kSEXP, SEXP pSEXP, SEXP nSEXP) {
+// update_car_Omega_adp_helper
+void update_car_Omega_adp_helper(arma::mat& Omega, const arma::mat& data, const arma::mat& design, const arma::vec& mu, const arma::mat& beta, const arma::vec& lambda_curr, int k, int p, int n);
+RcppExport SEXP _SRGlasso_update_car_Omega_adp_helper(SEXP OmegaSEXP, SEXP dataSEXP, SEXP designSEXP, SEXP muSEXP, SEXP betaSEXP, SEXP lambda_currSEXP, SEXP kSEXP, SEXP pSEXP, SEXP nSEXP) {
 BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat& >::type Omega(OmegaSEXP);
     Rcpp::traits::input_parameter< const arma::mat& >::type data(dataSEXP);
     Rcpp::traits::input_parameter< const arma::mat& >::type design(designSEXP);
     Rcpp::traits::input_parameter< const arma::vec& >::type mu(muSEXP);
-    Rcpp::traits::input_parameter< const arma::vec& >::type tau2(tau2SEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type beta(betaSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type lambda_curr(lambda_currSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< int >::type p(pSEXP);
+    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    update_car_Omega_adp_helper(Omega, data, design, mu, beta, lambda_curr, k, p, n);
+    return R_NilValue;
+END_RCPP
+}
+// update_car_tau2_adp_helper
+arma::vec update_car_tau2_adp_helper(const arma::mat& beta, const arma::vec& lambda2, const arma::mat& Omega, int k, int p, int n);
+RcppExport SEXP _SRGlasso_update_car_tau2_adp_helper(SEXP betaSEXP, SEXP lambda2SEXP, SEXP OmegaSEXP, SEXP kSEXP, SEXP pSEXP, SEXP nSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat& >::type beta(betaSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type lambda2(lambda2SEXP);
     Rcpp::traits::input_parameter< const arma::mat& >::type Omega(OmegaSEXP);
     Rcpp::traits::input_parameter< int >::type k(kSEXP);
     Rcpp::traits::input_parameter< int >::type p(pSEXP);
     Rcpp::traits::input_parameter< int >::type n(nSEXP);
-    rcpp_result_gen = Rcpp::wrap(update_car_beta_helper1(data, design, mu, tau2, Omega, k, p, n));
+    rcpp_result_gen = Rcpp::wrap(update_car_tau2_adp_helper(beta, lambda2, Omega, k, p, n));
+    return rcpp_result_gen;
+END_RCPP
+}
+// update_car_lambda_Omega_adp_helper
+void update_car_lambda_Omega_adp_helper(arma::vec& lambda_curr, const arma::mat& Omega, const arma::vec& r, const arma::vec& delta);
+RcppExport SEXP _SRGlasso_update_car_lambda_Omega_adp_helper(SEXP lambda_currSEXP, SEXP OmegaSEXP, SEXP rSEXP, SEXP deltaSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec& >::type lambda_curr(lambda_currSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type Omega(OmegaSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type r(rSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type delta(deltaSEXP);
+    update_car_lambda_Omega_adp_helper(lambda_curr, Omega, r, delta);
+    return R_NilValue;
+END_RCPP
+}
+// sec_dev_Omegasl_Omega
+arma::mat sec_dev_Omegasl_Omega(const arma::mat& design, const arma::mat& Sigma, const arma::mat& beta, const arma::vec& mu, int s, int l);
+RcppExport SEXP _SRGlasso_sec_dev_Omegasl_Omega(SEXP designSEXP, SEXP SigmaSEXP, SEXP betaSEXP, SEXP muSEXP, SEXP sSEXP, SEXP lSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat& >::type design(designSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type Sigma(SigmaSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type beta(betaSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type mu(muSEXP);
+    Rcpp::traits::input_parameter< int >::type s(sSEXP);
+    Rcpp::traits::input_parameter< int >::type l(lSEXP);
+    rcpp_result_gen = Rcpp::wrap(sec_dev_Omegasl_Omega(design, Sigma, beta, mu, s, l));
+    return rcpp_result_gen;
+END_RCPP
+}
+// CAR_FI
+arma::mat CAR_FI(const arma::mat& design, const arma::mat& Omega, const arma::mat& beta, const arma::vec& mu, int k, int p);
+RcppExport SEXP _SRGlasso_CAR_FI(SEXP designSEXP, SEXP OmegaSEXP, SEXP betaSEXP, SEXP muSEXP, SEXP kSEXP, SEXP pSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat& >::type design(designSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type Omega(OmegaSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type beta(betaSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type mu(muSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< int >::type p(pSEXP);
+    rcpp_result_gen = Rcpp::wrap(CAR_FI(design, Omega, beta, mu, k, p));
+    return rcpp_result_gen;
+END_RCPP
+}
+// CAR_FI_graph
+arma::mat CAR_FI_graph(const arma::mat& design, const arma::mat& Omega, const arma::mat& beta, const arma::vec& mu, int k, int p);
+RcppExport SEXP _SRGlasso_CAR_FI_graph(SEXP designSEXP, SEXP OmegaSEXP, SEXP betaSEXP, SEXP muSEXP, SEXP kSEXP, SEXP pSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat& >::type design(designSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type Omega(OmegaSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type beta(betaSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type mu(muSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< int >::type p(pSEXP);
+    rcpp_result_gen = Rcpp::wrap(CAR_FI_graph(design, Omega, beta, mu, k, p));
+    return rcpp_result_gen;
+END_RCPP
+}
+// CAR_FI_beta
+arma::mat CAR_FI_beta(const arma::mat& design, const arma::mat& Omega, const arma::mat& beta, const arma::vec& mu, int k, int p);
+RcppExport SEXP _SRGlasso_CAR_FI_beta(SEXP designSEXP, SEXP OmegaSEXP, SEXP betaSEXP, SEXP muSEXP, SEXP kSEXP, SEXP pSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat& >::type design(designSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type Omega(OmegaSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type beta(betaSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type mu(muSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< int >::type p(pSEXP);
+    rcpp_result_gen = Rcpp::wrap(CAR_FI_beta(design, Omega, beta, mu, k, p));
+    return rcpp_result_gen;
+END_RCPP
+}
+// CAR_FI_para
+arma::mat CAR_FI_para(const arma::mat& Design, const arma::mat& Omega, const arma::mat& beta, const arma::vec& mu, int k, int p);
+RcppExport SEXP _SRGlasso_CAR_FI_para(SEXP DesignSEXP, SEXP OmegaSEXP, SEXP betaSEXP, SEXP muSEXP, SEXP kSEXP, SEXP pSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat& >::type Design(DesignSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type Omega(OmegaSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type beta(betaSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type mu(muSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< int >::type p(pSEXP);
+    rcpp_result_gen = Rcpp::wrap(CAR_FI_para(Design, Omega, beta, mu, k, p));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -141,6 +270,313 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// expected_G_eigen
+arma::vec expected_G_eigen(const arma::mat& new_design, const arma::mat& old_design, const Rcpp::List& CAR_model, int k, int p, int n_new, int n_old, const string& summary);
+RcppExport SEXP _SRGlasso_expected_G_eigen(SEXP new_designSEXP, SEXP old_designSEXP, SEXP CAR_modelSEXP, SEXP kSEXP, SEXP pSEXP, SEXP n_newSEXP, SEXP n_oldSEXP, SEXP summarySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat& >::type new_design(new_designSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type old_design(old_designSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type CAR_model(CAR_modelSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< int >::type p(pSEXP);
+    Rcpp::traits::input_parameter< int >::type n_new(n_newSEXP);
+    Rcpp::traits::input_parameter< int >::type n_old(n_oldSEXP);
+    Rcpp::traits::input_parameter< const string& >::type summary(summarySEXP);
+    rcpp_result_gen = Rcpp::wrap(expected_G_eigen(new_design, old_design, CAR_model, k, p, n_new, n_old, summary));
+    return rcpp_result_gen;
+END_RCPP
+}
+// G_det
+arma::vec G_det(const arma::mat& new_design, const arma::mat& old_design, const Rcpp::List& CAR_model, int k, int p, int n_new, int n_old);
+RcppExport SEXP _SRGlasso_G_det(SEXP new_designSEXP, SEXP old_designSEXP, SEXP CAR_modelSEXP, SEXP kSEXP, SEXP pSEXP, SEXP n_newSEXP, SEXP n_oldSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat& >::type new_design(new_designSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type old_design(old_designSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type CAR_model(CAR_modelSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< int >::type p(pSEXP);
+    Rcpp::traits::input_parameter< int >::type n_new(n_newSEXP);
+    Rcpp::traits::input_parameter< int >::type n_old(n_oldSEXP);
+    rcpp_result_gen = Rcpp::wrap(G_det(new_design, old_design, CAR_model, k, p, n_new, n_old));
+    return rcpp_result_gen;
+END_RCPP
+}
+// expected_G_det
+double expected_G_det(const arma::vec& new_design, const arma::mat& old_design, const Rcpp::List& CAR_model, int k, int p, int n_new, int n_old);
+RcppExport SEXP _SRGlasso_expected_G_det(SEXP new_designSEXP, SEXP old_designSEXP, SEXP CAR_modelSEXP, SEXP kSEXP, SEXP pSEXP, SEXP n_newSEXP, SEXP n_oldSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::vec& >::type new_design(new_designSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type old_design(old_designSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type CAR_model(CAR_modelSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< int >::type p(pSEXP);
+    Rcpp::traits::input_parameter< int >::type n_new(n_newSEXP);
+    Rcpp::traits::input_parameter< int >::type n_old(n_oldSEXP);
+    rcpp_result_gen = Rcpp::wrap(expected_G_det(new_design, old_design, CAR_model, k, p, n_new, n_old));
+    return rcpp_result_gen;
+END_RCPP
+}
+// G_det_para
+arma::vec G_det_para(const arma::mat& new_design, const arma::mat& old_design, const Rcpp::List& CAR_model, int k, int p, int n_new, int n_old);
+RcppExport SEXP _SRGlasso_G_det_para(SEXP new_designSEXP, SEXP old_designSEXP, SEXP CAR_modelSEXP, SEXP kSEXP, SEXP pSEXP, SEXP n_newSEXP, SEXP n_oldSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat& >::type new_design(new_designSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type old_design(old_designSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type CAR_model(CAR_modelSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< int >::type p(pSEXP);
+    Rcpp::traits::input_parameter< int >::type n_new(n_newSEXP);
+    Rcpp::traits::input_parameter< int >::type n_old(n_oldSEXP);
+    rcpp_result_gen = Rcpp::wrap(G_det_para(new_design, old_design, CAR_model, k, p, n_new, n_old));
+    return rcpp_result_gen;
+END_RCPP
+}
+// expected_G_det_para
+double expected_G_det_para(const arma::vec& new_design, const arma::mat& old_design, const Rcpp::List& CAR_model, int k, int p, int n_new, int n_old);
+RcppExport SEXP _SRGlasso_expected_G_det_para(SEXP new_designSEXP, SEXP old_designSEXP, SEXP CAR_modelSEXP, SEXP kSEXP, SEXP pSEXP, SEXP n_newSEXP, SEXP n_oldSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::vec& >::type new_design(new_designSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type old_design(old_designSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type CAR_model(CAR_modelSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< int >::type p(pSEXP);
+    Rcpp::traits::input_parameter< int >::type n_new(n_newSEXP);
+    Rcpp::traits::input_parameter< int >::type n_old(n_oldSEXP);
+    rcpp_result_gen = Rcpp::wrap(expected_G_det_para(new_design, old_design, CAR_model, k, p, n_new, n_old));
+    return rcpp_result_gen;
+END_RCPP
+}
+// G_tr_para
+arma::vec G_tr_para(const arma::mat& new_design, const arma::mat& old_design, const Rcpp::List& CAR_model, int k, int p, int n_new, int n_old);
+RcppExport SEXP _SRGlasso_G_tr_para(SEXP new_designSEXP, SEXP old_designSEXP, SEXP CAR_modelSEXP, SEXP kSEXP, SEXP pSEXP, SEXP n_newSEXP, SEXP n_oldSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat& >::type new_design(new_designSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type old_design(old_designSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type CAR_model(CAR_modelSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< int >::type p(pSEXP);
+    Rcpp::traits::input_parameter< int >::type n_new(n_newSEXP);
+    Rcpp::traits::input_parameter< int >::type n_old(n_oldSEXP);
+    rcpp_result_gen = Rcpp::wrap(G_tr_para(new_design, old_design, CAR_model, k, p, n_new, n_old));
+    return rcpp_result_gen;
+END_RCPP
+}
+// expected_G_tr_para
+double expected_G_tr_para(const arma::vec& new_design, const arma::mat& old_design, const Rcpp::List& CAR_model, int k, int p, int n_new, int n_old);
+RcppExport SEXP _SRGlasso_expected_G_tr_para(SEXP new_designSEXP, SEXP old_designSEXP, SEXP CAR_modelSEXP, SEXP kSEXP, SEXP pSEXP, SEXP n_newSEXP, SEXP n_oldSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::vec& >::type new_design(new_designSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type old_design(old_designSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type CAR_model(CAR_modelSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< int >::type p(pSEXP);
+    Rcpp::traits::input_parameter< int >::type n_new(n_newSEXP);
+    Rcpp::traits::input_parameter< int >::type n_old(n_oldSEXP);
+    rcpp_result_gen = Rcpp::wrap(expected_G_tr_para(new_design, old_design, CAR_model, k, p, n_new, n_old));
+    return rcpp_result_gen;
+END_RCPP
+}
+// full_tr_para
+arma::vec full_tr_para(const arma::mat& new_design, const arma::mat& old_design, const Rcpp::List& CAR_model, int k, int p, int n_new, int n_old);
+RcppExport SEXP _SRGlasso_full_tr_para(SEXP new_designSEXP, SEXP old_designSEXP, SEXP CAR_modelSEXP, SEXP kSEXP, SEXP pSEXP, SEXP n_newSEXP, SEXP n_oldSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat& >::type new_design(new_designSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type old_design(old_designSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type CAR_model(CAR_modelSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< int >::type p(pSEXP);
+    Rcpp::traits::input_parameter< int >::type n_new(n_newSEXP);
+    Rcpp::traits::input_parameter< int >::type n_old(n_oldSEXP);
+    rcpp_result_gen = Rcpp::wrap(full_tr_para(new_design, old_design, CAR_model, k, p, n_new, n_old));
+    return rcpp_result_gen;
+END_RCPP
+}
+// expected_all_tr_para
+double expected_all_tr_para(const arma::vec& new_design, const arma::mat& old_design, const Rcpp::List& CAR_model, int k, int p, int n_new, int n_old);
+RcppExport SEXP _SRGlasso_expected_all_tr_para(SEXP new_designSEXP, SEXP old_designSEXP, SEXP CAR_modelSEXP, SEXP kSEXP, SEXP pSEXP, SEXP n_newSEXP, SEXP n_oldSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::vec& >::type new_design(new_designSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type old_design(old_designSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type CAR_model(CAR_modelSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< int >::type p(pSEXP);
+    Rcpp::traits::input_parameter< int >::type n_new(n_newSEXP);
+    Rcpp::traits::input_parameter< int >::type n_old(n_oldSEXP);
+    rcpp_result_gen = Rcpp::wrap(expected_all_tr_para(new_design, old_design, CAR_model, k, p, n_new, n_old));
+    return rcpp_result_gen;
+END_RCPP
+}
+// full_det_para
+arma::vec full_det_para(const arma::mat& new_design, const arma::mat& old_design, const Rcpp::List& CAR_model, int k, int p, int n_new, int n_old);
+RcppExport SEXP _SRGlasso_full_det_para(SEXP new_designSEXP, SEXP old_designSEXP, SEXP CAR_modelSEXP, SEXP kSEXP, SEXP pSEXP, SEXP n_newSEXP, SEXP n_oldSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat& >::type new_design(new_designSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type old_design(old_designSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type CAR_model(CAR_modelSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< int >::type p(pSEXP);
+    Rcpp::traits::input_parameter< int >::type n_new(n_newSEXP);
+    Rcpp::traits::input_parameter< int >::type n_old(n_oldSEXP);
+    rcpp_result_gen = Rcpp::wrap(full_det_para(new_design, old_design, CAR_model, k, p, n_new, n_old));
+    return rcpp_result_gen;
+END_RCPP
+}
+// expected_full_det_para
+double expected_full_det_para(const arma::vec& new_design, const arma::mat& old_design, const Rcpp::List& CAR_model, int k, int p, int n_new, int n_old);
+RcppExport SEXP _SRGlasso_expected_full_det_para(SEXP new_designSEXP, SEXP old_designSEXP, SEXP CAR_modelSEXP, SEXP kSEXP, SEXP pSEXP, SEXP n_newSEXP, SEXP n_oldSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::vec& >::type new_design(new_designSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type old_design(old_designSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type CAR_model(CAR_modelSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< int >::type p(pSEXP);
+    Rcpp::traits::input_parameter< int >::type n_new(n_newSEXP);
+    Rcpp::traits::input_parameter< int >::type n_old(n_oldSEXP);
+    rcpp_result_gen = Rcpp::wrap(expected_full_det_para(new_design, old_design, CAR_model, k, p, n_new, n_old));
+    return rcpp_result_gen;
+END_RCPP
+}
+// beta_tr_para
+arma::vec beta_tr_para(const arma::mat& new_design, const arma::mat& old_design, const Rcpp::List& CAR_model, int k, int p, int n_new, int n_old);
+RcppExport SEXP _SRGlasso_beta_tr_para(SEXP new_designSEXP, SEXP old_designSEXP, SEXP CAR_modelSEXP, SEXP kSEXP, SEXP pSEXP, SEXP n_newSEXP, SEXP n_oldSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat& >::type new_design(new_designSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type old_design(old_designSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type CAR_model(CAR_modelSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< int >::type p(pSEXP);
+    Rcpp::traits::input_parameter< int >::type n_new(n_newSEXP);
+    Rcpp::traits::input_parameter< int >::type n_old(n_oldSEXP);
+    rcpp_result_gen = Rcpp::wrap(beta_tr_para(new_design, old_design, CAR_model, k, p, n_new, n_old));
+    return rcpp_result_gen;
+END_RCPP
+}
+// expected_beta_tr_para
+double expected_beta_tr_para(const arma::vec& new_design, const arma::mat& old_design, const Rcpp::List& CAR_model, int k, int p, int n_new, int n_old);
+RcppExport SEXP _SRGlasso_expected_beta_tr_para(SEXP new_designSEXP, SEXP old_designSEXP, SEXP CAR_modelSEXP, SEXP kSEXP, SEXP pSEXP, SEXP n_newSEXP, SEXP n_oldSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::vec& >::type new_design(new_designSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type old_design(old_designSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type CAR_model(CAR_modelSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< int >::type p(pSEXP);
+    Rcpp::traits::input_parameter< int >::type n_new(n_newSEXP);
+    Rcpp::traits::input_parameter< int >::type n_old(n_oldSEXP);
+    rcpp_result_gen = Rcpp::wrap(expected_beta_tr_para(new_design, old_design, CAR_model, k, p, n_new, n_old));
+    return rcpp_result_gen;
+END_RCPP
+}
+// expected_invG_tr_para
+double expected_invG_tr_para(const arma::vec& new_design, const arma::mat& old_design, const Rcpp::List& CAR_model, int k, int p, int n_new, int n_old);
+RcppExport SEXP _SRGlasso_expected_invG_tr_para(SEXP new_designSEXP, SEXP old_designSEXP, SEXP CAR_modelSEXP, SEXP kSEXP, SEXP pSEXP, SEXP n_newSEXP, SEXP n_oldSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::vec& >::type new_design(new_designSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type old_design(old_designSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type CAR_model(CAR_modelSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< int >::type p(pSEXP);
+    Rcpp::traits::input_parameter< int >::type n_new(n_newSEXP);
+    Rcpp::traits::input_parameter< int >::type n_old(n_oldSEXP);
+    rcpp_result_gen = Rcpp::wrap(expected_invG_tr_para(new_design, old_design, CAR_model, k, p, n_new, n_old));
+    return rcpp_result_gen;
+END_RCPP
+}
+// PIbeta_tr_para
+arma::vec PIbeta_tr_para(const arma::mat& new_design, const arma::mat& old_design, const Rcpp::List& CAR_model, int k, int p, int n_new, int n_old);
+RcppExport SEXP _SRGlasso_PIbeta_tr_para(SEXP new_designSEXP, SEXP old_designSEXP, SEXP CAR_modelSEXP, SEXP kSEXP, SEXP pSEXP, SEXP n_newSEXP, SEXP n_oldSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat& >::type new_design(new_designSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type old_design(old_designSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type CAR_model(CAR_modelSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< int >::type p(pSEXP);
+    Rcpp::traits::input_parameter< int >::type n_new(n_newSEXP);
+    Rcpp::traits::input_parameter< int >::type n_old(n_oldSEXP);
+    rcpp_result_gen = Rcpp::wrap(PIbeta_tr_para(new_design, old_design, CAR_model, k, p, n_new, n_old));
+    return rcpp_result_gen;
+END_RCPP
+}
+// expected_PIbeta_tr_para
+double expected_PIbeta_tr_para(const arma::vec& new_design, const arma::mat& old_design, const Rcpp::List& CAR_model, int k, int p, int n_new, int n_old);
+RcppExport SEXP _SRGlasso_expected_PIbeta_tr_para(SEXP new_designSEXP, SEXP old_designSEXP, SEXP CAR_modelSEXP, SEXP kSEXP, SEXP pSEXP, SEXP n_newSEXP, SEXP n_oldSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::vec& >::type new_design(new_designSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type old_design(old_designSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type CAR_model(CAR_modelSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< int >::type p(pSEXP);
+    Rcpp::traits::input_parameter< int >::type n_new(n_newSEXP);
+    Rcpp::traits::input_parameter< int >::type n_old(n_oldSEXP);
+    rcpp_result_gen = Rcpp::wrap(expected_PIbeta_tr_para(new_design, old_design, CAR_model, k, p, n_new, n_old));
+    return rcpp_result_gen;
+END_RCPP
+}
+// PIfull_tr_para
+arma::vec PIfull_tr_para(const arma::mat& new_design, const arma::mat& old_design, const Rcpp::List& CAR_model, int k, int p, int n_new, int n_old);
+RcppExport SEXP _SRGlasso_PIfull_tr_para(SEXP new_designSEXP, SEXP old_designSEXP, SEXP CAR_modelSEXP, SEXP kSEXP, SEXP pSEXP, SEXP n_newSEXP, SEXP n_oldSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat& >::type new_design(new_designSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type old_design(old_designSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type CAR_model(CAR_modelSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< int >::type p(pSEXP);
+    Rcpp::traits::input_parameter< int >::type n_new(n_newSEXP);
+    Rcpp::traits::input_parameter< int >::type n_old(n_oldSEXP);
+    rcpp_result_gen = Rcpp::wrap(PIfull_tr_para(new_design, old_design, CAR_model, k, p, n_new, n_old));
+    return rcpp_result_gen;
+END_RCPP
+}
+// expected_PIfull_tr_para
+double expected_PIfull_tr_para(const arma::vec& new_design, const arma::mat& old_design, const Rcpp::List& CAR_model, int k, int p, int n_new, int n_old);
+RcppExport SEXP _SRGlasso_expected_PIfull_tr_para(SEXP new_designSEXP, SEXP old_designSEXP, SEXP CAR_modelSEXP, SEXP kSEXP, SEXP pSEXP, SEXP n_newSEXP, SEXP n_oldSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::vec& >::type new_design(new_designSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type old_design(old_designSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type CAR_model(CAR_modelSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< int >::type p(pSEXP);
+    Rcpp::traits::input_parameter< int >::type n_new(n_newSEXP);
+    Rcpp::traits::input_parameter< int >::type n_old(n_oldSEXP);
+    rcpp_result_gen = Rcpp::wrap(expected_PIfull_tr_para(new_design, old_design, CAR_model, k, p, n_new, n_old));
+    return rcpp_result_gen;
+END_RCPP
+}
 // rgig
 double rgig(double lambda, double chi, double psi);
 RcppExport SEXP _SRGlasso_rgig(SEXP lambdaSEXP, SEXP chiSEXP, SEXP psiSEXP) {
@@ -210,6 +646,29 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const arma::vec& >::type responses(responsesSEXP);
     Rcpp::traits::input_parameter< bool >::type logis(logisSEXP);
     rcpp_result_gen = Rcpp::wrap(Ising_PseudoLikelihood_Cpp(x, graph, thresholds, responses, logis));
+    return rcpp_result_gen;
+END_RCPP
+}
+// Pois_CAR_LASSO_Cpp
+List Pois_CAR_LASSO_Cpp(const arma::mat& data, const arma::mat& design, const int n_iter, const int n_burn_in, const int thin_by, const double r_beta, const double delta_beta, const double r_Omega, const double delta_Omega, const int ns, const int m, const double emax, bool progress);
+RcppExport SEXP _SRGlasso_Pois_CAR_LASSO_Cpp(SEXP dataSEXP, SEXP designSEXP, SEXP n_iterSEXP, SEXP n_burn_inSEXP, SEXP thin_bySEXP, SEXP r_betaSEXP, SEXP delta_betaSEXP, SEXP r_OmegaSEXP, SEXP delta_OmegaSEXP, SEXP nsSEXP, SEXP mSEXP, SEXP emaxSEXP, SEXP progressSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat& >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type design(designSEXP);
+    Rcpp::traits::input_parameter< const int >::type n_iter(n_iterSEXP);
+    Rcpp::traits::input_parameter< const int >::type n_burn_in(n_burn_inSEXP);
+    Rcpp::traits::input_parameter< const int >::type thin_by(thin_bySEXP);
+    Rcpp::traits::input_parameter< const double >::type r_beta(r_betaSEXP);
+    Rcpp::traits::input_parameter< const double >::type delta_beta(delta_betaSEXP);
+    Rcpp::traits::input_parameter< const double >::type r_Omega(r_OmegaSEXP);
+    Rcpp::traits::input_parameter< const double >::type delta_Omega(delta_OmegaSEXP);
+    Rcpp::traits::input_parameter< const int >::type ns(nsSEXP);
+    Rcpp::traits::input_parameter< const int >::type m(mSEXP);
+    Rcpp::traits::input_parameter< const double >::type emax(emaxSEXP);
+    Rcpp::traits::input_parameter< bool >::type progress(progressSEXP);
+    rcpp_result_gen = Rcpp::wrap(Pois_CAR_LASSO_Cpp(data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, ns, m, emax, progress));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -313,6 +772,24 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// update_beta1_helper
+arma::mat update_beta1_helper(const arma::mat& data, const arma::mat& design, const arma::vec& mu, const arma::vec& tau2, const arma::mat& Omega, int k, int p, int n);
+RcppExport SEXP _SRGlasso_update_beta1_helper(SEXP dataSEXP, SEXP designSEXP, SEXP muSEXP, SEXP tau2SEXP, SEXP OmegaSEXP, SEXP kSEXP, SEXP pSEXP, SEXP nSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat& >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type design(designSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type mu(muSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type tau2(tau2SEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type Omega(OmegaSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< int >::type p(pSEXP);
+    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    rcpp_result_gen = Rcpp::wrap(update_beta1_helper(data, design, mu, tau2, Omega, k, p, n));
+    return rcpp_result_gen;
+END_RCPP
+}
 // update_beta_helper
 arma::mat update_beta_helper(const arma::mat& data, const arma::mat& design, const arma::vec& mu, const arma::vec& tau2, const arma::mat& Omega, int k, int p, int n);
 RcppExport SEXP _SRGlasso_update_beta_helper(SEXP dataSEXP, SEXP designSEXP, SEXP muSEXP, SEXP tau2SEXP, SEXP OmegaSEXP, SEXP kSEXP, SEXP pSEXP, SEXP nSEXP) {
@@ -328,24 +805,6 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type p(pSEXP);
     Rcpp::traits::input_parameter< int >::type n(nSEXP);
     rcpp_result_gen = Rcpp::wrap(update_beta_helper(data, design, mu, tau2, Omega, k, p, n));
-    return rcpp_result_gen;
-END_RCPP
-}
-// update_beta_helper1
-arma::mat update_beta_helper1(const arma::mat& data, const arma::mat& design, const arma::vec& mu, const arma::vec& tau2, const arma::mat& Omega, int k, int p, int n);
-RcppExport SEXP _SRGlasso_update_beta_helper1(SEXP dataSEXP, SEXP designSEXP, SEXP muSEXP, SEXP tau2SEXP, SEXP OmegaSEXP, SEXP kSEXP, SEXP pSEXP, SEXP nSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::mat& >::type data(dataSEXP);
-    Rcpp::traits::input_parameter< const arma::mat& >::type design(designSEXP);
-    Rcpp::traits::input_parameter< const arma::vec& >::type mu(muSEXP);
-    Rcpp::traits::input_parameter< const arma::vec& >::type tau2(tau2SEXP);
-    Rcpp::traits::input_parameter< const arma::mat& >::type Omega(OmegaSEXP);
-    Rcpp::traits::input_parameter< int >::type k(kSEXP);
-    Rcpp::traits::input_parameter< int >::type p(pSEXP);
-    Rcpp::traits::input_parameter< int >::type n(nSEXP);
-    rcpp_result_gen = Rcpp::wrap(update_beta_helper1(data, design, mu, tau2, Omega, k, p, n));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -461,6 +920,44 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// update_Z_helper_Pois_CAR
+void update_Z_helper_Pois_CAR(arma::mat& Z_curr, const arma::mat& data, const arma::mat& design, const arma::vec& mu_curr, const arma::mat& beta_curr, const arma::mat& Omega_curr, int k, int p, int n, int ns, int m, double emax);
+RcppExport SEXP _SRGlasso_update_Z_helper_Pois_CAR(SEXP Z_currSEXP, SEXP dataSEXP, SEXP designSEXP, SEXP mu_currSEXP, SEXP beta_currSEXP, SEXP Omega_currSEXP, SEXP kSEXP, SEXP pSEXP, SEXP nSEXP, SEXP nsSEXP, SEXP mSEXP, SEXP emaxSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat& >::type Z_curr(Z_currSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type design(designSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type mu_curr(mu_currSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type beta_curr(beta_currSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type Omega_curr(Omega_currSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< int >::type p(pSEXP);
+    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    Rcpp::traits::input_parameter< int >::type ns(nsSEXP);
+    Rcpp::traits::input_parameter< int >::type m(mSEXP);
+    Rcpp::traits::input_parameter< double >::type emax(emaxSEXP);
+    update_Z_helper_Pois_CAR(Z_curr, data, design, mu_curr, beta_curr, Omega_curr, k, p, n, ns, m, emax);
+    return R_NilValue;
+END_RCPP
+}
+// Graphical_ALASSO_Cpp
+Rcpp::List Graphical_ALASSO_Cpp(const arma::mat& data, const int n_iter, const int n_burn_in, const int thin_by, const arma::vec& lambda_a, const arma::vec& lambda_b, bool progress);
+RcppExport SEXP _SRGlasso_Graphical_ALASSO_Cpp(SEXP dataSEXP, SEXP n_iterSEXP, SEXP n_burn_inSEXP, SEXP thin_bySEXP, SEXP lambda_aSEXP, SEXP lambda_bSEXP, SEXP progressSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat& >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< const int >::type n_iter(n_iterSEXP);
+    Rcpp::traits::input_parameter< const int >::type n_burn_in(n_burn_inSEXP);
+    Rcpp::traits::input_parameter< const int >::type thin_by(thin_bySEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type lambda_a(lambda_aSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type lambda_b(lambda_bSEXP);
+    Rcpp::traits::input_parameter< bool >::type progress(progressSEXP);
+    rcpp_result_gen = Rcpp::wrap(Graphical_ALASSO_Cpp(data, n_iter, n_burn_in, thin_by, lambda_a, lambda_b, progress));
+    return rcpp_result_gen;
+END_RCPP
+}
 // Graphical_LASSO_Cpp
 Rcpp::List Graphical_LASSO_Cpp(const arma::mat& data, const int n_iter, const int n_burn_in, const int thin_by, const double lambda_a, const double lambda_b, bool progress);
 RcppExport SEXP _SRGlasso_Graphical_LASSO_Cpp(SEXP dataSEXP, SEXP n_iterSEXP, SEXP n_burn_inSEXP, SEXP thin_bySEXP, SEXP lambda_aSEXP, SEXP lambda_bSEXP, SEXP progressSEXP) {
@@ -475,6 +972,40 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const double >::type lambda_b(lambda_bSEXP);
     Rcpp::traits::input_parameter< bool >::type progress(progressSEXP);
     rcpp_result_gen = Rcpp::wrap(Graphical_LASSO_Cpp(data, n_iter, n_burn_in, thin_by, lambda_a, lambda_b, progress));
+    return rcpp_result_gen;
+END_RCPP
+}
+// Intercept_Graphical_ALASSO_Cpp
+Rcpp::List Intercept_Graphical_ALASSO_Cpp(const arma::mat& data, const int n_iter, const int n_burn_in, const int thin_by, const arma::vec& lambda_a, const arma::vec& lambda_b, bool progress);
+RcppExport SEXP _SRGlasso_Intercept_Graphical_ALASSO_Cpp(SEXP dataSEXP, SEXP n_iterSEXP, SEXP n_burn_inSEXP, SEXP thin_bySEXP, SEXP lambda_aSEXP, SEXP lambda_bSEXP, SEXP progressSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat& >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< const int >::type n_iter(n_iterSEXP);
+    Rcpp::traits::input_parameter< const int >::type n_burn_in(n_burn_inSEXP);
+    Rcpp::traits::input_parameter< const int >::type thin_by(thin_bySEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type lambda_a(lambda_aSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type lambda_b(lambda_bSEXP);
+    Rcpp::traits::input_parameter< bool >::type progress(progressSEXP);
+    rcpp_result_gen = Rcpp::wrap(Intercept_Graphical_ALASSO_Cpp(data, n_iter, n_burn_in, thin_by, lambda_a, lambda_b, progress));
+    return rcpp_result_gen;
+END_RCPP
+}
+// Intercept_Graphical_LASSO_Cpp
+Rcpp::List Intercept_Graphical_LASSO_Cpp(const arma::mat& data, const int n_iter, const int n_burn_in, const int thin_by, const double lambda_a, const double lambda_b, bool progress);
+RcppExport SEXP _SRGlasso_Intercept_Graphical_LASSO_Cpp(SEXP dataSEXP, SEXP n_iterSEXP, SEXP n_burn_inSEXP, SEXP thin_bySEXP, SEXP lambda_aSEXP, SEXP lambda_bSEXP, SEXP progressSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat& >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< const int >::type n_iter(n_iterSEXP);
+    Rcpp::traits::input_parameter< const int >::type n_burn_in(n_burn_inSEXP);
+    Rcpp::traits::input_parameter< const int >::type thin_by(thin_bySEXP);
+    Rcpp::traits::input_parameter< const double >::type lambda_a(lambda_aSEXP);
+    Rcpp::traits::input_parameter< const double >::type lambda_b(lambda_bSEXP);
+    Rcpp::traits::input_parameter< bool >::type progress(progressSEXP);
+    rcpp_result_gen = Rcpp::wrap(Intercept_Graphical_LASSO_Cpp(data, n_iter, n_burn_in, thin_by, lambda_a, lambda_b, progress));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -532,30 +1063,61 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_SRGlasso_Auto_Poisson_Gibbs_Batch_Cpp", (DL_FUNC) &_SRGlasso_Auto_Poisson_Gibbs_Batch_Cpp, 5},
     {"_SRGlasso_Auto_Poisson_Pseudo_likelihood_Cpp", (DL_FUNC) &_SRGlasso_Auto_Poisson_Pseudo_likelihood_Cpp, 3},
+    {"_SRGlasso_CAR_ALASSO_Cpp", (DL_FUNC) &_SRGlasso_CAR_ALASSO_Cpp, 10},
     {"_SRGlasso_CAR_LASSO_Cpp", (DL_FUNC) &_SRGlasso_CAR_LASSO_Cpp, 10},
-    {"_SRGlasso_update_car_beta_helper1", (DL_FUNC) &_SRGlasso_update_car_beta_helper1, 8},
+    {"_SRGlasso_update_car_Omega_adp_helper", (DL_FUNC) &_SRGlasso_update_car_Omega_adp_helper, 9},
+    {"_SRGlasso_update_car_tau2_adp_helper", (DL_FUNC) &_SRGlasso_update_car_tau2_adp_helper, 6},
+    {"_SRGlasso_update_car_lambda_Omega_adp_helper", (DL_FUNC) &_SRGlasso_update_car_lambda_Omega_adp_helper, 4},
+    {"_SRGlasso_sec_dev_Omegasl_Omega", (DL_FUNC) &_SRGlasso_sec_dev_Omegasl_Omega, 6},
+    {"_SRGlasso_CAR_FI", (DL_FUNC) &_SRGlasso_CAR_FI, 6},
+    {"_SRGlasso_CAR_FI_graph", (DL_FUNC) &_SRGlasso_CAR_FI_graph, 6},
+    {"_SRGlasso_CAR_FI_beta", (DL_FUNC) &_SRGlasso_CAR_FI_beta, 6},
+    {"_SRGlasso_CAR_FI_para", (DL_FUNC) &_SRGlasso_CAR_FI_para, 6},
     {"_SRGlasso_update_car_beta_helper", (DL_FUNC) &_SRGlasso_update_car_beta_helper, 8},
     {"_SRGlasso_update_car_mu_helper", (DL_FUNC) &_SRGlasso_update_car_mu_helper, 7},
     {"_SRGlasso_update_car_Omega_helper", (DL_FUNC) &_SRGlasso_update_car_Omega_helper, 9},
     {"_SRGlasso_update_car_tau2_helper", (DL_FUNC) &_SRGlasso_update_car_tau2_helper, 6},
+    {"_SRGlasso_expected_G_eigen", (DL_FUNC) &_SRGlasso_expected_G_eigen, 8},
+    {"_SRGlasso_G_det", (DL_FUNC) &_SRGlasso_G_det, 7},
+    {"_SRGlasso_expected_G_det", (DL_FUNC) &_SRGlasso_expected_G_det, 7},
+    {"_SRGlasso_G_det_para", (DL_FUNC) &_SRGlasso_G_det_para, 7},
+    {"_SRGlasso_expected_G_det_para", (DL_FUNC) &_SRGlasso_expected_G_det_para, 7},
+    {"_SRGlasso_G_tr_para", (DL_FUNC) &_SRGlasso_G_tr_para, 7},
+    {"_SRGlasso_expected_G_tr_para", (DL_FUNC) &_SRGlasso_expected_G_tr_para, 7},
+    {"_SRGlasso_full_tr_para", (DL_FUNC) &_SRGlasso_full_tr_para, 7},
+    {"_SRGlasso_expected_all_tr_para", (DL_FUNC) &_SRGlasso_expected_all_tr_para, 7},
+    {"_SRGlasso_full_det_para", (DL_FUNC) &_SRGlasso_full_det_para, 7},
+    {"_SRGlasso_expected_full_det_para", (DL_FUNC) &_SRGlasso_expected_full_det_para, 7},
+    {"_SRGlasso_beta_tr_para", (DL_FUNC) &_SRGlasso_beta_tr_para, 7},
+    {"_SRGlasso_expected_beta_tr_para", (DL_FUNC) &_SRGlasso_expected_beta_tr_para, 7},
+    {"_SRGlasso_expected_invG_tr_para", (DL_FUNC) &_SRGlasso_expected_invG_tr_para, 7},
+    {"_SRGlasso_PIbeta_tr_para", (DL_FUNC) &_SRGlasso_PIbeta_tr_para, 7},
+    {"_SRGlasso_expected_PIbeta_tr_para", (DL_FUNC) &_SRGlasso_expected_PIbeta_tr_para, 7},
+    {"_SRGlasso_PIfull_tr_para", (DL_FUNC) &_SRGlasso_PIfull_tr_para, 7},
+    {"_SRGlasso_expected_PIfull_tr_para", (DL_FUNC) &_SRGlasso_expected_PIfull_tr_para, 7},
     {"_SRGlasso_rgig", (DL_FUNC) &_SRGlasso_rgig, 3},
     {"_SRGlasso_Ising_LASSO_Cpp", (DL_FUNC) &_SRGlasso_Ising_LASSO_Cpp, 18},
     {"_SRGlasso_IsingSamplerCpp", (DL_FUNC) &_SRGlasso_IsingSamplerCpp, 6},
     {"_SRGlasso_Ising_PseudoLikelihood_Cpp", (DL_FUNC) &_SRGlasso_Ising_PseudoLikelihood_Cpp, 5},
+    {"_SRGlasso_Pois_CAR_LASSO_Cpp", (DL_FUNC) &_SRGlasso_Pois_CAR_LASSO_Cpp, 13},
     {"_SRGlasso_Pois_SRG_LASSO_Cpp", (DL_FUNC) &_SRGlasso_Pois_SRG_LASSO_Cpp, 13},
     {"_SRGlasso_Proit_CAR_LASSO_Cpp", (DL_FUNC) &_SRGlasso_Proit_CAR_LASSO_Cpp, 10},
     {"_SRGlasso_Probit_Graphical_LASSO_Cpp", (DL_FUNC) &_SRGlasso_Probit_Graphical_LASSO_Cpp, 7},
     {"_SRGlasso_Proit_SRG_LASSO_Cpp", (DL_FUNC) &_SRGlasso_Proit_SRG_LASSO_Cpp, 10},
     {"_SRGlasso_SRG_LASSO_Cpp", (DL_FUNC) &_SRGlasso_SRG_LASSO_Cpp, 10},
+    {"_SRGlasso_update_beta1_helper", (DL_FUNC) &_SRGlasso_update_beta1_helper, 8},
     {"_SRGlasso_update_beta_helper", (DL_FUNC) &_SRGlasso_update_beta_helper, 8},
-    {"_SRGlasso_update_beta_helper1", (DL_FUNC) &_SRGlasso_update_beta_helper1, 8},
     {"_SRGlasso_Sigma_to_CAR_Cpp", (DL_FUNC) &_SRGlasso_Sigma_to_CAR_Cpp, 1},
     {"_SRGlasso_rtn1", (DL_FUNC) &_SRGlasso_rtn1, 4},
     {"_SRGlasso_ZIP_SRG_LASSO_Cpp", (DL_FUNC) &_SRGlasso_ZIP_SRG_LASSO_Cpp, 18},
     {"_SRGlasso_logPostZij_helper_Cpp", (DL_FUNC) &_SRGlasso_logPostZij_helper_Cpp, 9},
     {"_SRGlasso_update_Z_helper_Pois", (DL_FUNC) &_SRGlasso_update_Z_helper_Pois, 10},
     {"_SRGlasso_update_Z_helper_Pois_reg", (DL_FUNC) &_SRGlasso_update_Z_helper_Pois_reg, 12},
+    {"_SRGlasso_update_Z_helper_Pois_CAR", (DL_FUNC) &_SRGlasso_update_Z_helper_Pois_CAR, 12},
+    {"_SRGlasso_Graphical_ALASSO_Cpp", (DL_FUNC) &_SRGlasso_Graphical_ALASSO_Cpp, 7},
     {"_SRGlasso_Graphical_LASSO_Cpp", (DL_FUNC) &_SRGlasso_Graphical_LASSO_Cpp, 7},
+    {"_SRGlasso_Intercept_Graphical_ALASSO_Cpp", (DL_FUNC) &_SRGlasso_Intercept_Graphical_ALASSO_Cpp, 7},
+    {"_SRGlasso_Intercept_Graphical_LASSO_Cpp", (DL_FUNC) &_SRGlasso_Intercept_Graphical_LASSO_Cpp, 7},
     {"_SRGlasso_rinvGau", (DL_FUNC) &_SRGlasso_rinvGau, 2},
     {"_SRGlasso_stein_loss_cpp", (DL_FUNC) &_SRGlasso_stein_loss_cpp, 2},
     {"_SRGlasso_gig_mode", (DL_FUNC) &_SRGlasso_gig_mode, 2},
