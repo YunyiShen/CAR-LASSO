@@ -263,7 +263,7 @@ void update_Z_helper_Pois(arma::mat &Z_curr,
       //Rcout<< "before ars" << i << " " << j << "\n" << Z_curr(i,j) <<endl;
       for (int ww = 0; ww < m; ++ww)
       {
-        x[ww] = (log(y(i, j) + .01) + mu_Zij) / 2 + ((double)ww - ((double)m / 2)) * (4 * (y(i, j) + abs(mu_Zij)) / (double)m);
+        x[ww] = (log(y(i, j) + .01) + mu_Zij) / 2 + ((double)ww - ((double)m / 2)) * ((4 * sqrt(sigma2_Zij)) / (double)m);
         //Rcout << log(y(i,j)+.01) + ((double)ww-((double)m/2)) * (4/(double)m) << "  " << x[ww] <<endl;
         //Z_curr(i,j) = x[ww];
         //Rcout << "ars working" <<endl;
@@ -440,7 +440,7 @@ struct get_Z_worker : public Worker
         //Rcout<< "before ars" << i << " " << j << "\n" << Z_curr(i,j) <<endl;
         for (int ww = 0; ww < m; ++ww)
         {
-          x[ww] = (log(y(i, j) + .01) + mu_Zij) / 2 + ((double)ww - ((double)m / 2)) * (4 * (y(i, j) + abs(mu_Zij)) / (double)m);
+          x[ww] = (log(y(i, j) + .01) + mu_Zij) / 2 + ((double)ww - ((double)m / 2)) * ((4 * sqrt(sigma2_Zij)) / (double)m);
           //Rcout << log(y(i,j)+.01) + ((double)ww-((double)m/2)) * (4/(double)m) << "  " << x[ww] <<endl;
           //Z_curr(i,j) = x[ww];
           //Rcout << "ars working" <<endl;
@@ -483,8 +483,8 @@ struct get_Z_worker : public Worker
   }
 };
 
-
-void update_Z_helper_multinomial_para(arma::mat &Z_curr,
+// [[Rcpp::export]]
+void update_Z_helper_Pois_para(arma::mat &Z_curr,
                                       const arma::mat &mu_Z,
                                       const arma::mat &Sigma_Z, // this is Sigma (cov) not Omega (percision)
                                       const arma::mat &y,
