@@ -74,7 +74,7 @@ void spl1_multi_(const int *ns, int *n, int *ilow, int *ihigh, int *ipt,
   double Sigmabb = Sigma_Z(w, w);
   arma::mat Sigmac = Sigma_Z(ind_noj, find(ind == w));
   arma::mat Sigmaa = Sigma_Z(ind_noj, ind_noj);
-  int N = as_scalar(sum(y.row(l))); // multinomial parameter
+  int N = as_scalar(sum(y.row(l), 1)); // multinomial parameter
   double mu_Zij = mu_Z(l, w) + as_scalar(trans(Sigmac) * solve(Sigmaa, trans(Z_curr(find(indi == l), ind_noj) - mu_Z(find(indi == l), ind_noj))));
   double sigma2_Zij = Sigmabb - as_scalar(trans(Sigmac) * solve(Sigmaa, Sigmac));
   //mu_Zij = as_scalar(mu_Zij);
@@ -134,9 +134,9 @@ void spl1_multi_(const int *ns, int *n, int *ilow, int *ihigh, int *ipt,
       n1 = *n + 1;
       x[n1] = *beta;
       // h and hprime
-      hx[n1] = (-0.5 * (*beta - mu_Zij) * (*beta - mu_Zij) / sigma2_Zij) + (y(l, w) * (*beta) - N * log(as_scalar(sum(exp(Z_curr(find(indi == l), ind_noj)))) + exp(*beta) + 1));
+      hx[n1] = (-0.5 * (*beta - mu_Zij) * (*beta - mu_Zij) / sigma2_Zij) + (y(l, w) * (*beta) - N * log(as_scalar(sum(exp(Z_curr(find(indi == l), ind_noj)), 1)) + exp(*beta) + 1));
 
-      hpx[n1] = (-(*beta - mu_Zij) / sigma2_Zij) + (y(l, w) - N * exp(*beta) / (as_scalar(sum(exp(Z_curr(find(indi == l), ind_noj)))) + exp(*beta) + 1));
+      hpx[n1] = (-(*beta - mu_Zij) / sigma2_Zij) + (y(l, w) - N * exp(*beta) / (as_scalar(sum(exp(Z_curr(find(indi == l), ind_noj)), 1)) + exp(*beta) + 1));
       fx = hx[n1] - *huzmax;
       if (alu1 < fx - alhu)
       {
@@ -251,9 +251,9 @@ void update_Z_helper_multinomial(arma::mat &Z_curr,
       Sigmac = Sigma_Z(ind_noj, find(ind == j));
       Sigmaa = Sigma_Z(ind_noj, ind_noj);
 
-      mu_Zij = mu_Z(i, j) + as_scalar(trans(Sigmac) * solve(Sigmaa, trans(Z_curr(find(indi == i), ind_noj) - mu_Z(find(indi == i), ind_noj))));
+      mu_Zij = mu_Z(i, j) + as_scalar(trans(Sigmac) * solve(Sigmaa, trans(Z__j - mu_Z(find(indi == i), ind_noj))));
       sigma2_Zij = Sigmabb - as_scalar(trans(Sigmac) * solve(Sigmaa, Sigmac));
-      normalizingwoZi = as_scalar(sum(sum(exp(Z__j))) + 1);
+      normalizingwoZi = as_scalar(sum(sum(exp(Z__j), 1)) + 1);
 
       int *iwv = new int[ns + 7]();
       double *rwv = new double[6 * (ns + 1) + 9]();
@@ -274,8 +274,8 @@ void update_Z_helper_multinomial(arma::mat &Z_curr,
       //Rcout<< "before ars" << i << " " << j << "\n" << Z_curr(i,j) <<endl;
       for (int ww = 0; ww < m; ++ww)
       {
-        x[ww] = (log(y(i, j)/(y(i,k) + .01)+.01) + mu_Zij) / 2 + ((double)ww - ((double)m / 2)) * (4 * (log(y(i, j)/(y(i,k) + .01)+.01) + abs(mu_Zij)) / (double)m);
-        //Rcout << log(y(i,j)+.01) + ((double)ww-((double)m/2)) * (4/(double)m) << "  " << x[ww] <<endl;
+        x[ww] = (log(y(i, j) / (y(i, k) + (y(i, k) == 0)) + .01) + mu_Zij) / 2 + ((double)ww - ((double)m / 2)) * (4 * sqrt(sigma2_Zij) / (double)m);
+        //Rcout << (log(y(i, j)/(y(i,k)+ (y(i,k)==0))+.01)) / 2 << x[ww] <<endl;
         //Z_curr(i,j) = x[ww];
         //Rcout << "ars working" <<endl;
         //Rcout << "i:" << i << "  j:" << j << "  ww:" << ww <<endl;
@@ -370,12 +370,15 @@ struct get_Z_worker : public Worker
         Sigmac = Sigma_Z(ind_noj, find(ind == j));
         Sigmaa = Sigma_Z(ind_noj, ind_noj);
 
-        mu_Zij = mu_Z(i, j) + as_scalar(trans(Sigmac) * solve(Sigmaa, trans(Z_curr(find(indi == i), ind_noj) - mu_Z(find(indi == i), ind_noj))));
+        mu_Zij = mu_Z(i, j) + as_scalar(trans(Sigmac) * solve(Sigmaa, trans(Z__j - mu_Z(find(indi == i), ind_noj))));
         sigma2_Zij = Sigmabb - as_scalar(trans(Sigmac) * solve(Sigmaa, Sigmac));
-        normalizingwoZi = as_scalar(sum(sum(exp(Z__j))) + 1);
+        normalizingwoZi = as_scalar(sum(sum(exp(Z__j), 1)) + 1);
 
         int *iwv = new int[ns + 7]();
         double *rwv = new double[6 * (ns + 1) + 9]();
+        //double *x = new double[ns]();
+        //double *hx = new double[ns]();
+        //double *hpx = new double[ns]();
 
         double *x = new double[m]();
         double *hx = new double[m]();
@@ -387,10 +390,17 @@ struct get_Z_worker : public Worker
         double xlb = 0;
         double xub = 0;
         int ifault = 0;
-
+        //Rcout<< "before ars" << i << " " << j << "\n" << Z_curr(i,j) <<endl;
         for (int ww = 0; ww < m; ++ww)
         {
-          x[ww] = (log(y(i, j)/(y(i,k) + .01)+.01) + mu_Zij) / 2 + ((double)ww - ((double)m / 2)) * (4 * (log(y(i, j)/(y(i,k) + .01)+.01) + abs(mu_Zij)) / (double)m);
+          x[ww] = (log(y(i, j) / (y(i, k) + (y(i, k) == 0)) + .01) + mu_Zij) / 2 + ((double)ww - ((double)m / 2)) * (4 * sqrt(sigma2_Zij) / (double)m);
+          //Rcout << (log(y(i, j)/(y(i,k)+ (y(i,k)==0))+.01)) / 2 << x[ww] <<endl;
+          //Z_curr(i,j) = x[ww];
+          //Rcout << "ars working" <<endl;
+          //Rcout << "i:" << i << "  j:" << j << "  ww:" << ww <<endl;
+          //Rcout << "flag" <<endl;
+
+          //Rcout << h_hprime_temp <<endl;
           hx[ww] = -(0.5 * (x[ww] - mu_Zij) * (x[ww] - mu_Zij) / sigma2_Zij) + (y(i, j) * (x[ww]) - N(i) * log(normalizingwoZi + exp(x[ww])));
 
           hpx[ww] = -((x[ww] - mu_Zij) / sigma2_Zij) + (y(i, j) - N(i) * exp(x[ww]) / (exp(x[ww]) + normalizingwoZi));
@@ -400,6 +410,9 @@ struct get_Z_worker : public Worker
 
         initial_(&ns, &m, &emax, x, hx, hpx,
                  &lb, &xlb, &ub, &xub, &ifault, iwv, rwv);
+        //for(int kkk = 0 ; kkk < 7 ; kkk++) Rcout << "iwv "<< kkk <<": " << iwv[kkk]<<" ";
+        //Rcout<<endl;
+        //Rcout<< "i: " << i << " j: " << j << " y:  " << y(i,j)<< "  sigma2: " << sigma2_Zij << " mu: " << mu_Zij << endl;
         sample_multi_(iwv, rwv,
                       i, j, // which node
                       Z_curr,
@@ -407,7 +420,7 @@ struct get_Z_worker : public Worker
                       Sigma_Z, // this is Sigma (cov) not Omega (percision)
                       y,
                       k, p, n, &ifault);
-
+        //Rcout << "after:\n" << Z_curr(i,j) <<endl;
         if (ifault != 0)
         {
           Rcout << "ARS failed with code" << ifault << endl;
@@ -423,6 +436,7 @@ struct get_Z_worker : public Worker
   }
 };
 
+// [[Rcpp::export]]
 void update_Z_helper_multinomial_para(arma::mat &Z_curr,
                                       const arma::mat &mu_Z,
                                       const arma::mat &Sigma_Z, // this is Sigma (cov) not Omega (percision)
