@@ -247,7 +247,7 @@ void update_Z_helper_multinomial(arma::mat &Z_curr,
       //Rcout << i << "  " << j << endl;
       ind_noj = find(ind != j);
       //Rcout << "flag1" <<endl;
-      Z__j = Z_curr(find(indi == i), ind_noj);
+      Z__j = Z_curr(arma::find(indi == i), ind_noj);
       //Rcout << "flag2" <<endl;
       Sigmabb = Sigma_Z(j, j);
       Sigmac = Sigma_Z(ind_noj, find(ind == j));
