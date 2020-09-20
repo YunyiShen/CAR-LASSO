@@ -5,6 +5,7 @@
 // [[Rcpp::depends(RcppArmadillo)]]
 #include <RcppArmadillo.h> 
 #include <tgmath.h>
+#include <string>
 #include "CAR_FI_helper.h"
 using namespace Rcpp;
 using namespace arma;
