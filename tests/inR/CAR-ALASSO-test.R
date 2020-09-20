@@ -65,8 +65,8 @@ hist((CAR_Graph-Omega)/Omega)
 CAR_A_test <- CAR_ALASSO_Cpp(Z,  Design, n_iter = 25000, 
                           n_burn_in = 5000, thin_by = 10, 
                           r_beta = 1+0*beta, delta_beta = .01 + 0 * beta,
-                          r_Omega = rep(1,.5*(k+1)*k),
-                          delta_Omega = rep(.01,.5*(k+1)*k),
+                          r_Omega = rep(1,.5*(k-1)*k),
+                          delta_Omega = rep(.01,.5*(k-1)*k),
                           progress = T)
 
 A_Graph <- 0 * Omega
