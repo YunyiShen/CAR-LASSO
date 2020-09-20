@@ -260,10 +260,24 @@ void update_Z_helper_Pois(arma::mat &Z_curr,
       double xlb = 0;
       double xub = 0;
       int ifault = 0;
+
+      double center = (log(y(i, j) + .01) + mu_Zij) / 2 ;
+      double range = sqrt(sigma2_Zij);
+      bool bad_init = true;
+      double left_hp, right_hp;
+      while(bad_init){
+         left_hp = -((center - range - mu_Zij) / sigma2_Zij) + (y(i, j) - exp(center-range));
+         right_hp = -((center + range - mu_Zij) / sigma2_Zij) + (y(i, j) - exp(center+range));
+         bad_init = left_hp * right_hp >= 0;
+         if(bad_init) {range += sqrt(sigma2_Zij);}// adaptively chose intial points
+      }
+      range += sqrt(sigma2_Zij);// being safe
+
+
       //Rcout<< "before ars" << i << " " << j << "\n" << Z_curr(i,j) <<endl;
       for (int ww = 0; ww < m; ++ww)
       {
-        x[ww] = (log(y(i, j) + .01) + mu_Zij) / 2 + ((double)ww - ((double)m / 2)) * ((4 * sqrt(sigma2_Zij)) / (double)m);
+        x[ww] = center + ((double)ww - ((double)m / 2)) * (2*range/m);
         //Rcout << log(y(i,j)+.01) + ((double)ww-((double)m/2)) * (4/(double)m) << "  " << x[ww] <<endl;
         //Z_curr(i,j) = x[ww];
         //Rcout << "ars working" <<endl;
@@ -440,7 +454,7 @@ struct get_Z_worker : public Worker
         //Rcout<< "before ars" << i << " " << j << "\n" << Z_curr(i,j) <<endl;
         for (int ww = 0; ww < m; ++ww)
         {
-          x[ww] = (log(y(i, j) + .01) + mu_Zij) / 2 + ((double)ww - ((double)m / 2)) * ((4 * sqrt(sigma2_Zij)) / (double)m);
+          x[ww] = (log(y(i, j) + .01) + mu_Zij) / 2 + ((double)ww - ((double)m / 2)) * ((8 * sqrt(sigma2_Zij)) / (double)m);
           //Rcout << log(y(i,j)+.01) + ((double)ww-((double)m/2)) * (4/(double)m) << "  " << x[ww] <<endl;
           //Z_curr(i,j) = x[ww];
           //Rcout << "ars working" <<endl;

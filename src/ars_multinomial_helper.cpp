@@ -256,7 +256,7 @@ void update_Z_helper_multinomial(arma::mat &Z_curr,
       mu_Zij = mu_Z(i, j) + as_scalar(trans(Sigmac) * solve(Sigmaa, trans(Z__j - mu_Z(find(indi == i), ind_noj))));
       sigma2_Zij = Sigmabb - as_scalar(trans(Sigmac) * solve(Sigmaa, Sigmac));
       normalizingwoZi = as_scalar(sum(sum(exp(Z__j), 1)) + 1);
-
+      //Rcout << "mu: " << mu_Zij << " sigma2 " << sigma2_Zij << " C: " << normalizingwoZi << " Y: " << y(i,j) << endl;
       int *iwv = new int[ns + 7]();
       double *rwv = new double[6 * (ns + 1) + 9]();
       //double *x = new double[ns]();
@@ -273,11 +273,26 @@ void update_Z_helper_multinomial(arma::mat &Z_curr,
       double xlb = 0;
       double xub = 0;
       int ifault = 0;
+      double center = (log((y(i,j)+0.01*(y(i,j)==0))*normalizingwoZi/(N(i)-y(i,j)+0.1)+0.1) + mu_Zij) / 2;
+      //double sd_post = 1/(sqrt(1/sigma2_Zij+N(i)*(normalizingwoZi*exp(center)/(normalizingwoZi+exp(center))*(normalizingwoZi+exp(center)))));
+      double range = 5*sqrt(sigma2_Zij);
+      //Rcout <<"init range " << range << endl;
+      bool bad_init = true;
+      double left_hp, right_hp;
+      while(bad_init){
+         left_hp = -((center-range - mu_Zij) / sigma2_Zij) + (y(i, j) - N(i) * exp(center-range) / (exp(center-range) + normalizingwoZi));
+         right_hp = -((center+range - mu_Zij) / sigma2_Zij) + (y(i, j) - N(i) * exp(center+range) / (exp(center+range) + normalizingwoZi));
+         bad_init = left_hp * right_hp >= 0;
+         if(bad_init) {range += sqrt(sigma2_Zij);}// adaptively chose intial points
+         //Rcout << "range: "<<range <<endl;
+      }
+      range *= 1.1;// being safe
+
       //Rcout<< "before ars" << i << " " << j << "\n" << Z_curr(i,j) <<endl;
       for (int ww = 0; ww < m; ++ww)
       {
 
-        x[ww] = (log(y(i, j) / (y(i, k) + (y(i, k) == 0)) + .01) + mu_Zij) / 2 + ((double)ww - ((double)m / 2)) * (4 * sqrt(sigma2_Zij) / (double)m);
+        x[ww] = center + ((double)ww - ((double)m / 2)) * (2*range/m);
         //Rcout << (log(y(i, j)/(y(i,k)+ (y(i,k)==0))+.01)) / 2 << x[ww] <<endl;
         //Z_curr(i,j) = x[ww];
         //Rcout << "ars working" <<endl;
@@ -401,7 +416,7 @@ struct get_Z_worker : public Worker
         for (int ww = 0; ww < m; ++ww)
         {
 
-          x[ww] = (log(y(i, j) / (y(i, k) + (y(i, k) == 0)) + .01) + mu_Zij) / 2 + ((double)ww - ((double)m / 2)) * (4 * sqrt(sigma2_Zij) / (double)m);
+          x[ww] = (log(y(i, j) / (y(i, k) + (y(i, k) == 0)) + .01) + mu_Zij) / 2 + ((double)ww - ((double)m / 2)) * (8 * sqrt(sigma2_Zij) / (double)m);
           //Rcout << (log(y(i, j)/(y(i,k)+ (y(i,k)==0))+.01)) / 2 << x[ww] <<endl;
 
           //Z_curr(i,j) = x[ww];

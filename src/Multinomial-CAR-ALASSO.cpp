@@ -31,7 +31,7 @@ List Multinomial_CAR_ALASSO_Cpp(const arma::mat & data, // col composition data,
                    const arma::vec delta_Omega,
                    const int ns, const int m, const double emax, // ars parameters
                    bool progress){
-  int k = data.n_cols; // number of nodes
+  int k = data.n_cols-1; // number of nodes
   int p = design.n_cols; //number of predictors
   int n = data.n_rows; // number of samples
   
@@ -56,14 +56,18 @@ List Multinomial_CAR_ALASSO_Cpp(const arma::mat & data, // col composition data,
   
   arma::vec tau2_curr = randg<arma::vec> (k*p,distr_param(r_beta(0),delta_beta(0))); // current latent variable tau^2, for prior of beta
 
-  arma::vec mu_curr = trans( mean(data) ); // current value of mean
-  arma::mat Omega_curr(k,k); // current value of Omega
-  Omega_curr = inv(cov(log(data+.1)));
+  
   arma::mat beta_curr(p,k,fill::zeros); // current value of beta
   
-  arma::mat Z_curr = log(data+.1); // latent normal variable
-  
-  
+  arma::mat Z_curr = data; // latent normal variable
+  Z_curr.each_col() /= (Z_curr.col(k)+.1);
+  Z_curr.shed_col(k);
+  Z_curr = log(Z_curr+.1);
+
+  arma::vec mu_curr(k,fill::zeros); // current value of mean
+  mu_curr = trans(mean(Z_curr));
+  arma::mat Omega_curr(k,k); // current value of Omega
+  Omega_curr = inv(cov(Z_curr));
   
   arma::vec lambda2_beta = randg<arma::vec> (k*p,distr_param(r_beta(0),delta_beta(0))); // current lambda, for prior of beta
   arma::vec lambda_Omega = randg<arma::vec> (.5*k*(k-1),distr_param(r_Omega(0),delta_Omega(0)));
@@ -84,18 +88,18 @@ List Multinomial_CAR_ALASSO_Cpp(const arma::mat & data, // col composition data,
           Rcpp::Named("lambda_Omega") = lambda_Omega_mcmc
       ));
     }
+    
+    
     // block update start:
     update_car_lambda_Omega_adp_helper(lambda_Omega,
                                        Omega_curr,
                                        r_Omega,
-                                       delta_Omega);    
-    
+                                       delta_Omega); 
+                                          
     // Update Latent Zs using ars
     // TODO: write a CAR based helper, since the prior changed
-    update_Z_helper_multinomial_CAR(Z_curr,
-                             data, design,mu_curr, beta_curr, Omega_curr,
-                             k,p,n,ns,m,emax);
-    //Rcout << "updated:\n" << Z_curr <<endl;
+    
+    
     //Update betas:
     beta_curr = update_car_beta_helper(Z_curr, design, mu_curr,
                                    tau2_curr, Omega_curr, 
@@ -105,7 +109,7 @@ List Multinomial_CAR_ALASSO_Cpp(const arma::mat & data, // col composition data,
     
     // update Omega
     //Rcout<<Z_curr<<endl;
-    update_car_Omega_adp_helper(Omega_curr, data, design, 
+    update_car_Omega_adp_helper(Omega_curr, Z_curr, design, 
                                      mu_curr, beta_curr,
                                      lambda_Omega,
                                      k, p, n);
@@ -114,7 +118,7 @@ List Multinomial_CAR_ALASSO_Cpp(const arma::mat & data, // col composition data,
     
     // Update mu
     
-    mu_curr = update_car_mu_helper(data,design,beta_curr,
+    mu_curr = update_car_mu_helper(Z_curr,design,beta_curr,
                                Omega_curr, 
                                k, p, n);
     
@@ -130,9 +134,13 @@ List Multinomial_CAR_ALASSO_Cpp(const arma::mat & data, // col composition data,
     
     update_car_lambda2_beta_adp_helper(lambda2_beta,tau2_curr,
                                         r_beta,delta_beta,k, p);
-        
-    
-    
+    //Rcout << i <<endl;    
+    //Rcout << Z_curr <<endl;
+    update_Z_helper_multinomial_CAR(Z_curr,
+                             data, design,mu_curr, beta_curr, Omega_curr,
+                             k,p,n,ns,m,emax);
+
+
     // saving the state
     if( (i-n_burn_in)>=0 && (i+1-n_burn_in)%thin_by ==0 ){
       
