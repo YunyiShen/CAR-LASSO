@@ -322,7 +322,7 @@ void update_Z_helper_multinomial(arma::mat &Z_curr,
       //Rcout << "after:\n" << Z_curr(i,j) <<endl;
       if (ifault != 0)
       {
-        Rcout << "ARS failed with code" << ifault << endl;
+        Rcout << "ARS failed with code" << ifault << "if this happen frequently, increase m" << endl;
         //stop("ARS failed with code %i \n",ifault);
       }
       delete[] iwv;
