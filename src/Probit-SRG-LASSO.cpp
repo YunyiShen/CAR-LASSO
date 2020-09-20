@@ -19,7 +19,7 @@ using namespace arma;
  */
 
 // [[Rcpp::export]]
-List Proit_SRG_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sample
+List Probit_SRG_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sample
                    const arma::mat & design, // design matrix, each ROW as a sample
                    const int n_iter, // how many iterations?
                    const int n_burn_in, // burn in
