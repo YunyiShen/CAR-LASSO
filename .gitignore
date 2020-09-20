@@ -2,6 +2,7 @@
 .Rproj.user/*
 .Rproj.user
 *.o
+*.so
 src/sandbox.cpp
 R/sandbox.R
 tests/*
