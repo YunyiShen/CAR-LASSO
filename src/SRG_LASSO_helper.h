@@ -6,6 +6,13 @@ arma::mat update_beta_helper(const arma::mat & data,
                              const arma::vec & tau2,
                              const arma::mat & Omega,
                              int k, int p, int n);
+
+arma::mat update_beta_helper1(const arma::mat & data,
+                             const arma::mat & design,
+                             const arma::vec & mu,
+                             const arma::vec & tau2,
+                             const arma::mat & Omega,
+                             int k, int p, int n);
                              
 arma::vec update_mu_helper(const arma::mat & data,
                            const arma::mat & design,

@@ -19,7 +19,7 @@ using namespace arma;
  */
 
 // [[Rcpp::export]]
-List Proit_SRG_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sample
+List Probit_SRG_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sample
                    const arma::mat & design, // design matrix, each ROW as a sample
                    const int n_iter, // how many iterations?
                    const int n_burn_in, // burn in
@@ -50,8 +50,8 @@ List Proit_SRG_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as
   arma::mat lambda_mcmc(n_save , 2); // LASSO parameter for beta and B
   lambda_mcmc += NA_REAL;
   
-  arma::mat Z_mcmc(n_save , k*n); // latent normal 
-  Z_mcmc += NA_REAL;
+  //arma::mat Z_mcmc(n_save , k*n); // latent normal 
+  // Z_mcmc += NA_REAL;
   
   arma::vec tau2_curr = randg<arma::vec> (k*p,distr_param(r_beta,delta_beta)); // current latent variable tau^2, for prior of beta
 
@@ -82,8 +82,8 @@ List Proit_SRG_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as
           Rcpp::Named("beta") = beta_mcmc,
           Rcpp::Named("mu") = mu_mcmc,
           Rcpp::Named("Omega") = Omega_mcmc,
-          Rcpp::Named("lambda") = lambda_mcmc,
-          Rcpp::Named("Z") = Z_mcmc
+          Rcpp::Named("lambda") = lambda_mcmc//,
+          //Rcpp::Named("Z") = Z_mcmc
       ));
     }
     // block update start:
@@ -140,7 +140,7 @@ List Proit_SRG_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as
     // saving the state
     if( (i-n_burn_in)>=0 && (i+1-n_burn_in)%thin_by ==0 ){
       
-      Z_mcmc.row(i_save) = trans(vectorise(Z_curr));
+      //Z_mcmc.row(i_save) = trans(vectorise(Z_curr));
       beta_mcmc.row(i_save) = trans(vectorise(beta_curr));
       Omega_mcmc.row(i_save) = trans( Omega_curr(trimatu_ind( size(Omega_curr) )));
       mu_mcmc.row(i_save) = mu_curr.t();
@@ -158,8 +158,8 @@ List Proit_SRG_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as
       Rcpp::Named("beta") = beta_mcmc,
       Rcpp::Named("mu") = mu_mcmc,
       Rcpp::Named("Omega") = Omega_mcmc,
-      Rcpp::Named("lambda") = lambda_mcmc,
-      Rcpp::Named("Z") = Z_mcmc
+      Rcpp::Named("lambda") = lambda_mcmc//,
+      //Rcpp::Named("Z") = Z_mcmc
   ));
 }
 

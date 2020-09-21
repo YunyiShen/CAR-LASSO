@@ -12,10 +12,13 @@ using namespace arma;
 #include "CAR_LASSO_helper.h"
 
 /*
- * Helper functions for Conditional Auto Regression LASSO, 
+ * Main sampling functions for Conditional Auto Regression LASSO, 
  * Basic idea was to embed Graphical LASSO into a normal LASSO using the hirechical structure
  *   described by Wang (2012) and Park and Casella 2008
  * In this model average structure offer some extra information of conditional correlation
+ * 
+ * This one was not adaptive, i.e. lambda_Omega was a fixed for all entries of Omega and 
+ *   similar for betas
  * 
  * A CAR can be reparameterize into a model s.t.: 
  * Y~N(Sigma (Xbeta+mu),Sigma)
@@ -40,7 +43,7 @@ Output:
   @ mu: a matrix with each row as an MCMC sample, columns are intercept vectors
   @ Omega: a matrix with each row as an MCMC sample, 
     columns are the upper diagnol entries of precision matrix Omega
-  @ lambda: a matrix with only row columns, first was for beta, second was for Omega
+  @ lambda: a matrix with only two columns, first was for beta, second was for Omega
     each row was an MCMC sample of shrinkage parameter lambda
 
 

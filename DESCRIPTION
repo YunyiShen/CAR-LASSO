@@ -1,5 +1,5 @@
-Package: SRGlasso
-Title: Simultaneous Regressive Graphical Lasso
+Package: CARlasso
+Title: Conditional AutoRegressive Lasso
 Version: 0.1
 Authors@R: person("Yunyi", "Shen", email = "yshen99@wisc.edu", role = c("aut", "cre"))
 Description: Bayesian simultaneous regressive and graphical LASSO with automatic shrinkage parameter
@@ -12,7 +12,7 @@ Suggests: testthat
 RoxygenNote: 7.0.2
 Roxygen: list(markdown = TRUE)
 LinkingTo: 
-    Rcpp, RcppArmadillo, RcppProgress
-Imports: 
-    Rcpp, RcppArmadillo, RcppProgress
+    Rcpp, RcppArmadillo, RcppProgress, RcppParallel
+Imports:  
+    Rcpp, RcppArmadillo, RcppProgress, RcppParallel
 SystemRequirements: C++11

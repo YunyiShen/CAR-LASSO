@@ -17,6 +17,9 @@ using namespace arma;
  * introduced in Wang (2012). Samples from the conditional distribution of a 
  * permuted column/row for simulating the posterior distribution for the concentration 
  * matrix specifying a Gaussian Graphical Model
+ * 
+ * No intercept, not adaptive
+ * 
  */
 
 
@@ -34,7 +37,7 @@ Output:
   A list with component:
   @ Omega: a matrix with each row as an MCMC sample, 
     columns are the upper diagnol entries of precision matrix Omega
-  @ lambda: a matrix with only row columns, first was for beta, second was for Omega
+  @ lambda: a matrix with only one column, 
     each row was an MCMC sample of shrinkage parameter lambda
 
 
@@ -155,14 +158,14 @@ Rcpp::List Graphical_LASSO_Cpp(const arma::mat & data,
       
       Ci = (S(j,j)+lambda_curr) * Omega11inv;
       Ci.diag() += tauI;
-      invCi = inv(Ci);
-      //CiChol = chol(Ci);
+      //invCi = inv(Ci);
+      CiChol = chol(Ci);
       
       //S_temp = S.col(j);
       //S_temp = S_temp(perms_j);
-      mui = -invCi*S12;
-      
-      gamma = mvnrnd(mui, invCi);
+      mui = - solve(Ci,S12);
+      gamma = solve(CiChol,randn(size(mui))) + mui;
+      //gamma = mvnrnd(mui, invCi);
       
       // Replacing omega entries
       Omega.submat(perms_j,ind_j) = gamma;
