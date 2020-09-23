@@ -161,7 +161,7 @@ List Probit_CAR_ALASSO_Cpp(const arma::mat & data, // col composition data, ROW 
       Rcpp::Named("Omega") = Omega_mcmc,
       Rcpp::Named("lambda_beta") = lambda_beta_mcmc,
       Rcpp::Named("lambda_Omega") = lambda_Omega_mcmc//,
-      //Rcpp::Named("Z") = Z_mcmc // it is not a good idea to sace all latent normal
+      //Rcpp::Named("Z") = Z_mcmc // it is not a good idea to save all latent normal
   ));
 }
 

@@ -271,7 +271,7 @@ void update_Z_helper_Pois(arma::mat &Z_curr,
          bad_init = left_hp * right_hp >= 0;
          if(bad_init) {range += sqrt(sigma2_Zij);}// adaptively chose intial points
       }
-      range += sqrt(sigma2_Zij);// being safe
+      range *= 1.1;// being safe
 
 
       //Rcout<< "before ars" << i << " " << j << "\n" << Z_curr(i,j) <<endl;

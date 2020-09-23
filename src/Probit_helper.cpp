@@ -23,7 +23,7 @@ void update_Z_helper(arma::mat & Z_curr, // persumably large, thus will not copy
   
   arma::vec mu_Zi;
   
-  arma::vec y_star(k,fill::zeros); // latent y (y|Z~ N(Z,1)), bascally the probit trnasformation
+  arma::vec y_star(k,fill::zeros); // latent y (y|Z~ N(Z,1)), basically the probit trnasformation
   
   for(int i = 0 ; i < n ; ++i){
     for(int j = 0 ; j < k ; ++j){
