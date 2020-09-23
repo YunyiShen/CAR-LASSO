@@ -6,7 +6,7 @@ library(RcppProgress)
 rm(list = ls())
 
 k = 5
-n = 7000
+n = 100
 p = 1
 
 sourceCpp("./src/Probit-CAR-ALASSO.cpp")
@@ -51,12 +51,12 @@ for( i in 1:n ){
 
 
 
-test <- Probit_CAR_ALASSO_Cpp(Y,  Design, n_iter = 500000, 
-                            n_burn_in = 50000, thin_by = 500, 
+test <- Probit_CAR_ALASSO_Cpp(Y,  Design, n_iter = 1500, 
+                            n_burn_in = 500, thin_by = 5, 
                             r_beta = 1+0*beta, delta_beta = .01 + 0 * beta,
                             r_Omega = rep(1,.5*(k-1)*k),
                             delta_Omega = rep(.01,.5*(k-1)*k),
-                            progress = T)
+                            progress = F)
 
 Graph <- 0 * Omega
 Graph[upper.tri(Graph,T)] <- apply(test$Omega,2,mean)

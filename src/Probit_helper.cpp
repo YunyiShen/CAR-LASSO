@@ -62,6 +62,7 @@ void update_Z_helper_CAR(arma::mat & Z_curr, // persumably large, thus will not 
       y_star(j) = rtn1(Z_curr(i,j),1,
              data(i,j) == 1 ? 0 : -INFINITY, // if data(i,j)=1, then y_star >= 0
              data(i,j) == 0 ? 0 : INFINITY); // if data(i,j)=0 y_star<0
+      //cout << "Z:" << Z_curr(i,j)<< " data:" << data(i,j) << " y*:" << y_star(j) << endl;
     }
     mu_Zi = Sigma_Z * (trans(mu_Zmat.row(i))+y_star);
     Z_curr.row(i) = trans( mvnrnd(mu_Zi,Sigma_Z));
