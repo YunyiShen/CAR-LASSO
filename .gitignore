@@ -6,4 +6,5 @@
 src/sandbox.cpp
 R/sandbox.R
 tests/*
+real_data/*
 .vscode/*
