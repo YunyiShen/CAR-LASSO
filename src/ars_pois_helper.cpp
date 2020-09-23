@@ -29,7 +29,7 @@ void spl1_(const int *ns, int *n, int *ilow, int *ihigh, int *ipt,
            const arma::mat &y,
            int k, int p, int n_sample)
 {
-  const int max_attempt = 3 * (*ns); // maximal number of attempts to sample a value
+  const int max_attempt = 10 * (*ns); // maximal number of attempts to sample a value
   //  (usually (not necessarily) is something wrong if this number is reached)
 
   /* Local variables */
@@ -271,7 +271,7 @@ void update_Z_helper_Pois(arma::mat &Z_curr,
          bad_init = left_hp * right_hp >= 0;
          if(bad_init) {range += sqrt(sigma2_Zij);}// adaptively chose intial points
       }
-      range += sqrt(sigma2_Zij);// being safe
+      range *= 1.1;// being safe
 
 
       //Rcout<< "before ars" << i << " " << j << "\n" << Z_curr(i,j) <<endl;
