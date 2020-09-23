@@ -105,7 +105,7 @@ List Pois_CAR_ALASSO_Cpp(const arma::mat & data, // col composition data, ROW as
     
     // update Omega
     //Rcout<<Z_curr<<endl;
-    update_car_Omega_adp_helper(Omega_curr, data, design, 
+    update_car_Omega_adp_helper(Omega_curr, Z_curr, design, 
                                      mu_curr, beta_curr,
                                      lambda_Omega,
                                      k, p, n);
@@ -114,7 +114,7 @@ List Pois_CAR_ALASSO_Cpp(const arma::mat & data, // col composition data, ROW as
     
     // Update mu
     
-    mu_curr = update_car_mu_helper(data,design,beta_curr,
+    mu_curr = update_car_mu_helper(Z_curr,design,beta_curr,
                                Omega_curr, 
                                k, p, n);
     
