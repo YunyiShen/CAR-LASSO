@@ -9,7 +9,7 @@ library(RcppParallel)
 library(BB)
 library(GenSA)
 
-sourceCpp("./src/CAR-LASSO.cpp")
+sourceCpp("./src/CAR-ALASSO.cpp")
 sourceCpp("./src/CAR_active_learning_helper_para.cpp")
 sourceCpp("./src/CAR_FI_helper.cpp")
 
@@ -80,7 +80,7 @@ p <- 10
 
 n_step <- 15
 n_rep_step <- 1 # number of repeats
-n_new <- 30 # number of new experiments each time
+n_new <- 50 # number of new experiments each time
 n_new_each_step <- n_rep_step * n_new
 
 
@@ -100,8 +100,16 @@ cat(kappa(Sigma),"\n")
 
 
 #beta <- matrix(rnorm(k*p,0,2),p,k)
-beta <- 5*as.matrix(rsparsematrix(p,k,0.3))
+beta <- 3*as.matrix(rsparsematrix(p,k,0.3))
+#beta <- diag(rnorm(k))
+
 mu <- matrix(rnorm(k,0,1))
+
+
+r_beta <- 1+0*beta
+delta_beta <- .01 + 0 * beta
+r_Omega <- rep(1,.5*(k+1)*k)
+delta_Omega <- rep(.01,.5*(k+1)*k)
 
 
 design_init <- matrix(rnorm(p * n_init), ncol = p)
@@ -126,10 +134,10 @@ data_temp <- matrix(NA,n_new_each_step,k)
 
 
 # initial result
-sample_init <- CAR_LASSO_Cpp(data_init,  design_init, n_iter = 25000, 
+sample_init <- CAR_ALASSO_Cpp(data_init,  design_init, n_iter = 25000, 
                              n_burn_in = 5000, thin_by = 50, 
-                             r_beta = 1, delta_beta = .01,
-                             r_Omega = 1,delta_Omega = .01,
+                             r_beta = r_beta, delta_beta = delta_beta,
+                             r_Omega = r_Omega,delta_Omega = delta_Omega,
                              progress = T)
 sample_AL_con <- sample_AL_uncon <- sample_rand <- sample_rep <- sample_init
 
@@ -164,10 +172,10 @@ for(i in 1:n_step+1){
   data_rep <- rbind(data_rep,data_temp)
   design_rep <- rbind(design_rep,design_temp)
   
-  sample_rep <- CAR_LASSO_Cpp(data_rep,  design_rep, n_iter = 25000, 
+  sample_rep <- CAR_ALASSO_Cpp(data_rep,  design_rep, n_iter = 25000, 
                               n_burn_in = 5000, thin_by = 50, 
-                              r_beta = 1, delta_beta = .01,
-                              r_Omega = 1,delta_Omega = .01,
+                              r_beta = r_beta, delta_beta = delta_beta,
+                              r_Omega = r_Omega,delta_Omega = delta_Omega,
                               progress = T)
   
   graph_rep <- get_graph(sample_rep,k)
@@ -179,7 +187,7 @@ for(i in 1:n_step+1){
   
   # random
   cat("  random:\n")
-  design_temp <- matrix(rnorm(n_new*p,0,10),ncol = p)
+  design_temp <- matrix(rnorm(n_new*p,0,1),ncol = p)
   design_temp <- lapply(1:n_rep_step,function(i){design_temp})
   design_temp <- Reduce(rbind, design_temp)
   Xbeta_temp <- design_temp %*% beta
@@ -189,10 +197,10 @@ for(i in 1:n_step+1){
   data_rand <- rbind(data_rand,data_temp)
   design_rand <- rbind(design_rand,design_temp)
   
-  sample_rand <- CAR_LASSO_Cpp(data_rand,  design_rand, n_iter = 25000, 
+  sample_rand <- CAR_ALASSO_Cpp(data_rand,  design_rand, n_iter = 25000, 
                                n_burn_in = 5000, thin_by = 50, 
-                               r_beta = 1, delta_beta = .01,
-                               r_Omega = 1,delta_Omega = .01,
+                               r_beta = r_beta, delta_beta = delta_beta,
+                               r_Omega = r_Omega,delta_Omega = delta_Omega,
                                progress = T)
   
   graph_rand <- get_graph(sample_rand,k)
@@ -205,10 +213,10 @@ for(i in 1:n_step+1){
   
   # AL_con
   cat("  active learning:\n")
-  guess <- rnorm(n_new * p,0,10)
+  guess <- rnorm(n_new * p,0,1)
   AL_design_con <- BBoptim(par = guess,
                          fn = Prior_Info_tr,
-                         #lower = -3 + 0*guess,upper = 3+0*guess,
+                         #lower = -Inf + 0*guess,upper = Inf+0*guess,
                          CAR_sample = sample_AL_con,
                          k = k, 
                          pp = p,
@@ -234,10 +242,10 @@ for(i in 1:n_step+1){
   data_AL_con <- rbind(data_AL_con,data_temp)
   design_AL_con <- rbind(design_AL_con,design_temp)
   
-  sample_AL_con <- CAR_LASSO_Cpp(data_AL_con,  design_AL_con, n_iter = 25000, 
+  sample_AL_con <- CAR_ALASSO_Cpp(data_AL_con,  design_AL_con, n_iter = 25000, 
                                  n_burn_in = 5000, thin_by = 50, 
-                                 r_beta = 1, delta_beta = .01,
-                                 r_Omega = 1,delta_Omega = .01,
+                                 r_beta = r_beta, delta_beta = delta_beta,
+                                 r_Omega = r_Omega,delta_Omega = delta_Omega,
                                  progress = T)
   
   graph_AL_con <- get_graph(sample_AL_con,k)
@@ -270,8 +278,8 @@ for(i in 1:n_step+1){
   
   #sample_AL_uncon <- CAR_LASSO_Cpp(data_AL_uncon,  design_AL_uncon, n_iter = 25000, 
   #                      n_burn_in = 5000, thin_by = 50, 
-  #                      r_beta = 1, delta_beta = .01,
-  #                      r_Omega = 1,delta_Omega = .01,
+  #                      r_beta = r_beta, delta_beta = delta_beta,
+  #                      r_Omega = r_Omega,delta_Omega = delta_Omega,
   #                      progress = T)
   
   #graph_AL_uncon <- get_graph(sample_AL_uncon,k)
