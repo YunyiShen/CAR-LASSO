@@ -1,9 +1,11 @@
 // [[Rcpp::depends(RcppArmadillo)]]
 // [[Rcpp::depends(RcppProgress)]]
+#define ARMA_DONT_PRINT_ERRORS
 #include <RcppArmadillo.h> 
 #include <tgmath.h>
 using namespace Rcpp;
 using namespace arma;
+
 
 #include <progress.hpp>
 #include <progress_bar.hpp>
