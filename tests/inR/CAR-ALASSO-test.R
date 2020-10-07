@@ -5,9 +5,9 @@ library(RcppProgress)
 
 rm(list = ls())
 
-k = 10
-n = 5000
-p = 5
+k = 30
+n = 177
+p = 11
 
 
 sourceCpp("./src/CAR-LASSO.cpp")
@@ -15,23 +15,22 @@ sourceCpp("./src/graphical-LASSO.cpp")
 sourceCpp("./src/CAR-ALASSO.cpp")
 source("./R/misc.R")
 
-B <- rsparsematrix(k,k,0.2)
-omega <- diag(rgamma(k,3,.1))
-I <- diag(rep(1,k))
-Omega <- t(I-B) %*% omega %*% (I-B)
-#Omega <- omega
-#diag(Omega) <- diag(Omega) + k
-Omega <- as.matrix(Omega)
-image(Omega)
+source("./tests/Formal/Accurancy/Graph_generator.R")
 
-Sigma <- solve(Omega)
+set.seed(12345)
+Graph_raw <- g_model1(k)
+Omega <- Graph_raw$Omega
+#image(Omega)
+
+Sigma <- Graph_raw$Sigma
+
 
 Design <- 1.0* (matrix(rnorm(n*p,0,1),n,p))
 #Design <- (Design-mean(Design))/sd(Design)
 colnames(Design) <- paste0("x",1:p)
 
 
-beta <- matrix(rnorm(p*k,5,1),p,k)
+beta <- matrix(rnorm(p*k,0,3),p,k)
 beta[sample(p*k,floor(0.3*p*k))] = 0
 
 mu <-  1+rnorm(k)
@@ -75,6 +74,12 @@ A_Graph <- A_Graph+t(A_Graph)
 diag(A_Graph) <- 0.5 * diag(A_Graph)
 
 
+multireg <- CAR_multireg(Z,Design,10000)
+
+multireg_Graph <- 0 * Omega
+multireg_Graph[upper.tri(multireg_Graph,T)] <- apply(multireg$Omega,2,mean)
+multireg_Graph <- multireg_Graph+t(multireg_Graph)
+diag(multireg_Graph) <- 0.5 * diag(multireg_Graph)
 
 
 Glasso <- Graphical_LASSO_Cpp(Z, 25000, 5000, 10, 1, .01, T)

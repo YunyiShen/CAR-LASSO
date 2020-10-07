@@ -9,3 +9,10 @@ get_graph <- function(CAR_sample,k, summary = "mean"){
   diag(Omega) <- 0.5 * diag(Omega)
   return(Omega)
 }
+
+get_CAR_MB <- function(B,Omega){
+  D <- diag(diag(Omega))
+  R <- D-Omega
+  
+  return(list(M=diag(1/diag(Omega)),C = solve(D,R),B=t(solve(D,t(B)))))
+}

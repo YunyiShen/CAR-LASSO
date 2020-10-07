@@ -10,7 +10,7 @@
 CAR_multireg <- function(data,design,n_sample, Bbar=NULL, A = NULL, nu=3, V=NULL){
     n <- nrow(data)
     k <- ncol(data)
-    p <- nrow(design)
+    p <- ncol(design)
     if(is.null(Bbar)) Bbar <- matrix(0,p+1,k)
     if(is.null(A)) A <- diag(1e-8,p+1,p+1)
     if(is.null(V)) V <- 3*diag(2,k,k)
@@ -19,12 +19,12 @@ CAR_multireg <- function(data,design,n_sample, Bbar=NULL, A = NULL, nu=3, V=NULL
         function(i,data,design,Bbar,A,nu,V){
             temp <- bayesm::rmultireg(data,cbind(1,design),Bbar,A,nu,V)
             Omega <- solve(temp$Sigma)
-            B <- Omega %*% temp$B
+            B <- temp$B %*% Omega
             mu <- B[1,]
-            B <- t(B[-1,])
+            B <- (B[-1,])
             return(list(Omega = Omega[upper.tri(Omega,T)],beta = c(B),mu = mu))
         }
-        ,Bbar,A,nu,V)
+        ,data,design,Bbar,A,nu,V)
 
     Omega_mcmc <- Reduce(rbind,lapply(sample_multireg,function(w){t(w$Omega)}))
     beta_mcmc <- Reduce(rbind,lapply(sample_multireg,function(w){t(w$beta)}))
@@ -37,7 +37,7 @@ Multinomial_CAR_multireg <- function(data,design,n_burn_in,n_sample, thin_by, Bb
                                     A = NULL, nu=3, V=NULL,ns = 1000,m=20,emax=64){
     n <- nrow(data)
     k <- ncol(data)-1
-    p <- nrow(design)
+    p <- ncol(design)
 
     n_store <- floor( n_sample/thin_by )
     i_store <- 1
@@ -56,11 +56,13 @@ Multinomial_CAR_multireg <- function(data,design,n_burn_in,n_sample, thin_by, Bb
     
     # mainloop
     for(i in 1:(n_burn_in + n_sample)){
+        #browser()
         temp <- bayesm::rmultireg(Z_curr,cbind(1,design),Bbar,A,nu,V)
         Omega_curr <- solve(temp$Sigma)
-        beta_curr <- Omega_curr %*% temp$B
+        #browser()
+        beta_curr <- temp$B %*% Omega_curr 
         mu_curr <- beta_curr[1,]
-        beta_curr <- t(beta_curr[-1,])
+        beta_curr <- (beta_curr[-1,])
 
         update_Z_helper_multinomial_CAR(Z_curr,data,
             design,mu_curr,beta_curr,Omega_curr,k,p,n,ns,m,emax)
@@ -82,8 +84,8 @@ Multinomial_CAR_multireg <- function(data,design,n_burn_in,n_sample, thin_by, Bb
 Pois_CAR_multireg <- function(data,design,n_burn_in,n_sample, thin_by, Bbar=NULL, 
                                     A = NULL, nu=3, V=NULL,ns = 1000,m=20,emax=64){
     n <- nrow(data)
-    k <- ncol(data)
-    p <- nrow(design)
+    k <- ncol(data)-1
+    p <- ncol(design)
 
     n_store <- floor( n_sample/thin_by )
     i_store <- 1
@@ -102,11 +104,13 @@ Pois_CAR_multireg <- function(data,design,n_burn_in,n_sample, thin_by, Bbar=NULL
     
     # mainloop
     for(i in 1:(n_burn_in + n_sample)){
+        #browser()
         temp <- bayesm::rmultireg(Z_curr,cbind(1,design),Bbar,A,nu,V)
         Omega_curr <- solve(temp$Sigma)
-        beta_curr <- Omega_curr %*% temp$B
+        #browser()
+        beta_curr <- temp$B %*% Omega_curr 
         mu_curr <- beta_curr[1,]
-        beta_curr <- t(beta_curr[-1,])
+        beta_curr <- (beta_curr[-1,])
 
         update_Z_helper_Pois_CAR(Z_curr,data,
             design,mu_curr,beta_curr,Omega_curr,k,p,n,ns,m,emax)
