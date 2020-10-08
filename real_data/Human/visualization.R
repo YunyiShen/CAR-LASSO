@@ -9,9 +9,9 @@ among_spp <- graph_from_adjacency_matrix(CAR$C,mode = "directed",weighted = T,di
 abs_graph <- graph_from_adjacency_matrix(abs(Graph_binary*A_Graph),mode = "undirected",weighted = T,diag = F)
 
 l <-layout_with_fr(among_spp)#, repulserad=vcount(among_spp)^3,area=vcount(among_spp)^2.4)
-plot(among_spp,edge.arrow.size=.1,
+plot(abs_graph,edge.arrow.size=.1,
      vertex.label=colnames(comp_mat)[-ncol(comp_mat)],
-     vertex.size = 10*exp(10* page_rank(among_spp)$vector),
+     vertex.size = (100* page_rank(among_spp)$vector),
      #vertex.label=1:35,
      edge.curved=0)
 
@@ -58,7 +58,8 @@ plot(full_graph,edge.arrow.size=.1,
      #vertex.shape = shape_ER[c(rep(2,(ncol(comp_mat)-1)),rep(1,ncol(Design_dummy)))],
      vertex.size = 100*(page_rank(full_graph)$vector),
      vertex.color = col_ER[c(rep(1,(ncol(comp_mat)-1)),rep(2,ncol(Design_dummy)))],
-     #layout = layout_with_gem,
-     layout = layout_on_sphere,
+     layout = layout_with_gem,
+     #layout = layout_in_circle,
      edge.color = col_pn[(sign(E(full_graph)$weight)+1)/2+1],
      edge.curved=0)
+    

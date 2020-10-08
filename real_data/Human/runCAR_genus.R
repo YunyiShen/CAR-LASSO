@@ -8,12 +8,12 @@ rm(list = ls())
 
 sourceCpp("./src/Multinomial-CAR-ALASSO.cpp")
 source("./R/multireg-wrap.R")
-comp_mat <- read.csv("real_data/Human/clean_data/genus_mat_.01_60.csv") %>% as.matrix()
+comp_mat <- read.csv("./real_data/Human/clean_data/genus_mat_.005_50.csv",row.names = 1) %>% as.matrix()
 #comp_mat <- comp_mat[,-36]
 
-Design <- read.csv("real_data/Human/clean_data/Design.csv")
+Design <- read.csv("real_data/Human/clean_data/Design_.005_50.csv",row.names = 1)
 
-Design_temp <- Design[,c(-1)]
+Design_temp <- Design
 Design_temp$res <- 1
 
 Design_dummy <- model.matrix(res~.,data = Design_temp)
@@ -52,6 +52,6 @@ Graph_binary <- multireg_Graph/A_Graph < .5
 beta_binary <- multireg_beta/A_beta < .5
 
 
-save.image("./real_data/Human/res/CAR_full_design_genus_.01_60.RData")  
+save.image("./real_data/Human/res/CAR_full_design_genus_.005_50.RData")  
 
 
