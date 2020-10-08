@@ -25,8 +25,8 @@ p <- ncol(Design_dummy)
 
 Omega <- matrix(0,k,k)
 
-test <- Multinomial_CAR_ALASSO_Cpp(comp_mat,  Design_dummy, n_iter = 25000, 
-                                   n_burn_in = 5000, thin_by = 10, 
+test <- Multinomial_CAR_ALASSO_Cpp(comp_mat,  Design_dummy, n_iter = 50000, 
+                                   n_burn_in = 10000, thin_by = 25, 
                                    r_beta = matrix(1,p,k), delta_beta = matrix(0.01,p,k),
                                    r_Omega = rep(1,.5*(k-1)*k),
                                    delta_Omega = rep(.01,.5*(k-1)*k),
@@ -52,6 +52,6 @@ Graph_binary <- multireg_Graph/A_Graph < .5
 beta_binary <- multireg_beta/A_beta < .5
 
 
-save.image("./real_data/Human/res/CAR_full_design_genus_.005_50.RData")  
+save.image("./real_data/Human/res/CAR_full_design_genus_.005_50_long_chain.RData")  
 
 
