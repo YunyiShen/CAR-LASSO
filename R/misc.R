@@ -14,5 +14,5 @@ get_CAR_MB <- function(B,Omega){
   D <- diag(diag(Omega))
   R <- D-Omega
   
-  return(list(M=diag(1/diag(Omega)),C = solve(D,R),B=t(solve(D,t(B)))))
+  return(list(M=diag(1/diag(Omega)),C = t(solve(D,R)),B=t(solve(D,t(B)))))
 }
