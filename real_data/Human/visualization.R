@@ -1,7 +1,9 @@
 library(igraph)
 library(GGally)
 source("./R/misc.R")
-B_binary <- multireg_beta/A_beta<.5
+B_binary <- abs(multireg_beta/A_beta) < .5
+Graph_binary <- abs(multireg_Graph/A_Graph) < .5
+
 diag(Graph_binary) <- 1
 CAR <- get_CAR_MB(A_beta*B_binary,Graph_binary*A_Graph)
 
@@ -46,7 +48,7 @@ edge_abs_df$weight <- abs(edge_abs_df$weight)
 
 full_graph <- graph.data.frame(edge_df,vertices_df,directed=T)
 full_graph_abs <- graph.data.frame(edge_abs_df,vertices_df,directed=T)
-rev_edge_df <- edge_abs_df
+rev_edge_df <- edge_df
 rev_edge_df$from <- edge_df$to
 rev_edge_df$to <- edge_df$from
 rev_graph <- graph.data.frame(rev_edge_df,vertices_df,directed=T)
@@ -64,10 +66,11 @@ plot(full_graph,edge.arrow.size=.2,
      #vertex.label=colnames(comp_mat)[1:35],
      vertex.label=c(colnames(comp_mat)[-ncol(comp_mat)],colnames(Design_dummy)),
      vertex.shape = shape_ER[c(rep(2,(ncol(comp_mat)-1)),rep(1,ncol(Design_dummy)))],
-     vertex.size = 2*(alpha_centrality(full_graph)),
+     vertex.size = 3*(alpha_centrality(full_graph)),
+     #vertex.size = 100*(page_rank(rev_graph)$vector),
      vertex.color = col_ER[c(rep(1,(ncol(comp_mat)-1)),rep(2,ncol(Design_dummy)))],
-     layout = layout_with_gem,
-     #layout = layout_in_circle,
+     #layout = layout_with_gem,
+     layout = layout_in_circle,
      edge.color = col_pn[(sign(E(full_graph)$weight)+1)/2+1],
      edge.curved=0)
     
