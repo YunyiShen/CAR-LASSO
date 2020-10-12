@@ -29,6 +29,8 @@ double rinvGau(double mu, double  lambda){
   double u = R::runif(0,1);
   double chisqr = R::rchisq(1);
   double x = mu + a * chisqr - b * sqrt( c * chisqr + d * chisqr * chisqr); // solve the smaller root
+  x = x<1e-12 ? 1e-12 : x;
+  //Rcout << x << std::endl;
   res = (u < (mu / (mu + x))) ? x : d/x; // accept the small one with prob mu/(mu+x), otherwise the larger one
   return(res);
 }
@@ -55,6 +57,7 @@ double rinvGau_full(const double & mu, const double & lambda){
   double chisqr = R::rchisq(1);
   
   double x = mu + a * chisqr - b * sqrt( c * chisqr + d * chisqr * chisqr); // solve the smaller root
+  
   res = (u < (mu / (mu + x))) ? x : d/x; // accept the small one with prob mu/(mu+x), otherwise the larger one
   return(res);
 }

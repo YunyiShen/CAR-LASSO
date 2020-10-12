@@ -52,6 +52,7 @@ arma::mat update_car_beta_helper(const arma::mat & data,
   
   Q_beta = kron(Sigma,XtX); // precision matrix of beta, more intuitive way was sum_i X_i^TSigmaX_i, but kron is faster
 
+  //Rcout << tau2 << endl;
   Q_beta.diag() += 1/tau2; // penalty due to Laplace prior
   
   //arma::mat res;
@@ -219,6 +220,8 @@ arma::vec update_car_tau2_helper(const arma::mat & beta,
   
   
   arma::vec mu_prime = sqrt(lambda2/(betavec%betavec));
+  //Rcout << betavec%betavec << endl;
+  //Rcout << mu_prime << endl;
   for(int i = 0 ; i < k*p ; ++i){
     invtau2(i) =  rinvGau(mu_prime(i),lambda2); 
   }
