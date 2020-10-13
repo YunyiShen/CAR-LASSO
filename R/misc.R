@@ -16,3 +16,11 @@ get_CAR_MB <- function(B,Omega){
   
   return(list(M=diag(1/diag(Omega)),C = t(solve(D,R)),B=t(solve(D,t(B)))))
 }
+
+get_partial_correlation <- function(Omega){
+  Sigma <- solve(Omega)
+  D <- diag(sqrt(diag(Sigma)))
+  D%*%Omega%*%D
+  
+}
+
