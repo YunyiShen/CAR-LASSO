@@ -1,0 +1,179 @@
+,Age,Gender,Stratum,Diet.Group,BMI
+EM012,85,Female,Day-hospital,-,28.3
+EM015,87,Female,Day-hospital,-,25.4
+EM017,71,Female,Community,-,29
+EM041,83,Male,Day-hospital,-,24.5
+EM044,74,Female,Community,1,23
+EM047,67,Male,Community,2,36
+EM049,66,Male,Community,1,27.8
+EM053,67,Male,Community,2,21.5
+EM054,85,Male,Community,2,22.5
+EM055,85,Female,Community,1,30.4
+EM059,76,Male,Day-hospital,1,29.9
+EM060,72,Female,Community,1,25.2
+EM071,73,Female,Community,1,31.2
+EM072,77,Male,Community,2,28.4
+EM073,72,Male,Community,1,25.2
+EM081,75,Female,Community,1,31.6
+EM082,72,Male,Community,2,30.6
+EM084,67,Male,Community,2,25.7
+EM089,68,Female,Community,1,24.2
+EM093,77,Male,Day-hospital,2,32.8
+EM094,72,Female,Community,1,24.9
+EM095,72,Male,Community,2,29
+EM096,73,Male,Community,2,27
+EM100,70,Female,Community,1,22.9
+EM102,68,Male,Community,2,29
+EM105,79,Female,Day-hospital,2,35.3
+EM106,83,Male,Community,1,30.4
+EM107,77,Female,Community,1,31.2
+EM109,70,Male,Community,2,31.8
+EM110,71,Female,Community,2,25.4
+EM119,66,Male,Community,-,36
+EM120,79,Male,Community,2,27.5
+EM122,80,Male,Day-hospital,2,25.2
+EM133,84,Female,Rehabilitation,2,32
+EM134,78,Male,Community,1,27.4
+EM136,73,Male,Long-term care,3,27.3
+EM138,78,Male,Long-term care,3,28
+EM142,81,Male,Rehabilitation,3,31.6
+EM143,86,Male,Community,1,31.6
+EM144,66,Male,Long-term care,3,34.4
+EM150,87,Female,Long-term care,3,25.6
+EM157,74,Male,Community,2,30
+EM158,87,Male,Long-term care,4,26.6
+EM159,87,Male,Long-term care,4,26.7
+EM160,76,Male,Community,1,25.5
+EM161,82,Female,Long-term care,3,13.7
+EM166,76,Male,Long-term care,3,23.9
+EM168,88,Female,Long-term care,3,31.6
+EM169,91,Female,Long-term care,3,13.8
+EM171,71,Male,Community,2,29.4
+EM172,65,Male,Community,2,30
+EM175,93,Male,Community,2,24
+EM176,68,Female,Community,2,26.9
+EM177,83,Male,Community,2,28.7
+EM178,80,Male,Long-term care,3,20.2
+EM179,70,Female,Long-term care,3,26.3
+EM181,85,Male,Community,2,27
+EM182,91,Female,Long-term care,PEG fed,21.8
+EM183,93,Female,Long-term care,3,25.5
+EM185,78,Female,Community,2,31
+EM187,84,Female,Long-term care,3,25.1
+EM188,96,Female,Long-term care,4,18
+EM189,83,Male,Long-term care,4,34.3
+EM190,77,Male,Long-term care,3,21.6
+EM191,80,Female,Long-term care,4,12.1
+EM192,92,Female,Long-term care,3,19.5
+EM193,67,Male,Community,1,24.6
+EM195,78,Male,Long-term care,4,20.9
+EM197,90,Female,Long-term care,3,22.8
+EM198,92,Female,Long-term care,3,21.6
+EM199,95,Female,Long-term care,2,15.6
+EM203,66,Female,Community,1,21.6
+EM204,70,Female,Community,2,21.5
+EM205,69,Female,Community,1,27.5
+EM206,71,Male,Community,2,31
+EM207,64,Female,Community,1,45
+EM208,82,Female,Long-term care,4,18.7
+EM210,87,Female,Long-term care,2,21.6
+EM211,86,Female,Long-term care,4,27.9
+EM212,91,Female,Long-term care,4,30
+EM213,77,Female,Community,1,26.3
+EM214,74,Female,Community,1,21
+EM215,95,Female,Long-term care,3,25.2
+EM217,85,Female,Long-term care,3,24.6
+EM219,77,Female,Rehabilitation,3,26.5
+EM220,83,Female,Long-term care,4,24.6
+EM221,85,Female,Long-term care,3,20.3
+EM222,70,Male,Community,1,25
+EM223,68,Female,Community,1,30
+EM224,73,Male,Community,2,25.4
+EM227,92,Female,Long-term care,4,17.9
+EM228,70,Male,Community,2,34.1
+EM229,75,Female,Community,2,28.3
+EM230,81,Male,Community,3,24.2
+EM231,78,Female,Community,1,20.8
+EM232,69,Female,Rehabilitation,1,26.8
+EM233,75,Female,Long-term care,3,25.1
+EM234,83,Female,Long-term care,4,18.7
+EM235,81,Female,Community,1,22
+EM236,95,Female,Long-term care,3,22.1
+EM237,82,Female,Long-term care,PEG fed,21.1
+EM238,87,Female,Long-term care,3,22.6
+EM239,79,Male,Community,2,32.8
+EM240,69,Female,Community,1,21.3
+EM241,69,Female,Community,1,19.5
+EM242,81,Female,Long-term care,3,26.2
+EM243,81,Female,Long-term care,PEG fed,23
+EM244,71,Female,Community,2,27.1
+EM245,67,Female,Community,1,25.7
+EM247,77,Female,Community,2,24.6
+EM248,85,Female,Long-term care,3,23.3
+EM251,88,Female,Community,1,19.4
+EM252,79,Female,Community,2,27
+EM253,81,Female,Community,2,27.8
+EM254,76,Female,Community,1,23.6
+EM255,91,Female,Long-term care,PEG fed,20.8
+EM257,74,Female,Community,1,29.4
+EM259,67,Female,Community,1,22.3
+EM260,76,Male,Community,1,27.2
+EM261,68,Male,Community,1,31.7
+EM262,65,Female,Community,1,24
+EM263,69,Male,Community,1,31.3
+EM264,86,Female,Community,2,24
+EM265,81,Male,Community,2,24
+EM268,79,Female,Community,2,23
+EM269,67,Female,Community,2,41
+EM270,67,Female,Community,1,25
+EM271,73,Female,Community,1,25.3
+EM272,92,Male,Day-hospital,2,23
+EM273,78,Female,Community,2,47.7
+EM274,84,Female,Long-term care,4,27.6
+EM275,102,Female,Long-term care,3,24.8
+EM276,71,Female,Community,1,27
+EM277,70,Female,Community,1,32
+EM278,64,Female,Community,1,24
+EM279,86,Female,Community,2,20.3
+EM282,70,Male,Community,2,30.5
+EM283,81,Female,Community,2,29.9
+EM284,85,Male,Rehabilitation,3,27.9
+EM286,81,Female,Long-term care,4,23
+EM291,86,Female,Long-term care,3,27.9
+EM293,75,Female,Long-term care,2,21
+EM294,65,Female,Community,1,24.7
+EM298,72,Female,Long-term care,3,24.5
+EM299,72,Female,Long-term care,3,25.8
+EM300,91,Female,Long-term care,4,16.2
+EM301,91,Female,Long-term care,4,17.1
+EM305,79,Female,Rehabilitation,2,28.8
+EM308,82,Male,Long-term care,4,21.6
+EM309,81,Male,Long-term care,PEG fed,24.8
+EM312,90,Male,Rehabilitation,2,30.8
+EM313,79,Female,Long-term care,3,22.4
+EM314,83,Female,Long-term care,4,25.5
+EM316,74,Male,Rehabilitation,2,28.4
+EM318,70,Male,Long-term care,3,27
+EM319,67,Male,Rehabilitation,3,30.7
+EM320,75,Female,Long-term care,4,30.2
+EM321,84,Female,Rehabilitation,2,34
+EM323,74,Female,Long-term care,3,25.5
+EM326,66,Male,Rehabilitation,2,38.3
+EM327,80,Male,Rehabilitation,2,19.9
+EM328,73,Male,Rehabilitation,3,40.4
+EM330,76,Male,Long-term care,4,26.3
+EM334,83,Male,Day-hospital,2,29.6
+EM337,76,Female,Rehabilitation,3,33.2
+EM338,75,Female,Rehabilitation,2,29.2
+EM350,81,Male,Day-hospital,2,28.1
+EM351,91,Male,Day-hospital,2,22.7
+EM354,70,Female,Day-hospital,2,46.3
+EM355,88,Female,Day-hospital,2,28.4
+EM356,71,Male,Day-hospital,2,28
+EM357,88,Male,Day-hospital,2,24.4
+EM358,76,Female,Day-hospital,2,36.4
+EM361,86,Male,Day-hospital,1,25.6
+EM363,73,Male,Day-hospital,3,23.7
+EM364,73,Male,Day-hospital,2,34.1
+EM365,79,Female,Day-hospital,2,19.8
+EM366,85,Female,Long-term care,3,26.6

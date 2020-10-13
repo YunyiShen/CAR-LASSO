@@ -1,5 +1,6 @@
 // [[Rcpp::depends(RcppArmadillo)]]
 // [[Rcpp::depends(RcppProgress)]]
+#define ARMA_DONT_PRINT_ERRORS
 #include <RcppArmadillo.h> 
 #include <tgmath.h>
 using namespace Rcpp;
@@ -65,7 +66,7 @@ List Pois_CAR_ALASSO_Cpp(const arma::mat & data, // col composition data, ROW as
   
   
   
-  arma::vec lambda2_beta = randg<arma::vec> (k*p,distr_param(r_beta(0),delta_beta(0))); // current lambda, for prior of beta
+  arma::vec lambda2_beta = randg<arma::vec> (k*p,distr_param(1.0,0.01)); // current lambda, for prior of beta
   arma::vec lambda_Omega = randg<arma::vec> (.5*k*(k-1),distr_param(r_Omega(0),delta_Omega(0)));
   
   Progress prog((n_iter+n_burn_in), progress); // progress bar

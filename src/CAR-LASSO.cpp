@@ -1,4 +1,5 @@
 // [[Rcpp::depends(RcppArmadillo)]]
+#define ARMA_DONT_PRINT_ERRORS
 #include <RcppArmadillo.h> 
 #include <tgmath.h>
 using namespace Rcpp;
@@ -83,8 +84,10 @@ List CAR_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sam
   arma::mat lambda_mcmc(n_save , 2); // LASSO parameter for beta and B
   lambda_mcmc += NA_REAL;
   
-  arma::vec tau2_curr = randg<arma::vec> (k*p,distr_param(r_beta,delta_beta)); // current latent variable tau^2, for prior of beta
-
+  //arma::vec tau2_curr = randg<arma::vec> (k*p,distr_param(r_beta,delta_beta)); // current latent variable tau^2, for prior of beta
+  arma::vec tau2_curr = randg<arma::vec> (k*p,distr_param(1.0,.01)); // current latent variable tau^2, for prior of beta
+  
+  //Rcout << tau2_curr <<endl;
   arma::vec mu_curr = trans( mean(data) ); // current value of mean
   arma::mat centered_data = data;
   centered_data.each_row() -= mu_curr.t();

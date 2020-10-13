@@ -164,8 +164,8 @@ void spl1_multi_(const int *ns, int *n, int *ilow, int *ihigh, int *ipt,
   //Necesario al terminar de utilizar los generadores de numeros aleatorios del R
   PutRNGstate();
   if (attempts >= max_attempt)
-    Rcout << "Trap in ARS: Maximum number of attempts reached by routine spl1_\n"
-          << endl;
+    //Rcout << "Trap in ARS: Maximum number of attempts reached by routine spl1_\n"
+    //      << endl;
   Z_curr(l, w) = *beta;
   return;
 } /* end of the routine spl1_ */
@@ -322,7 +322,7 @@ void update_Z_helper_multinomial(arma::mat &Z_curr,
       //Rcout << "after:\n" << Z_curr(i,j) <<endl;
       if (ifault != 0)
       {
-        Rcout << "ARS failed with code" << ifault << "if this happen frequently, increase m" << endl;
+        //Rcout << "ARS failed with code" << ifault << "if this happen frequently, increase m" << endl;
         //stop("ARS failed with code %i \n",ifault);
       }
       delete[] iwv;
