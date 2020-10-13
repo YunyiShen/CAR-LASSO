@@ -5,8 +5,8 @@ library(RcppProgress)
 
 rm(list = ls())
 
-k = 5
-n = 100
+k = 2
+n = 15000
 p = 1
 
 sourceCpp("./src/Probit-CAR-ALASSO.cpp")
@@ -27,7 +27,9 @@ Omega <- Graph_raw$Omega
 
 Sigma <- Graph_raw$Sigma
 
-Design <- matrix(rnorm(n*p,0,1),n,p)
+Design <- matrix(rnorm(n*p,0,1),n/5,p)
+Design <- lapply(1:5,function(i,Design){return(Design)},Design)
+Design <- Reduce(rbind,Design)
 Design <- (Design-mean(Design))/sd(Design)
 colnames(Design) <- paste0("x",1:p)
 
@@ -51,12 +53,18 @@ for( i in 1:n ){
 
 
 
-test <- Probit_CAR_ALASSO_Cpp(Y,  Design, n_iter = 1500, 
-                            n_burn_in = 500, thin_by = 5, 
+test <- Probit_CAR_ALASSO_Cpp(Y,  Desig],1))>0)
+}
+
+
+
+
+test <- Probit_CAR_ALASSO_Cpp(Y,  Design, n_iter = 15000, 
+                            n_burn_in = 5000, thin_by = 5, 
                             r_beta = 1+0*beta, delta_beta = .01 + 0 * beta,
                             r_Omega = rep(1,.5*(k-1)*k),
                             delta_Omega = rep(.01,.5*(k-1)*k),
-                            progress = F)
+                            progress = T)
 
 Graph <- 0 * Omega
 Graph[upper.tri(Graph,T)] <- apply(test$Omega,2,mean)
@@ -70,7 +78,7 @@ test1 <- Probit_CAR_LASSO_Cpp(Y,  Design, n_iter = 10000,
                             delta_Omega = .01,
                             progress = T)
 
-test1 <- Proit_SRG_LASSO_Cpp(Y,  Design, n_iter = 20000, 
+test1 <- Probit_SRG_LASSO_Cpp(Y,  Design, n_iter = 20000, 
                             n_burn_in = 1000, thin_by = 10, 
                             r_beta = 1, delta_beta = .01 ,
                             r_Omega = 1,

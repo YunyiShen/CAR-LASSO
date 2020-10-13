@@ -1,7 +1,9 @@
 library(igraph)
 library(GGally)
 source("./R/misc.R")
-B_binary <- multireg_beta/A_beta<.5
+
+B_binary <- abs( A_beta/multireg_beta) > .5
+Graph_binary <- abs( A_Graph/multireg_Graph) > .5
 diag(Graph_binary) <- 1
 CAR <- get_CAR_MB(A_beta*B_binary,Graph_binary*A_Graph)
 
@@ -9,7 +11,7 @@ among_spp <- graph_from_adjacency_matrix(CAR$C,mode = "directed",weighted = T,di
 abs_graph <- graph_from_adjacency_matrix(abs(Graph_binary*A_Graph),mode = "undirected",weighted = T,diag = F)
 linear_reg_graph <- graph_from_adjacency_matrix(t(CAR$C),weighted = T, mode = "directed")
 
-col_pn <- c("pink","lightblue")
+col_pn <- c("lightblue","pink")
 l <-layout_with_fr(among_spp)#, repulserad=vcount(among_spp)^3,area=vcount(among_spp)^2.4)
 plot(among_spp,edge.arrow.size=.1,
      vertex.label=colnames(comp_mat)[-ncol(comp_mat)],
@@ -64,7 +66,7 @@ plot(full_graph,edge.arrow.size=.2,
      #vertex.label=colnames(comp_mat)[1:35],
      vertex.label=c(colnames(comp_mat)[-ncol(comp_mat)],colnames(Design_dummy)),
      vertex.shape = shape_ER[c(rep(2,(ncol(comp_mat)-1)),rep(1,ncol(Design_dummy)))],
-     vertex.size = (alpha_centrality(full_graph)),
+     vertex.size = .5*(alpha_centrality(full_graph)),
      vertex.color = col_ER[c(rep(1,(ncol(comp_mat)-1)),rep(2,ncol(Design_dummy)))],
      #layout = layout_with_gem,
      layout = layout_in_circle,

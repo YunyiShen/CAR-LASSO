@@ -11,7 +11,7 @@ source("./R/multireg-wrap.R")
 comp_mat <- read.csv("./real_data/Soil/clean_data/genus_mat_.005_50_without_unclass.csv",row.names = 1) %>% as.matrix()
 #comp_mat <- comp_mat[,-36]
 
-Design <- read.csv("real_data/Soil/clean_data/Design_.005_50_with_unclass.csv",row.names = 1)
+Design <- read.csv("real_data/Soil/clean_data/Design_.005_50_without_unclass.csv",row.names = 1)
 
 Design_temp <- Design
 Design_temp$res <- 1
@@ -29,9 +29,9 @@ Omega <- matrix(0,k,k)
 
 test <- Multinomial_CAR_ALASSO_Cpp(comp_mat,  Design_dummy, n_iter = 50000, 
                                    n_burn_in = 10000, thin_by = 25, 
-                                   r_beta = matrix(1,p,k), delta_beta = matrix(0.01,p,k),
-                                   r_Omega = rep(1,.5*(k-1)*k),
-                                   delta_Omega = rep(.01,.5*(k-1)*k),
+                                   r_beta = matrix(1e-2,p,k), delta_beta = matrix(1e-6,p,k),
+                                   r_Omega = rep(1e-2,.5*(k-1)*k),
+                                   delta_Omega = rep(1e-6,.5*(k-1)*k),
                                    ns = 100,m = 10, emax = 64,
                                    progress = T)
 
@@ -50,10 +50,10 @@ multireg_Graph <- multireg_Graph+t(multireg_Graph)
 diag(multireg_Graph) <- 0.5 * diag(multireg_Graph)
 multireg_beta <- matrix(apply(multireg_res$beta,2,mean,na.rm = T),p,k)
 
-Graph_binary <- multireg_Graph/A_Graph < .5
-beta_binary <- multireg_beta/A_beta < .5
+Graph_binary <- abs(A_Graph/multireg_Graph) > .5
+beta_binary <- abs(A_beta/multireg_beta) > .5
 
 
-save.image("./real_data/Soil/res/CAR_full_design_genus_.005_50_without_unclass_long_chain.RData")  
+save.image("./real_data/Soil/res/CAR_full_design_genus_.005_50_without_unclass_lambda_prior_1e-2_1e-6_long_chain.RData")  
 
 
