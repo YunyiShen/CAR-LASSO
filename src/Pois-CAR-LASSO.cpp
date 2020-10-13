@@ -1,5 +1,6 @@
 // [[Rcpp::depends(RcppArmadillo)]]
 // [[Rcpp::depends(RcppProgress)]]
+#define ARMA_DONT_PRINT_ERRORS
 #include <RcppArmadillo.h> 
 #include <tgmath.h>
 using namespace Rcpp;
@@ -54,7 +55,7 @@ List Pois_CAR_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as 
   //arma::mat Z_mcmc(n_save , k*n); // latent normal 
   // Z_mcmc += NA_REAL;
   
-  arma::vec tau2_curr = randg<arma::vec> (k*p,distr_param(r_beta,delta_beta)); // current latent variable tau^2, for prior of beta
+  arma::vec tau2_curr = randg<arma::vec> (k*p,distr_param(1.0,0.01)); // current latent variable tau^2, for prior of beta
 
   arma::vec mu_curr = trans( mean(data) ); // current value of mean
   arma::mat Omega_curr(k,k); // current value of Omega

@@ -36,7 +36,7 @@ void update_Z_helper(arma::mat & Z_curr, // persumably large, thus will not copy
   }
 }
 
-
+// [[Rcpp::export]]
 void update_Z_helper_CAR(arma::mat & Z_curr, // persumably large, thus will not copy
                      const arma::mat & data, 
                      const arma::mat & design,
