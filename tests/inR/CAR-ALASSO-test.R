@@ -6,8 +6,8 @@ library(RcppProgress)
 rm(list = ls())
 
 k = 30
-n = 177
-p = 11
+n = 400
+p = 10
 
 
 sourceCpp("./src/CAR-LASSO.cpp")
@@ -24,6 +24,12 @@ Omega <- Graph_raw$Omega
 
 Sigma <- Graph_raw$Sigma
 
+B <- rsparsematrix(k,k,0.2)
+omega <- diag(rgamma(k,1,.1))
+I <- diag(rep(1,k))
+Omega <- t(I-B) %*% omega %*% (I-B)
+diag(Omega) <- diag(Omega) + k
+Omega <- as.matrix(Omega)
 
 Design <- 1.0* (matrix(rnorm(n*p,0,1),n,p))
 #Design <- (Design-mean(Design))/sd(Design)
@@ -46,9 +52,9 @@ for( i in 1:n ){
 
 par(mfrow = c(1,2))
 
-CAR_test <- CAR_LASSO_Cpp(Z,  Design, n_iter = 25000, 
-                          n_burn_in = 5000, thin_by = 50, 
-                          r_beta = 1, delta_beta = .01,
+CAR_test <- CAR_LASSO_Cpp(Z,  Design, n_iter = 10000, 
+                          n_burn_in = 5000, thin_by = 10, 
+                          r_beta = 1, delta_beta = 1e-2,
                           r_Omega = 1,delta_Omega = .01,
                           progress = T)
 
@@ -61,11 +67,11 @@ image(Omega)
 hist((CAR_Graph-Omega)/Omega)
 
 
-CAR_A_test <- CAR_ALASSO_Cpp(Z,  Design, n_iter = 25000, 
+CAR_A_test <- CAR_ALASSO_Cpp(Z,  Design, n_iter = 10000, 
                           n_burn_in = 5000, thin_by = 10, 
-                          r_beta = 1+0*beta, delta_beta = .01 + 0 * beta,
-                          r_Omega = rep(1,.5*(k-1)*k),
-                          delta_Omega = rep(.01,.5*(k-1)*k),
+                          r_beta = 1e-2+0*beta, delta_beta = 1e-6 + 0 * beta,
+                          r_Omega = rep(1e-2,.5*(k-1)*k),
+                          delta_Omega = rep(1e-6,.5*(k-1)*k),
                           progress = T)
 
 A_Graph <- 0 * Omega
@@ -82,7 +88,7 @@ multireg_Graph <- multireg_Graph+t(multireg_Graph)
 diag(multireg_Graph) <- 0.5 * diag(multireg_Graph)
 
 
-Glasso <- Graphical_LASSO_Cpp(Z, 25000, 5000, 10, 1, .01, T)
+Glasso <- Graphical_LASSO_Cpp(Z, 10000, 5000, 10, 1, .01, T)
 
 Glasso_Graph <- 0 * Omega
 Glasso_Graph[upper.tri(Glasso_Graph,T)] = apply(Glasso$Omega,2,mean)
