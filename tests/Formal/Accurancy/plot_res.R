@@ -10,7 +10,7 @@ all_loss_k30 <- all_loss_k30[all_loss_k30$k==30,]
 
 all_loss_k30$beta.sparsity <- as.factor( all_loss_k30$s)
 all_loss_k30$p <- paste0("#.predictors:",all_loss_k30$p)
-all_loss_k30$mod <- paste0("Cov.model:",all_loss_k30$mod)
+all_loss_k30$mod <- paste0("model:",all_loss_k30$mod)
 
 Stein_k30 <- ggplot(data = all_loss_k30,aes(x=algo,y=log(steinOmega))) + 
     geom_boxplot(aes(fill = beta.sparsity)) + 
@@ -22,8 +22,16 @@ Stein_k30 <- ggplot(data = all_loss_k30,aes(x=algo,y=log(steinOmega))) +
         axis.text.x = element_text(angle=45,hjust = 1,vjust=1),
         plot.margin = margin(.15, .15, .15, .15, "cm"))
 Stein_k30
-ggsave("./tests/Formal/Accurancy/Figs/Stein_k30.pdf",Stein_k30,width = 10,height = 10,unit = "in")
-ggsave("./tests/Formal/Accurancy/Figs/Stein_k30.jpg",Stein_k30,width = 10,height = 10,unit = "in")
+ggsave("./tests/Formal/Accurancy/Figs/Stein_k30_Asmallprior.pdf",Stein_k30,width = 10,height = 6,unit = "in")
+ggsave("./tests/Formal/Accurancy/Figs/Stein_k30_Asmallprior.jpg",Stein_k30,width = 10,height = 6,unit = "in")
+
+Stein_k30_aggregate_mean <- aggregate(steinOmega~p+mod+algo+beta.sparsity,data = all_loss_k30,FUN = mean)
+Stein_k30_aggregate_sd <- aggregate(steinOmega~p+mod+algo+beta.sparsity,data = all_loss_k30,FUN = sd)
+
+Stein_k30_aggregate <- Stein_k30_aggregate_mean[,1:4]
+Stein_k30_aggregate$mean <- Stein_k30_aggregate_mean$steinOmega
+Stein_k30_aggregate$sd <- Stein_k30_aggregate_sd$steinOmega
+
 
 
 beta_k30 <- ggplot(data = all_loss_k30[!is.na(all_loss_k30$logL2beta),],
@@ -38,5 +46,5 @@ beta_k30 <- ggplot(data = all_loss_k30[!is.na(all_loss_k30$logL2beta),],
         plot.margin = margin(.15, .15, .15, .15, "cm"))
 
 beta_k30
-ggsave("./tests/Formal/Accurancy/Figs/beta_k30.pdf",beta_k30,width = 8,height = 8,unit = "in")
-ggsave("./tests/Formal/Accurancy/Figs/beta_k30.jpg",beta_k30,width = 8,height = 8,unit = "in")
+ggsave("./tests/Formal/Accurancy/Figs/beta_k30_Asmallprior.pdf",beta_k30,width = 10,height = 6,unit = "in")
+ggsave("./tests/Formal/Accurancy/Figs/beta_k30_Asmallprior.jpg",beta_k30,width = 10,height = 6,unit = "in")
