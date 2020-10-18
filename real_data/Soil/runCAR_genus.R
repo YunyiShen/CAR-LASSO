@@ -8,10 +8,10 @@ rm(list = ls())
 
 sourceCpp("./src/Multinomial-CAR-ALASSO.cpp")
 source("./R/multireg-wrap.R")
-comp_mat <- read.csv("./real_data/Soil/clean_data/genus_mat_.005_50_without_unclass.csv",row.names = 1) %>% as.matrix()
+comp_mat <- read.csv("./real_data/Soil/clean_data/genus_mat_.01_50_without_unclass.csv",row.names = 1) %>% as.matrix()
 #comp_mat <- comp_mat[,-36]
 
-Design <- read.csv("real_data/Soil/clean_data/Design_.005_50_without_unclass.csv",row.names = 1)
+Design <- read.csv("real_data/Soil/clean_data/Design_.01_50_without_unclass.csv",row.names = 1)
 
 Design_temp <- Design
 Design_temp$res <- 1
@@ -54,6 +54,6 @@ Graph_binary <- abs(A_Graph/multireg_Graph) > .5
 beta_binary <- abs(A_beta/multireg_beta) > .5
 
 
-save.image("./real_data/Soil/res/CAR_full_design_genus_.005_50_without_unclass_lambda_prior_1e-2_1e-6_long_chain.RData")  
+save.image("./real_data/Soil/res/CAR_full_design_genus_.01_50_without_unclass_lambda_prior_1e-2_1e-6_long_chain.RData")  
 
 
