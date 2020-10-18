@@ -8,7 +8,7 @@ all_loss <- Reduce(rbind,all_loss)
 all_loss_k30 <- all_loss[!is.na(all_loss$steinOmega),]
 all_loss_k30 <- all_loss_k30[all_loss_k30$k==30,]
 
-all_loss_k30$beta.sparsity <- as.factor( all_loss_k30$s)
+all_loss_k30$beta.sparsity <- factor( 1-all_loss_k30$s,levels = c(0.8,0.5))
 all_loss_k30$p <- paste0("#.predictors:",all_loss_k30$p)
 all_loss_k30$mod <- paste0("model:",all_loss_k30$mod)
 
@@ -48,3 +48,4 @@ beta_k30 <- ggplot(data = all_loss_k30[!is.na(all_loss_k30$logL2beta),],
 beta_k30
 ggsave("./tests/Formal/Accurancy/Figs/beta_k30_Asmallprior.pdf",beta_k30,width = 10,height = 6,unit = "in")
 ggsave("./tests/Formal/Accurancy/Figs/beta_k30_Asmallprior.jpg",beta_k30,width = 10,height = 6,unit = "in")
+    

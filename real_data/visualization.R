@@ -83,13 +83,18 @@ library(ggraph)
 set_graph_style(plot_margin = margin(10,10,10,10))
 ggraph(full_graph,layout = "circle")+
   geom_edge_link(aes(color = direction.,width = abs_weight,alpha = abs_weight)) + 
-  scale_edge_color_manual(values = (  cbPalette))+
-  geom_node_point(mapping = aes(col = type,shape = type,size = alpha_centrality,stroke = 3)) +
-  scale_color_manual(values = cbPalette) + 
+  scale_edge_color_manual(values = (  cbPalette_edge))+
+  geom_node_point(mapping = aes(shape = type,size = alpha_centrality,stroke = 6),col = "#696969",alpha = 1) +
+  #scale_color_manual(values = cbPalette) + 
   geom_node_text(aes(label = name),nudge_y = 0.0,family = "",repel = T,check_overlap = T)+
   coord_fixed(clip = 'off')+
   theme(legend.text=element_text(size=10))+
+  guides(width = guide_legend(order = 4),
+         #color = guide_legend(order=3),
+         size = guide_legend(order=2),
+         shape = guide_legend(order=1),
+         edge_color = guide_legend(order = 3))+
   theme_void()
 
-ggsave("./real_data/soil.pdf",width = 8,height = 6)
+ggsave("./real_data/humangut.pdf",width = 8,height = 6)
 
