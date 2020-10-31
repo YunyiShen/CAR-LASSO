@@ -69,3 +69,14 @@ void update_xi_helper(arma::vec xi,
     }
     return;
 }
+
+// [[Rcpp::export]]
+void get_data_centered(arma::mat & centered_data,
+                       const arma::mat & data,
+                       const arma::mat & design_r,
+                       const arma::mat & nu,
+                       const arma::mat & Omega){
+    arma::mat Sigma = inv(Omega);
+    centered_data = data - (design_r * nu) * Sigma;
+    return;
+}

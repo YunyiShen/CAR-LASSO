@@ -15,4 +15,10 @@ void update_xi_helper(arma::vec xi,
                       const double & beta, 
                       int k, int pr);
 
+
+void get_data_centered(arma::mat & centered_data,
+                       const arma::mat & data,
+                       const arma::mat & design_r,
+                       const arma::mat & nu,
+                       const arma::mat & Omega);
 #endif

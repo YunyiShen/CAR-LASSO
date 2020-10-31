@@ -5,8 +5,8 @@ library(RcppProgress)
 
 rm(list = ls())
 
-k = 30
-n = 400
+k = 5
+n = 1000
 p = 10
 
 
@@ -24,12 +24,12 @@ Omega <- Graph_raw$Omega
 
 Sigma <- Graph_raw$Sigma
 
-B <- rsparsematrix(k,k,0.2)
-omega <- diag(rgamma(k,1,.1))
-I <- diag(rep(1,k))
-Omega <- t(I-B) %*% omega %*% (I-B)
-diag(Omega) <- diag(Omega) + k
-Omega <- as.matrix(Omega)
+#B <- rsparsematrix(k,k,0.2)
+#omega <- diag(rgamma(k,1,.1))
+#I <- diag(rep(1,k))
+#Omega <- t(I-B) %*% omega %*% (I-B)
+#diag(Omega) <- diag(Omega) + k
+#Omega <- as.matrix(Omega)
 
 Design <- 1.0* (matrix(rnorm(n*p,0,1),n,p))
 #Design <- (Design-mean(Design))/sd(Design)
