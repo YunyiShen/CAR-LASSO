@@ -98,8 +98,8 @@ List CAR_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sam
   
   
   
-  double lambda2_beta = R::rgamma(r_beta,1/delta_beta); // current value of squared LASSO parameter of \beta
-  double lambda_Omega = R::rgamma(r_Omega,1/delta_Omega); // current value of squared LASSO parameter of B
+  double lambda2_beta = randg<double>(distr_param(r_beta,1/delta_beta)); // current value of squared LASSO parameter of \beta
+  double lambda_Omega = randg<double>(distr_param(r_Omega,1/delta_Omega)); // current value of squared LASSO parameter of B
   
   double Omega_r_post = (r_Omega+(k*(k+1)/2));
   double Omega_delta_post;
@@ -125,7 +125,7 @@ List CAR_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sam
 	  
 	// Update lambda_Omega
     Omega_delta_post = (delta_Omega + sum(sum(abs(Omega_curr)))/2);
-    lambda_Omega = R::rgamma(Omega_r_post, 1/Omega_delta_post);
+    lambda_Omega = randg<double>(distr_param(Omega_r_post, 1/Omega_delta_post));
     
     //Update betas:
     beta_curr = update_car_beta_helper(data, design, mu_curr,
@@ -157,7 +157,7 @@ List CAR_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sam
     
     // Update lambda_beta
     
-    lambda2_beta = R::rgamma(r_beta+k*p,1/(delta_beta+sum(tau2_curr)/2));
+    lambda2_beta = randg<double>(distr_param(r_beta+k*p,1/(delta_beta+sum(tau2_curr)/2)));
     
     
     
