@@ -38,13 +38,13 @@ arma::mat update_car_beta_helper(const arma::mat & data,
   
   
   
-  arma::uvec ind_para = linspace<uvec>(0,k-1,k);
+  //arma::uvec ind_para = linspace<uvec>(0,k-1,k);
   
   arma::mat Sigma = inv_sympd(Omega);
 
   arma::mat Y_tilde = data;
   Y_tilde.each_row() -= mu.t() * Sigma;
-  arma::uvec ind_p = linspace<uvec>(0,p-1,p);
+  //arma::uvec ind_p = linspace<uvec>(0,p-1,p);
   
   
   arma::mat mu_beta_mat = design.t() * Y_tilde;
