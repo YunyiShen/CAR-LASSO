@@ -8,7 +8,6 @@ using namespace arma;
 // [[Rcpp::depends(RcppProgress)]]
 #include <progress.hpp>
 #include <progress_bar.hpp>
-//#include "helper.h"
 #include "CAR_LASSO_helper.h"
 #include "CAR_LASSO_randeff_helper.h"
 
@@ -23,8 +22,10 @@ using namespace arma;
  * 
  * A CAR w/ random effect can be reparameterize into a model s.t.: 
  * Y_i~N(Sigma (X_ibeta+mu+nu_i),Sigma)
- * nu~N(0,xi) is the random effect's precision
- * xi~Gamma(alpha,beta) // we have some prior on the precision
+ *     Here we have nu matrix similar to beta matrix, each column (random effect for a certain node) 
+ *        was iid while rows were independent, that's for different nodes
+ * nu_{.,j}~N(0,xi_j) xi_{j} is the random effect's precision
+ * xi_{j}~Gamma(alpha,beta) iid // we have some prior on the precision
  */
 
 /* 
@@ -32,6 +33,7 @@ Input:
   @ data: a matrix with column as nodes and row as samples
   @ design: a design matrix of common input to the network, should have same # of rows as data
   @ design_r: a design matrix for the random effect
+  @ membership: "design" matrix for variance component of random effect
   @ n_iter: number of saved sampling iterations in the Gibbs sampler
   @ n_burn_in: number of burn in before sampling
   @ thin_by: subsampling steps, integer
@@ -57,9 +59,10 @@ Output:
 */
 
 // [[Rcpp::export]]
-List CAR_LASSO_randeff_Cpp(const arma::mat &data,     // col composition data, ROW as a sample
-                           const arma::mat &design,   // design matrix, each ROW as a sample
-                           const arma::mat &design_r, // design matrix for random effect, each ROW as a sample
+List CAR_LASSO_randeff_Cpp(const arma::mat & data,     // col composition data, ROW as a sample
+                           const arma::mat & design,   // design matrix, each ROW as a sample
+                           const arma::mat & design_r, // design matrix for random effect, each ROW as a sample
+                           const arma::mat & membership, //design matrix for variance component, should have pr rows and m columns
                            const int n_iter,          // how many iterations?
                            const int n_burn_in,       // burn in
                            const int thin_by,         // thinning?
@@ -75,7 +78,7 @@ List CAR_LASSO_randeff_Cpp(const arma::mat &data,     // col composition data, R
     int p = design.n_cols;    //number of predictors
     int pr = design_r.n_cols; // number of unique random effects catagories
     int n = data.n_rows;      // number of samples
-
+    int m = membership.n_cols; // number of mumbers;
     int n_save = floor(n_iter / thin_by); //
     int i_save = 0;
 
@@ -92,7 +95,7 @@ List CAR_LASSO_randeff_Cpp(const arma::mat &data,     // col composition data, R
     arma::mat nu_mcmc(n_save, k * pr); // LASSO parameter for beta and B
     nu_mcmc += NA_REAL;
 
-    arma::mat xi_mcmc(n_save, k); // LASSO parameter for beta and B
+    arma::mat xi_mcmc(n_save, k*m); // LASSO parameter for beta and B
     xi_mcmc += NA_REAL;
 
     arma::mat lambda_mcmc(n_save, 2); // LASSO parameter for beta and B
@@ -110,7 +113,7 @@ List CAR_LASSO_randeff_Cpp(const arma::mat &data,     // col composition data, R
     arma::mat beta_curr = solve(design.t() * design, design.t() * (centered_data * Omega_curr)); // current value of beta
 
     arma::mat nu_curr(pr, k, arma::fill::zeros);
-    arma::vec xi_curr(k, arma::fill::zeros);
+    arma::mat xi_curr(m,k, arma::fill::zeros);
     xi_curr += 1;
 
     double lambda2_beta = randg<double>(distr_param(r_beta, 1 / delta_beta));   // current value of squared LASSO parameter of \beta
@@ -161,7 +164,7 @@ List CAR_LASSO_randeff_Cpp(const arma::mat &data,     // col composition data, R
 
         // Update mu
 
-        mu_curr = update_car_mu_helper(data, design, beta_curr,
+        mu_curr = update_car_mu_helper(centered_data, design, beta_curr,
                                        Omega_curr,
                                        k, p, n);
 
@@ -174,11 +177,11 @@ List CAR_LASSO_randeff_Cpp(const arma::mat &data,     // col composition data, R
         lambda2_beta = R::rgamma(r_beta + k * p, 1 / (delta_beta + sum(tau2_curr) / 2));
 
         // update random effect
-        nu_curr = update_car_nu_helper(data, design, design_r, beta_curr,
+        nu_curr = update_car_nu_helper(data, design, design_r, membership,beta_curr,
                                        mu_curr, xi_curr, Omega_curr,
                                        k, pr, n);
 
-        update_xi_helper(xi_curr, nu_curr, alpha, beta, k, pr);
+        update_xi_helper(xi_curr, nu_curr, membership,alpha, beta, k, pr, m);
 
         // saving the state
         if ((i - n_burn_in) >= 0 && (i + 1 - n_burn_in) % thin_by == 0)
@@ -188,7 +191,7 @@ List CAR_LASSO_randeff_Cpp(const arma::mat &data,     // col composition data, R
             Omega_mcmc.row(i_save) = trans(Omega_curr(trimatu_ind(size(Omega_curr))));
             mu_mcmc.row(i_save) = mu_curr.t();
             nu_mcmc.row(i_save) = trans(vectorise(nu_curr));
-            xi_mcmc.row(i_save) = xi_curr.t();
+            xi_mcmc.row(i_save) = trans(vectorise(xi_curr));
             lambda_mcmc(i_save, 0) = sqrt(lambda2_beta);
             lambda_mcmc(i_save, 1) = lambda_Omega;
 
