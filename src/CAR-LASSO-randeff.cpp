@@ -21,11 +21,12 @@ using namespace arma;
  *   similar for betas
  * 
  * A CAR w/ random effect can be reparameterize into a model s.t.: 
- * Y_i~N(Sigma (X_ibeta+mu+nu_i),Sigma)
+ * Y_i~N(Sigma (X_ibeta+mu+nu_{i,.}),Sigma)
  *     Here we have nu matrix similar to beta matrix, each column (random effect for a certain node) 
  *        was iid while rows were independent, that's for different nodes
- * nu_{.,j}~N(0,xi_j) xi_{j} is the random effect's precision
- * xi_{j}~Gamma(alpha,beta) iid // we have some prior on the precision
+ * nu_{i,j}~N(0,tt_{i,j}) tt_{ij} is the random effect's precision, we also have
+ * tt = membership * xi, membership is the design matrix for variance component, must be orthagonal and 0,1
+ * xi_{i,j}~Gamma(alpha,beta) iid // we have some prior on the precision
  */
 
 /* 
