@@ -23,4 +23,14 @@ void get_data_centered(arma::mat & centered_data,
                        const arma::mat & design_r,
                        const arma::mat & nu,
                        const arma::mat & Omega);
+
+void update_car_randeff_Omega_helper(arma::mat & Omega,
+                             const arma::mat & data,
+                             const arma::mat & design,
+                             const arma::mat & design_r,
+                             const arma::mat & nu,
+                             const arma::vec & mu,
+                             const arma::mat & beta,
+                             const double & lambda_curr,
+                             int k, int p,int n);
 #endif
