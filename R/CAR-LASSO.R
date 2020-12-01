@@ -46,7 +46,7 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
   # check links
   if (!(link %in% c("identity", "probit", "log", "logit"))) {
     stop("Currently only implemented identity (normal), 
-      probit (bernoulli) links, log (Poisson) and logit (multi-nomial)")
+      probit (bernoulli) log (Poisson) and logit (multi-nomial)")
   }
 
   # omit NAs
