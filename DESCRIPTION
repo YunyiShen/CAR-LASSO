@@ -4,7 +4,7 @@ Version: 0.1
 Authors@R: person("Yunyi", "Shen", email = "yshen99@wisc.edu", role = c("aut", "cre"))
 Description: Bayesian Conditional Auto Regressive LASSO with automatic and adaptive shrinkage 
 Depends: R (>= 3.4.0)
-License: MIT
+License: GPL-3.0
 Encoding: UTF-8
 LazyData: true
 ByteCompile: TRUE
