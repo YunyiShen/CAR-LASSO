@@ -13,15 +13,15 @@ using namespace arma;
 #include "ars_multinomial_helper.h"
 
 /*
- * We would like to develope a Poisson Simulteneous Regressive Graphical LASSO for counting response, 
+ * We would like to develope a multinomial CAR LASSO for compositional response, 
  * Basic idea was to embed Graphical LASSO into a normal LASSO using the hirechical structure
  *   described by Wang (2012) and Park and Casella 2008
  * 
- * And add another layer of Poisson to account for counting nature of the data
+ * And add another layer of multinomial to account for compositional nature of the data
  */
 
 // [[Rcpp::export]]
-List Multinomial_CAR_ALASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sample
+List Multinomial_CAR_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sample
                    const arma::mat & design, // design matrix, each ROW as a sample
                    const int n_iter, // how many iterations?
                    const int n_burn_in, // burn in
