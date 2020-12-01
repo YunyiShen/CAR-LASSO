@@ -1,4 +1,4 @@
-#' Gibbs sampler for Conditional Auto Regression LASSO and extensions
+#' Gibbs sampler for Conditional Auto Regressive LASSO and extensions
 #'
 #' @param formula A double sided formula with response at left hand side and predictors at right hand side
 #' @param data A data.frame with all response and predictors, row as observations
