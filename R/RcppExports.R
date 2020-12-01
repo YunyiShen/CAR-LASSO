@@ -57,6 +57,10 @@ get_data_centered <- function(centered_data, data, design_r, nu, Omega) {
     invisible(.Call('_CARlasso_get_data_centered', PACKAGE = 'CARlasso', centered_data, data, design_r, nu, Omega))
 }
 
+sample_Omega_prior_cpp <- function(k, n_iter, n_burn_in, thin_by, lambda_a, lambda_b, progress) {
+    .Call('_CARlasso_sample_Omega_prior_cpp', PACKAGE = 'CARlasso', k, n_iter, n_burn_in, thin_by, lambda_a, lambda_b, progress)
+}
+
 rgig <- function(lambda, chi, psi) {
     .Call('_CARlasso_rgig', PACKAGE = 'CARlasso', lambda, chi, psi)
 }
