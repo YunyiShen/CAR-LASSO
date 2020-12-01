@@ -37,14 +37,16 @@ get_data_centered(centered_data,data1, design_r, nu,Omega)
 
 ## start the overall test for the sampling algorithm
 sourceCpp("./src/CAR-LASSO-randeff.cpp")
+sourceCpp("./src/CAR-ALASSO-randeff.cpp")
 sourceCpp("./src/CAR-LASSO.cpp")
+sourceCpp("./src/CAR-ALASSO.cpp")
 source("./tests/Formal/Accurancy/Graph_generator.R")
 
 set.seed(12345)
-k <- 10
-n <- 200
+k <- 20
+n <- 50
 p <- 2
-pr <- 50
+pr <- 5
 m <- 1
 
 design <- matrix(rnorm(n*p),n,p)
@@ -84,7 +86,7 @@ tests_rand <- CAR_LASSO_randeff_Cpp(data = Y, design = design,
                                n_iter = 10000, n_burn_in = 1000, thin_by = 10,
                                r_beta = 1, delta_beta = 0.01,
                                r_Omega = 1, delta_Omega = 0.01,
-                               alpha = 0.01, beta = 1,
+                               alpha = 1e-8, beta = 1e-2,
                                progress = T)
 
 
@@ -109,5 +111,22 @@ diag(CAR_fix_Graph) <- 0.5 * diag(CAR_fix_Graph)
 image((CAR_fix_Graph))
 
 
+tests_fix_A <- CAR_ALASSO_Cpp(data = Y, design = design,
+                               n_iter = 10000, n_burn_in = 1000, thin_by = 10,
+                               r_beta = 1e-2+0*beta, delta_beta = 1e-6 + 0 * beta,
+                               r_Omega = rep(1e-2,.5*(k-1)*k),
+                               delta_Omega = rep(1e-6,.5*(k-1)*k),
+                               progress = T)
+
+CAR_fix_A_Graph <- 0 * Omega
+CAR_fix_A_Graph[upper.tri(CAR_fix_A_Graph,T)] <- apply(tests_fix_A$Omega,2,mean)
+CAR_fix_A_Graph <- CAR_fix_A_Graph+t(CAR_fix_A_Graph)
+diag(CAR_fix_A_Graph) <- 0.5 * diag(CAR_fix_A_Graph)
+image((CAR_fix_A_Graph))
+
+
+
 stein_loss_cpp(CAR_fix_Graph,Omega)
 stein_loss_cpp(CAR_rand_Graph,Omega)
+stein_loss_cpp(CAR_fix_A_Graph,Omega)
+stein_loss_cpp(CAR_rand_A_Graph,Omega)

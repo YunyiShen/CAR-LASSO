@@ -5,9 +5,9 @@ library(RcppProgress)
 
 rm(list = ls())
 
-k = 5
-n = 1000
-p = 10
+k = 30
+n = 50
+p = 5
 
 
 sourceCpp("./src/CAR-LASSO.cpp")
@@ -36,8 +36,8 @@ Design <- 1.0* (matrix(rnorm(n*p,0,1),n,p))
 colnames(Design) <- paste0("x",1:p)
 
 
-beta <- matrix(rnorm(p*k,0,3),p,k)
-beta[sample(p*k,floor(0.3*p*k))] = 0
+beta <- matrix(rnorm(p*k,0,5),p,k)
+beta[sample(p*k,floor(0.8*p*k))] = 0
 
 mu <-  1+rnorm(k)
 #mu
