@@ -12,90 +12,94 @@ using namespace std;
 #include "helper.h"
 #include "GIG_helper.h"
 #include "CAR_LASSO_helper.h"
-/*
- * Helper functions for Conditional Auto Regression LASSO, 
- * Basic idea was to embed Graphical LASSO into a normal LASSO using the hirechical structure
- *   described by Wang (2012) and Park and Casella 2008
- * In this model average structure offer some extra information of conditional correlation
- * 
- * A CAR can be reparameterize into a model s.t.: 
- * Y~N(Sigma (Xbeta+mu),Sigma)
- */
+#include "CAR_LASSO_randeff_helper.h"
 
+
+// helper function for updating random effect matrix, so that the conditional mean was design_r * res
 
 // [[Rcpp::export]]
-arma::mat update_car_beta_helper(const arma::mat & data,
-                             const arma::mat & design,
-                             const arma::vec & mu,
-                             const arma::vec & tau2,
-                             const arma::mat & Omega,
-                             int k, int p, int n){
-  
+arma::mat update_car_nu_helper(const arma::mat & data,
+                               const arma::mat & design, // design matrix
+                               const arma::mat & design_r, // design mat for random effect
+                               const arma::mat & membership, // membership matrix for random precision, this should be something similar to a design matrix, that tells the algorithm which precision correspond to which random effect, important for multiple memberships, then the precision will be membership * xi
+                               const arma::mat & beta,
+                               const arma::vec & mu, // grand mean
+                               const arma::mat & xi, // the precision matrix of random effect, should be m rows k column, m is how many different distributions we have
+                               const arma::mat & Omega,
+                               int k, int pr, int n){
 
-  arma::mat Q_beta(k*p,k*p,fill::zeros);
+  arma::mat Q_nu(k*pr,k*pr,fill::zeros);
   
-  arma::mat XtX = design.t() * design;
-  
-  
-  
-  //arma::uvec ind_para = linspace<uvec>(0,k-1,k);
-  
+  arma::mat XtX = design_r.t() * design_r ;
+
   arma::mat Sigma = inv_sympd(Omega);
 
-  arma::mat Y_tilde = data;
-  Y_tilde.each_row() -= mu.t() * Sigma;
-  //arma::uvec ind_p = linspace<uvec>(0,p-1,p);
-  
-  
-  arma::mat mu_beta_mat = design.t() * Y_tilde;
-  arma::vec mu_beta = vectorise(mu_beta_mat);
-  
-  Q_beta = kron(Sigma,XtX); // precision matrix of beta, more intuitive way was sum_i X_i^TSigmaX_i, but kron is faster
+  arma::mat mu_nu_mat = data*Omega - design * beta;
+  mu_nu_mat.each_row() -= mu.t();
+  mu_nu_mat = design_r.t() * (mu_nu_mat * Sigma);
 
-  //Rcout << tau2 << endl;
-  Q_beta.diag() += 1/tau2; // penalty due to Laplace prior
+  arma::vec mu_nu = vectorise(mu_nu_mat);
   
-  //arma::mat res;
-  //arma::mat Sigma_beta = inv(Q_beta);
-  
-  //mu_beta = Sigma_beta*mu_beta;
-  //res = mvnrnd(mu_beta, Sigma_beta);
-  arma::mat res(size(mu_beta),fill::randn);
-  arma::mat chol_Q = arma::chol(Q_beta);
-  res = arma::solve(chol_Q,res) + arma::solve(Q_beta,mu_beta);
+  Q_nu = kron(Sigma,XtX); // precision matrix of beta, more intuitive way was sum_i X_i^TSigmaX_i, but kron is faster
+  arma::mat perc_random = membership * xi;
+  //Rcout << perc_random << endl;
+  Q_nu.diag() += vectorise(perc_random);
+  //Rcout << Q_nu << endl;
+  //Rcout << mu_nu << endl;
 
-  res = reshape(res,p,k);
+  arma::mat res(size(mu_nu),fill::randn);
+
+  arma::mat chol_Q = arma::chol(Q_nu);
+  res = arma::solve(chol_Q,res) + arma::solve(Q_nu,mu_nu);
+
+  res = reshape(res,pr,k);
   
   return(res);
-}
-
-
-// tested 20200712
-// [[Rcpp::export]]
-arma::vec update_car_mu_helper(const arma::mat & data,
-                           const arma::mat & design,
-                           const arma::mat & beta,
-                           const arma::mat & Omega, 
-                           int k,int p,int n){
-  arma::vec mu(k);
-  
-  // mu was normal with mean Omega*data-Xbeta
-  arma::mat YminusXbeta = data*Omega - design * beta;
-  arma::vec mu_mu = trans(mean(YminusXbeta));
-  
-  
-  mu = mvnrnd(mu_mu, Omega/n);
-  
-  return(mu);
   
 }
 
-
-// update Omega matrix using block method
 // [[Rcpp::export]]
-void update_car_Omega_helper(arma::mat & Omega,
+void update_xi_helper(arma::mat & xi,
+                      const arma::mat & nu,
+                      const arma::mat & membership,
+                      const double & alpha,
+                      const double & beta, 
+                      int k, int pr, int m){
+    double alpha_post; 
+    double beta_post;
+    int nn; // number of latent variable for that member
+    arma::vec latent_m; //vector of latent variable of mth membership
+    for(int i = 0; i < m; ++i){
+        for (int j = 0; j < k; ++j)
+        {
+            nn = as_scalar(sum(membership.col(i))); // number of latent var for node i, member j 
+            alpha_post = alpha + nn/2;
+            latent_m = membership.col(i) % nu.col(j);// this vector was 0 for non members and nu for members
+            beta_post = beta + arma::as_scalar( arma::sum(  latent_m % latent_m) )/2;
+            xi(i,j) = randg<double>( distr_param(alpha_post,1/beta_post) );
+        }
+    }
+    return;
+}
+
+// [[Rcpp::export]]
+void get_data_centered(arma::mat & centered_data,
+                       const arma::mat & data,
+                       const arma::mat & design_r,
+                       const arma::mat & nu,
+                       const arma::mat & Omega){
+    arma::mat Sigma = inv(Omega);
+    centered_data = data - (design_r * nu) * Sigma;
+    return;
+}
+
+
+
+void update_car_randeff_Omega_helper(arma::mat & Omega,
                              const arma::mat & data,
                              const arma::mat & design,
+                             const arma::mat & design_r,
+                             const arma::mat & nu,
                              const arma::vec & mu,
                              const arma::mat & beta,
                              const double & lambda_curr,
@@ -103,7 +107,7 @@ void update_car_Omega_helper(arma::mat & Omega,
   //arma::mat Omega;
   //arma::mat Y_tilde;
   
-  arma::mat expectation = design * beta;
+  arma::mat expectation = design * beta + design_r * nu;
   expectation.each_row() += mu.t();
   
   
@@ -206,24 +210,4 @@ void update_car_Omega_helper(arma::mat & Omega,
     
   }
   return;
-}
-
-// update 1/tau^2, this is for beta, 
-// tau in Omega was updated within update_Omega
-// [[Rcpp::export]]
-arma::vec update_car_tau2_helper(const arma::mat & beta,
-                             const double & lambda2,
-                             const arma::mat & Omega,
-                             int k, int p, int n){
-  arma::vec betavec = vectorise(beta);
-  arma::vec invtau2(k*p);
-  
-  
-  arma::vec mu_prime = sqrt(lambda2/(betavec%betavec));
-  //Rcout << betavec%betavec << endl;
-  //Rcout << mu_prime << endl;
-  for(int i = 0 ; i < k*p ; ++i){
-    invtau2(i) =  rinvGau(mu_prime(i),lambda2); 
-  }
-  return(1/invtau2);
 }
