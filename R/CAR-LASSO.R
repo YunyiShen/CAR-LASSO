@@ -184,11 +184,22 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
 
     if (verbos) cat("Algorithm start...\n\n")
     if (verbos & progress) cat("progress:\n\n")
-    res <- Probit_CAR_LASSO_Cpp(
-      y, design, n_iter, n_burn_in,
-      thin_by, r_beta, delta_beta,
-      r_Omega, delta_Omega, progress
-    )
+    if (adaptive) {
+      res <- Probit_CAR_ALASSO_Cpp(
+        y, design,
+        n_iter, n_burn_in,
+        thin_by, r_beta, delta_beta,
+        r_Omega, delta_Omega, progress
+      )
+    }
+    else {
+      res <- Probit_CAR_LASSO_Cpp(
+        y, design,
+        n_iter, n_burn_in,
+        thin_by, r_beta, delta_beta,
+        r_Omega, delta_Omega, progress
+      )
+    }
   }
 
   if (link == "identity") {
