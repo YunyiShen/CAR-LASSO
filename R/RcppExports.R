@@ -2,194 +2,194 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 CAR_ALASSO_randeff_Cpp <- function(data, design, design_r, membership, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, alpha, beta, progress) {
-    .Call('_CARlasso_CAR_ALASSO_randeff_Cpp', PACKAGE = 'CARlasso', data, design, design_r, membership, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, alpha, beta, progress)
+    .Call(`_CARlasso_CAR_ALASSO_randeff_Cpp`, data, design, design_r, membership, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, alpha, beta, progress)
 }
 
 CAR_ALASSO_Cpp <- function(data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, progress) {
-    .Call('_CARlasso_CAR_ALASSO_Cpp', PACKAGE = 'CARlasso', data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, progress)
+    .Call(`_CARlasso_CAR_ALASSO_Cpp`, data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, progress)
 }
 
 CAR_LASSO_randeff_Cpp <- function(data, design, design_r, membership, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, alpha, beta, progress) {
-    .Call('_CARlasso_CAR_LASSO_randeff_Cpp', PACKAGE = 'CARlasso', data, design, design_r, membership, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, alpha, beta, progress)
+    .Call(`_CARlasso_CAR_LASSO_randeff_Cpp`, data, design, design_r, membership, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, alpha, beta, progress)
 }
 
 CAR_LASSO_Cpp <- function(data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, progress) {
-    .Call('_CARlasso_CAR_LASSO_Cpp', PACKAGE = 'CARlasso', data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, progress)
+    .Call(`_CARlasso_CAR_LASSO_Cpp`, data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, progress)
 }
 
 update_car_Omega_adp_helper <- function(Omega, data, design, mu, beta, lambda_curr, k, p, n) {
-    invisible(.Call('_CARlasso_update_car_Omega_adp_helper', PACKAGE = 'CARlasso', Omega, data, design, mu, beta, lambda_curr, k, p, n))
+    invisible(.Call(`_CARlasso_update_car_Omega_adp_helper`, Omega, data, design, mu, beta, lambda_curr, k, p, n))
 }
 
 update_car_tau2_adp_helper <- function(beta, lambda2, Omega, k, p, n) {
-    .Call('_CARlasso_update_car_tau2_adp_helper', PACKAGE = 'CARlasso', beta, lambda2, Omega, k, p, n)
+    .Call(`_CARlasso_update_car_tau2_adp_helper`, beta, lambda2, Omega, k, p, n)
 }
 
 update_car_lambda_Omega_adp_helper <- function(lambda_curr, Omega, r, delta) {
-    invisible(.Call('_CARlasso_update_car_lambda_Omega_adp_helper', PACKAGE = 'CARlasso', lambda_curr, Omega, r, delta))
+    invisible(.Call(`_CARlasso_update_car_lambda_Omega_adp_helper`, lambda_curr, Omega, r, delta))
 }
 
 update_car_beta_helper <- function(data, design, mu, tau2, Omega, k, p, n) {
-    .Call('_CARlasso_update_car_beta_helper', PACKAGE = 'CARlasso', data, design, mu, tau2, Omega, k, p, n)
+    .Call(`_CARlasso_update_car_beta_helper`, data, design, mu, tau2, Omega, k, p, n)
 }
 
 update_car_mu_helper <- function(data, design, beta, Omega, k, p, n) {
-    .Call('_CARlasso_update_car_mu_helper', PACKAGE = 'CARlasso', data, design, beta, Omega, k, p, n)
+    .Call(`_CARlasso_update_car_mu_helper`, data, design, beta, Omega, k, p, n)
 }
 
 update_car_Omega_helper <- function(Omega, data, design, mu, beta, lambda_curr, k, p, n) {
-    invisible(.Call('_CARlasso_update_car_Omega_helper', PACKAGE = 'CARlasso', Omega, data, design, mu, beta, lambda_curr, k, p, n))
+    invisible(.Call(`_CARlasso_update_car_Omega_helper`, Omega, data, design, mu, beta, lambda_curr, k, p, n))
 }
 
 update_car_tau2_helper <- function(beta, lambda2, Omega, k, p, n) {
-    .Call('_CARlasso_update_car_tau2_helper', PACKAGE = 'CARlasso', beta, lambda2, Omega, k, p, n)
+    .Call(`_CARlasso_update_car_tau2_helper`, beta, lambda2, Omega, k, p, n)
 }
 
 update_car_nu_helper <- function(data, design, design_r, membership, beta, mu, xi, Omega, k, pr, n) {
-    .Call('_CARlasso_update_car_nu_helper', PACKAGE = 'CARlasso', data, design, design_r, membership, beta, mu, xi, Omega, k, pr, n)
+    .Call(`_CARlasso_update_car_nu_helper`, data, design, design_r, membership, beta, mu, xi, Omega, k, pr, n)
 }
 
 update_xi_helper <- function(xi, nu, membership, alpha, beta, k, pr, m) {
-    invisible(.Call('_CARlasso_update_xi_helper', PACKAGE = 'CARlasso', xi, nu, membership, alpha, beta, k, pr, m))
+    invisible(.Call(`_CARlasso_update_xi_helper`, xi, nu, membership, alpha, beta, k, pr, m))
 }
 
 get_data_centered <- function(centered_data, data, design_r, nu, Omega) {
-    invisible(.Call('_CARlasso_get_data_centered', PACKAGE = 'CARlasso', centered_data, data, design_r, nu, Omega))
+    invisible(.Call(`_CARlasso_get_data_centered`, centered_data, data, design_r, nu, Omega))
 }
 
 sample_Omega_prior_cpp <- function(k, n_iter, n_burn_in, thin_by, lambda_a, lambda_b, progress) {
-    .Call('_CARlasso_sample_Omega_prior_cpp', PACKAGE = 'CARlasso', k, n_iter, n_burn_in, thin_by, lambda_a, lambda_b, progress)
+    .Call(`_CARlasso_sample_Omega_prior_cpp`, k, n_iter, n_burn_in, thin_by, lambda_a, lambda_b, progress)
 }
 
 rgig <- function(lambda, chi, psi) {
-    .Call('_CARlasso_rgig', PACKAGE = 'CARlasso', lambda, chi, psi)
+    .Call(`_CARlasso_rgig`, lambda, chi, psi)
 }
 
 Ising_LASSO_Cpp <- function(data_, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_J, delta_J, propsd_mu, propsd_beta, propsd_J, propsd_lambda, exact, nauxIter, progress, verbos, reportby) {
-    .Call('_CARlasso_Ising_LASSO_Cpp', PACKAGE = 'CARlasso', data_, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_J, delta_J, propsd_mu, propsd_beta, propsd_J, propsd_lambda, exact, nauxIter, progress, verbos, reportby)
+    .Call(`_CARlasso_Ising_LASSO_Cpp`, data_, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_J, delta_J, propsd_mu, propsd_beta, propsd_J, propsd_lambda, exact, nauxIter, progress, verbos, reportby)
 }
 
 IsingSamplerCpp <- function(n, graph, thresholds, nIter, responses, exact) {
-    .Call('_CARlasso_IsingSamplerCpp', PACKAGE = 'CARlasso', n, graph, thresholds, nIter, responses, exact)
+    .Call(`_CARlasso_IsingSamplerCpp`, n, graph, thresholds, nIter, responses, exact)
 }
 
 Ising_PseudoLikelihood_Cpp <- function(x, graph, thresholds, responses, logis) {
-    .Call('_CARlasso_Ising_PseudoLikelihood_Cpp', PACKAGE = 'CARlasso', x, graph, thresholds, responses, logis)
+    .Call(`_CARlasso_Ising_PseudoLikelihood_Cpp`, x, graph, thresholds, responses, logis)
 }
 
 Multinomial_CAR_ALASSO_Cpp <- function(data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, ns, m, emax, progress) {
-    .Call('_CARlasso_Multinomial_CAR_ALASSO_Cpp', PACKAGE = 'CARlasso', data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, ns, m, emax, progress)
+    .Call(`_CARlasso_Multinomial_CAR_ALASSO_Cpp`, data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, ns, m, emax, progress)
 }
 
 Multinomial_CAR_LASSO_Cpp <- function(data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, ns, m, emax, progress) {
-    .Call('_CARlasso_Multinomial_CAR_LASSO_Cpp', PACKAGE = 'CARlasso', data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, ns, m, emax, progress)
+    .Call(`_CARlasso_Multinomial_CAR_LASSO_Cpp`, data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, ns, m, emax, progress)
 }
 
 Pois_CAR_ALASSO_Cpp <- function(data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, ns, m, emax, progress) {
-    .Call('_CARlasso_Pois_CAR_ALASSO_Cpp', PACKAGE = 'CARlasso', data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, ns, m, emax, progress)
+    .Call(`_CARlasso_Pois_CAR_ALASSO_Cpp`, data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, ns, m, emax, progress)
 }
 
 Pois_CAR_LASSO_Cpp <- function(data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, ns, m, emax, progress) {
-    .Call('_CARlasso_Pois_CAR_LASSO_Cpp', PACKAGE = 'CARlasso', data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, ns, m, emax, progress)
+    .Call(`_CARlasso_Pois_CAR_LASSO_Cpp`, data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, ns, m, emax, progress)
 }
 
 Pois_SRG_LASSO_Cpp <- function(data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, ns, m, emax, progress) {
-    .Call('_CARlasso_Pois_SRG_LASSO_Cpp', PACKAGE = 'CARlasso', data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, ns, m, emax, progress)
+    .Call(`_CARlasso_Pois_SRG_LASSO_Cpp`, data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, ns, m, emax, progress)
 }
 
 Probit_CAR_ALASSO_Cpp <- function(data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, progress) {
-    .Call('_CARlasso_Probit_CAR_ALASSO_Cpp', PACKAGE = 'CARlasso', data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, progress)
+    .Call(`_CARlasso_Probit_CAR_ALASSO_Cpp`, data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, progress)
 }
 
 Probit_CAR_LASSO_Cpp <- function(data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, progress) {
-    .Call('_CARlasso_Probit_CAR_LASSO_Cpp', PACKAGE = 'CARlasso', data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, progress)
+    .Call(`_CARlasso_Probit_CAR_LASSO_Cpp`, data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, progress)
 }
 
 Probit_Graphical_LASSO_Cpp <- function(data, n_iter, n_burn_in, thin_by, lambda_a, lambda_b, progress) {
-    .Call('_CARlasso_Probit_Graphical_LASSO_Cpp', PACKAGE = 'CARlasso', data, n_iter, n_burn_in, thin_by, lambda_a, lambda_b, progress)
+    .Call(`_CARlasso_Probit_Graphical_LASSO_Cpp`, data, n_iter, n_burn_in, thin_by, lambda_a, lambda_b, progress)
 }
 
 Probit_SRG_LASSO_Cpp <- function(data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, progress) {
-    .Call('_CARlasso_Probit_SRG_LASSO_Cpp', PACKAGE = 'CARlasso', data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, progress)
+    .Call(`_CARlasso_Probit_SRG_LASSO_Cpp`, data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, progress)
 }
 
 update_Z_helper_CAR <- function(Z_curr, data, design, mu_curr, beta_curr, Omega_curr, k, p, n) {
-    invisible(.Call('_CARlasso_update_Z_helper_CAR', PACKAGE = 'CARlasso', Z_curr, data, design, mu_curr, beta_curr, Omega_curr, k, p, n))
+    invisible(.Call(`_CARlasso_update_Z_helper_CAR`, Z_curr, data, design, mu_curr, beta_curr, Omega_curr, k, p, n))
 }
 
 SRG_LASSO_Cpp <- function(data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, progress) {
-    .Call('_CARlasso_SRG_LASSO_Cpp', PACKAGE = 'CARlasso', data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, progress)
+    .Call(`_CARlasso_SRG_LASSO_Cpp`, data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, progress)
 }
 
 update_beta1_helper <- function(data, design, mu, tau2, Omega, k, p, n) {
-    .Call('_CARlasso_update_beta1_helper', PACKAGE = 'CARlasso', data, design, mu, tau2, Omega, k, p, n)
+    .Call(`_CARlasso_update_beta1_helper`, data, design, mu, tau2, Omega, k, p, n)
 }
 
 update_beta_helper <- function(data, design, mu, tau2, Omega, k, p, n) {
-    .Call('_CARlasso_update_beta_helper', PACKAGE = 'CARlasso', data, design, mu, tau2, Omega, k, p, n)
+    .Call(`_CARlasso_update_beta_helper`, data, design, mu, tau2, Omega, k, p, n)
 }
 
 Sigma_to_CAR_Cpp <- function(Sigma) {
-    .Call('_CARlasso_Sigma_to_CAR_Cpp', PACKAGE = 'CARlasso', Sigma)
+    .Call(`_CARlasso_Sigma_to_CAR_Cpp`, Sigma)
 }
 
 rtn1 <- function(mean, sd, low, high) {
-    .Call('_CARlasso_rtn1', PACKAGE = 'CARlasso', mean, sd, low, high)
+    .Call(`_CARlasso_rtn1`, mean, sd, low, high)
 }
 
 update_Z_helper_multinomial <- function(Z_curr, mu_Z, Sigma_Z, y, k, p, n, ns, m, emax) {
-    invisible(.Call('_CARlasso_update_Z_helper_multinomial', PACKAGE = 'CARlasso', Z_curr, mu_Z, Sigma_Z, y, k, p, n, ns, m, emax))
+    invisible(.Call(`_CARlasso_update_Z_helper_multinomial`, Z_curr, mu_Z, Sigma_Z, y, k, p, n, ns, m, emax))
 }
 
 update_Z_helper_multinomial_para <- function(Z_curr, mu_Z, Sigma_Z, y, k, p, n, ns, m, emax) {
-    invisible(.Call('_CARlasso_update_Z_helper_multinomial_para', PACKAGE = 'CARlasso', Z_curr, mu_Z, Sigma_Z, y, k, p, n, ns, m, emax))
+    invisible(.Call(`_CARlasso_update_Z_helper_multinomial_para`, Z_curr, mu_Z, Sigma_Z, y, k, p, n, ns, m, emax))
 }
 
 update_Z_helper_multinomial_SRG <- function(Z_curr, data, design, mu_curr, beta_curr, Omega_curr, k, p, n, ns, m, emax) {
-    invisible(.Call('_CARlasso_update_Z_helper_multinomial_SRG', PACKAGE = 'CARlasso', Z_curr, data, design, mu_curr, beta_curr, Omega_curr, k, p, n, ns, m, emax))
+    invisible(.Call(`_CARlasso_update_Z_helper_multinomial_SRG`, Z_curr, data, design, mu_curr, beta_curr, Omega_curr, k, p, n, ns, m, emax))
 }
 
 update_Z_helper_multinomial_CAR <- function(Z_curr, data, design, mu_curr, beta_curr, Omega_curr, k, p, n, ns, m, emax) {
-    invisible(.Call('_CARlasso_update_Z_helper_multinomial_CAR', PACKAGE = 'CARlasso', Z_curr, data, design, mu_curr, beta_curr, Omega_curr, k, p, n, ns, m, emax))
+    invisible(.Call(`_CARlasso_update_Z_helper_multinomial_CAR`, Z_curr, data, design, mu_curr, beta_curr, Omega_curr, k, p, n, ns, m, emax))
 }
 
 update_Z_helper_Pois <- function(Z_curr, mu_Z, Sigma_Z, y, k, p, n, ns, m, emax) {
-    invisible(.Call('_CARlasso_update_Z_helper_Pois', PACKAGE = 'CARlasso', Z_curr, mu_Z, Sigma_Z, y, k, p, n, ns, m, emax))
+    invisible(.Call(`_CARlasso_update_Z_helper_Pois`, Z_curr, mu_Z, Sigma_Z, y, k, p, n, ns, m, emax))
 }
 
 update_Z_helper_Pois_reg <- function(Z_curr, data, design, mu_curr, beta_curr, Omega_curr, k, p, n, ns, m, emax) {
-    invisible(.Call('_CARlasso_update_Z_helper_Pois_reg', PACKAGE = 'CARlasso', Z_curr, data, design, mu_curr, beta_curr, Omega_curr, k, p, n, ns, m, emax))
+    invisible(.Call(`_CARlasso_update_Z_helper_Pois_reg`, Z_curr, data, design, mu_curr, beta_curr, Omega_curr, k, p, n, ns, m, emax))
 }
 
 update_Z_helper_Pois_CAR <- function(Z_curr, data, design, mu_curr, beta_curr, Omega_curr, k, p, n, ns, m, emax) {
-    invisible(.Call('_CARlasso_update_Z_helper_Pois_CAR', PACKAGE = 'CARlasso', Z_curr, data, design, mu_curr, beta_curr, Omega_curr, k, p, n, ns, m, emax))
+    invisible(.Call(`_CARlasso_update_Z_helper_Pois_CAR`, Z_curr, data, design, mu_curr, beta_curr, Omega_curr, k, p, n, ns, m, emax))
 }
 
 update_Z_helper_Pois_para <- function(Z_curr, mu_Z, Sigma_Z, y, k, p, n, ns, m, emax) {
-    invisible(.Call('_CARlasso_update_Z_helper_Pois_para', PACKAGE = 'CARlasso', Z_curr, mu_Z, Sigma_Z, y, k, p, n, ns, m, emax))
+    invisible(.Call(`_CARlasso_update_Z_helper_Pois_para`, Z_curr, mu_Z, Sigma_Z, y, k, p, n, ns, m, emax))
 }
 
 Graphical_ALASSO_Cpp <- function(data, n_iter, n_burn_in, thin_by, lambda_a, lambda_b, progress) {
-    .Call('_CARlasso_Graphical_ALASSO_Cpp', PACKAGE = 'CARlasso', data, n_iter, n_burn_in, thin_by, lambda_a, lambda_b, progress)
+    .Call(`_CARlasso_Graphical_ALASSO_Cpp`, data, n_iter, n_burn_in, thin_by, lambda_a, lambda_b, progress)
 }
 
 Graphical_LASSO_Cpp <- function(data, n_iter, n_burn_in, thin_by, lambda_a, lambda_b, progress) {
-    .Call('_CARlasso_Graphical_LASSO_Cpp', PACKAGE = 'CARlasso', data, n_iter, n_burn_in, thin_by, lambda_a, lambda_b, progress)
+    .Call(`_CARlasso_Graphical_LASSO_Cpp`, data, n_iter, n_burn_in, thin_by, lambda_a, lambda_b, progress)
 }
 
 Intercept_Graphical_ALASSO_Cpp <- function(data, n_iter, n_burn_in, thin_by, lambda_a, lambda_b, progress) {
-    .Call('_CARlasso_Intercept_Graphical_ALASSO_Cpp', PACKAGE = 'CARlasso', data, n_iter, n_burn_in, thin_by, lambda_a, lambda_b, progress)
+    .Call(`_CARlasso_Intercept_Graphical_ALASSO_Cpp`, data, n_iter, n_burn_in, thin_by, lambda_a, lambda_b, progress)
 }
 
 Intercept_Graphical_LASSO_Cpp <- function(data, n_iter, n_burn_in, thin_by, lambda_a, lambda_b, progress) {
-    .Call('_CARlasso_Intercept_Graphical_LASSO_Cpp', PACKAGE = 'CARlasso', data, n_iter, n_burn_in, thin_by, lambda_a, lambda_b, progress)
+    .Call(`_CARlasso_Intercept_Graphical_LASSO_Cpp`, data, n_iter, n_burn_in, thin_by, lambda_a, lambda_b, progress)
 }
 
 rinvGau <- function(mu, lambda) {
-    .Call('_CARlasso_rinvGau', PACKAGE = 'CARlasso', mu, lambda)
+    .Call(`_CARlasso_rinvGau`, mu, lambda)
 }
 
 stein_loss_cpp <- function(Omega, Omega_hat) {
-    .Call('_CARlasso_stein_loss_cpp', PACKAGE = 'CARlasso', Omega, Omega_hat)
+    .Call(`_CARlasso_stein_loss_cpp`, Omega, Omega_hat)
 }
 

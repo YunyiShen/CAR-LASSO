@@ -2,7 +2,7 @@
 % Please edit documentation in R/CAR-LASSO.R
 \name{CARlasso}
 \alias{CARlasso}
-\title{Gibbs sampler for Conditional Auto Regression LASSO and extensions}
+\title{Gibbs sampler for Conditional Auto Regressive LASSO and extensions}
 \usage{
 CARlasso(
   formula,
@@ -57,7 +57,7 @@ A list of MCMC samples.
 \item{lambda_Omega}{\strong{Adaptive only}, A coda::mcmc object, each row was an MCMC sample of the shrinage parameter for the upper triangular part (without diagonal) of precision matrix Omega}
 }
 \description{
-Gibbs sampler for Conditional Auto Regression LASSO and extensions
+Gibbs sampler for Conditional Auto Regressive LASSO and extensions
 }
 \examples{
 
