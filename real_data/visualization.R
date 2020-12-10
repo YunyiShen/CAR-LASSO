@@ -1,6 +1,15 @@
 library(igraph)
 library(GGally)
 source("./R/misc.R")
+
+# for human
+load("./real_data/Human/res/CAR_full_design_genus_.005_50_without_unclass_long_chain_lambdaprior_1e-2_1e-6.RData")
+
+# for soil
+load("./real_data/Soil/res/CAR_full_design_genus_.01_50_without_unclass_lambda_prior_1e-2_1e-6_long_chain.RData")
+
+
+
 B_binary <- abs(A_beta/multireg_beta) > .5
 Graph_binary <- abs(A_Graph/multireg_Graph) > .5
 diag(Graph_binary) <- 1
