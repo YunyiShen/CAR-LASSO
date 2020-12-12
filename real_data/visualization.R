@@ -1,6 +1,7 @@
 library(igraph)
 library(GGally)
 source("./R/misc.R")
+# Some resources on network plots: http://mr.schochastics.net/netVizR.html
 
 # for human
 load("./real_data/Human/res/CAR_full_design_genus_.005_50_without_unclass_long_chain_lambdaprior_1e-2_1e-6.RData")
@@ -83,27 +84,58 @@ V(full_graph)$name <- c(colnames(comp_mat)[-ncol(comp_mat)],"fertilizer","crop a
 V(full_graph)$alpha_centrality <- alpha_centrality(full_graph)
 V(full_graph)$type <- type[c(rep(2,(ncol(comp_mat)-1)),rep(1,ncol(Design_dummy)))]
 
-cbPalette_edge <- c( "#0072B2", "#D55E00")
+#cbPalette_edge <- c( "#0072B2", "#D55E00")
+cbPalette_edge <- c( "#0072B2", "#990000")
 cbPalette_node <- c( "#0815d3", "#682d01")
 
+## FOR HUMAN
+V(full_graph)$name[17] <- "StratumDayHospital"
+V(full_graph)$name[18] <- "StratumLong-term"
+V(full_graph)$name[19] <- "StratumRehab"
+V(full_graph)$name[20] <- "Diet1"
+V(full_graph)$name[21] <- "Diet2"
+V(full_graph)$name[22] <- "Diet3"
+V(full_graph)$name[23] <- "Diet4"
+V(full_graph)$name[24] <- "DietPEG"
+
+## FOR SOIL
+V(full_graph)$name[4] <- "C.Koribacter"
+V(full_graph)$name[5] <- "C.Nitrososphaera"
+V(full_graph)$name[6] <- "C.Solibacter"
 
 library(ggplot2)
 library(ggraph)
 set_graph_style(plot_margin = margin(10,10,10,10))
-ggraph(full_graph,layout = "circle")+
+p <- ggraph(full_graph,layout = "circle")+
   geom_edge_link(aes(color = direction.,width = abs_weight,alpha = abs_weight)) + 
   scale_edge_color_manual(values = (  cbPalette_edge))+
-  geom_node_point(mapping = aes(shape = type,size = alpha_centrality,stroke = 6),col = "#696969",alpha = 1) +
-  #scale_color_manual(values = cbPalette) + 
-  geom_node_text(aes(label = name),nudge_y = 0.0,family = "",repel = T,check_overlap = T)+
+  #geom_node_point(mapping = aes(shape = type,size = alpha_centrality,stroke = 6),col = "#696969",alpha = 1) +
+  geom_node_point(mapping = aes(shape = type,size = alpha_centrality,stroke = 1.5),col = "#000000",alpha = 1) +
+  scale_shape_manual(values = c(1,2))+
+  #scale_color_manual(values = cbPalette)+
   coord_fixed(clip = 'off')+
-  theme(legend.text=element_text(size=10))+
-  guides(width = guide_legend(order = 4),
+  guides(width = guide_legend(order = 1),
          #color = guide_legend(order=3),
          size = guide_legend(order=2),
-         shape = guide_legend(order=1),
-         edge_color = guide_legend(order = 3))+
-  theme_void()
+         shape = FALSE, #guide_legend(order=1),
+         edge_color = FALSE #guide_legend(order = 3)
+  )
 
-ggsave("./real_data/humangut.pdf",width = 8,height = 6)
+## FOR HUMAN: 
+dd = c(rep(0,6),0.1,rep(0,12),-0.1,rep(0,5))
+## FOR SOIL:
+dd = c(rep(0,5),0.1,rep(0,16))
+
+## to put labels names outside the circle
+p2 <- p  + geom_node_text(aes(label = name),nudge_x = p$data$x * .38, nudge_y = p$data$y * .2+dd, family = "")+  #repel = T,check_overlap = T)+
+  theme_graph(base_family = 'Helvetica')+
+  theme(legend.text=element_text(size=9),
+        legend.position = "bottom")
+
+
+
+#ggsave("./real_data/humangut.pdf",width = 8,height = 6)
+ggsave("./real_data/humangut2.pdf",p2,width = 8,height = 7)
+
+ggsave("./real_data/soil2.pdf",p2,width = 8,height = 7)
 

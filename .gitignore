@@ -6,3 +6,4 @@ src/sandbox.cpp
 R/sandbox.R
 tests/Political/*
 .vscode/*
+*.DS_Store
