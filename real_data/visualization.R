@@ -88,6 +88,7 @@ V(full_graph)$type <- type[c(rep(2,(ncol(comp_mat)-1)),rep(1,ncol(Design_dummy))
 cbPalette_edge <- c( "#0072B2", "#990000")
 cbPalette_node <- c( "#0815d3", "#682d01")
 
+# IF
 ## FOR HUMAN
 V(full_graph)$name[17] <- "StratumDayHospital"
 V(full_graph)$name[18] <- "StratumLong-term"
@@ -97,11 +98,11 @@ V(full_graph)$name[21] <- "Diet2"
 V(full_graph)$name[22] <- "Diet3"
 V(full_graph)$name[23] <- "Diet4"
 V(full_graph)$name[24] <- "DietPEG"
-
 ## FOR SOIL
 V(full_graph)$name[4] <- "C.Koribacter"
 V(full_graph)$name[5] <- "C.Nitrososphaera"
 V(full_graph)$name[6] <- "C.Solibacter"
+# END IF
 
 library(ggplot2)
 library(ggraph)
@@ -110,8 +111,8 @@ p <- ggraph(full_graph,layout = "circle")+
   geom_edge_link(aes(color = direction.,width = abs_weight,alpha = abs_weight)) + 
   scale_edge_color_manual(values = (  cbPalette_edge))+
   #geom_node_point(mapping = aes(shape = type,size = alpha_centrality,stroke = 6),col = "#696969",alpha = 1) +
-  geom_node_point(mapping = aes(shape = type,size = alpha_centrality,stroke = 1.5),col = "#000000",alpha = 1) +
-  scale_shape_manual(values = c(1,2))+
+  geom_node_point(mapping = aes(shape = type,size = alpha_centrality,stroke = 1.5),col = "#000000",fill= "white", alpha = 1) +
+  scale_shape_manual(values = c(21,24))+
   #scale_color_manual(values = cbPalette)+
   coord_fixed(clip = 'off')+
   guides(width = guide_legend(order = 1),
@@ -133,7 +134,7 @@ p2 <- p  + geom_node_text(aes(label = name),nudge_x = p$data$x * .38, nudge_y = 
         legend.position = "bottom")
 
 
-
+p2
 #ggsave("./real_data/humangut.pdf",width = 8,height = 6)
 ggsave("./real_data/humangut2.pdf",p2,width = 8,height = 7)
 
