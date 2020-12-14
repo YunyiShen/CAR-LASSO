@@ -122,8 +122,18 @@ for(k in ks){
   }
 }
 
+
+res = read.csv("scalingres.csv", header=TRUE)
+
 res$n <- paste0("sample_size:",res$n)
-res$p <- paste0("predictors:", res$p)
+#res$p <- paste0("predictors:", res$p)
+res$p <- paste0(res$p, " predictors")
+res <- within(res, p<-factor(p, levels=c("5 predictors", "10 predictors")))
+res <- within(res, n<-factor(n, levels=c("sample_size:500", "sample_size:1000")))
+res <- within(res, algo<-factor(algo))
+res <- within(res, algo<-factor(algo, levels=c("CAR_LASSO", "CAR_ALASSO", "SRG_LASSO", "GLASSO", "multireg")))
+res <- within(res, algo<-factor(algo, labels=c("CAR-LASSO", "CAR-ALASSO", "SRG-LASSO", "GLASSO", "multireg")))
+
 
 
 cbbPalette <- c(
@@ -137,16 +147,17 @@ ggplot(res,
   geom_line()+
   xlab("number of nodes")+
   ylab("CPU time(s)/1.1k samples")+
-  guides(color=guide_legend(nrow=2,byrow=TRUE))+
-  labs(color = "Algorithm") +
-  
-  theme(legend.position="top") + 
+  guides(color=guide_legend(nrow=1,byrow=TRUE))+
+  labs(color = " ") + theme_bw() + 
+  theme(legend.position="top", legend.box = "vertical") + 
   scale_fill_brewer()+
-  
-  theme(text = element_text(size=12), 
+  theme(text = element_text(size=14), 
+        legend.text=element_text(size=8),
         #axis.text.x = element_text(angle=0,size = 12),
         plot.margin = margin(.15, .15, .15, .15, "cm"))+
-  facet_grid(p~n,labeller = label_parsed, scales = 'fixed')
+#  facet_grid(p~n,labeller = label_parsed, scales = 'fixed')
+  facet_grid(p~n,scales = 'fixed')
 
-ggsave("scaling_test.pdf",width = 6,height = 5, unit = "in")
-ggsave("scaling_test.png",width = 6,height = 5, unit = "in", dpi = 500)
+ggsave("scaling_test2.pdf",width = 6,height = 6, unit = "in")
+#ggsave("scaling_test.pdf",width = 6,height = 5, unit = "in")
+#ggsave("scaling_test.png",width = 6,height = 5, unit = "in", dpi = 500)
