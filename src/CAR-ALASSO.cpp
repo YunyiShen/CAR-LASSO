@@ -83,7 +83,7 @@ List CAR_ALASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sa
   
   arma::mat lambda_beta_mcmc(n_save , k*p); // LASSO parameter for beta and B
   lambda_beta_mcmc += NA_REAL;
-  arma::mat lambda_Omega_mcmc(n_save , r_Omega.n_elem); // LASSO parameter for beta and B
+  arma::mat lambda_Omega_mcmc(n_save , r_Omega.n_elem); // LASSO parameter for Omega
   lambda_beta_mcmc += NA_REAL;
   
   arma::vec tau2_curr = randg<arma::vec> (k*p,distr_param(1.0,.01)); // current latent variable tau^2, for prior of beta

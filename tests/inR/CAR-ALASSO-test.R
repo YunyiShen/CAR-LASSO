@@ -6,8 +6,8 @@ library(RcppProgress)
 rm(list = ls())
 
 k = 30
-n = 400
-p = 10
+n = 50
+p = 5
 
 
 sourceCpp("./src/CAR-LASSO.cpp")
@@ -24,20 +24,20 @@ Omega <- Graph_raw$Omega
 
 Sigma <- Graph_raw$Sigma
 
-B <- rsparsematrix(k,k,0.2)
-omega <- diag(rgamma(k,1,.1))
-I <- diag(rep(1,k))
-Omega <- t(I-B) %*% omega %*% (I-B)
-diag(Omega) <- diag(Omega) + k
-Omega <- as.matrix(Omega)
+#B <- rsparsematrix(k,k,0.2)
+#omega <- diag(rgamma(k,1,.1))
+#I <- diag(rep(1,k))
+#Omega <- t(I-B) %*% omega %*% (I-B)
+#diag(Omega) <- diag(Omega) + k
+#Omega <- as.matrix(Omega)
 
 Design <- 1.0* (matrix(rnorm(n*p,0,1),n,p))
 #Design <- (Design-mean(Design))/sd(Design)
 colnames(Design) <- paste0("x",1:p)
 
 
-beta <- matrix(rnorm(p*k,0,3),p,k)
-beta[sample(p*k,floor(0.3*p*k))] = 0
+beta <- matrix(rnorm(p*k,0,5),p,k)
+beta[sample(p*k,floor(0.8*p*k))] = 0
 
 mu <-  1+rnorm(k)
 #mu
