@@ -5,9 +5,9 @@ library(RcppProgress)
 
 rm(list = ls())
 
-k = 30
-n = 50
-p = 5
+k = 100
+n = 200
+p = 10
 
 
 sourceCpp("./src/CAR-LASSO.cpp")
@@ -18,7 +18,7 @@ source("./R/misc.R")
 source("./tests/Formal/Accurancy/Graph_generator.R")
 
 set.seed(12345)
-Graph_raw <- g_model1(k)
+Graph_raw <- g_model5(k)
 Omega <- Graph_raw$Omega
 #image(Omega)
 
@@ -37,9 +37,9 @@ colnames(Design) <- paste0("x",1:p)
 
 
 beta <- matrix(rnorm(p*k,0,5),p,k)
-beta[sample(p*k,floor(0.8*p*k))] = 0
+beta[sample(p*k,floor(0.5*p*k))] = 0
 
-mu <-  1+rnorm(k)
+mu <-  rnorm(k)
 #mu
 
 Xbeta <- Design %*% beta
