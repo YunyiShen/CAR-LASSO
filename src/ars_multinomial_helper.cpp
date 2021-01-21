@@ -535,3 +535,25 @@ void update_Z_helper_multinomial_CAR(arma::mat &Z_curr, // persumably large, thu
                               k, p, n, ns, m, emax);
   return;
 }
+
+// [[Rcpp::export]]
+void update_Z_helper_multinomial_CAR_randeff(arma::mat &Z_curr, // persumably large, thus will not copy
+                                     const arma::mat &data,
+                                     const arma::mat &design,
+                                     const arma::mat &design_r,
+                                     const arma::vec &mu_curr,
+                                     const arma::mat &beta_curr,
+                                     const arma::mat &nu_curr,
+                                     const arma::mat &Omega_curr,
+                                     int k, int p, int n,
+                                     int ns, int m, double emax // ars parameters
+)
+{
+  arma::mat mu_Zmat = design * beta_curr + design_r * nu_curr;
+  mu_Zmat.each_row() += mu_curr.t(); // calculate the expectation of latent
+  arma::mat Sigma_Z = inv_sympd(Omega_curr);
+  mu_Zmat = mu_Zmat * Sigma_Z; // slightly different from regression, CAR need to times Sigma to mu
+  update_Z_helper_multinomial(Z_curr, mu_Zmat, Sigma_Z, data,
+                              k, p, n, ns, m, emax);
+  return;
+}
