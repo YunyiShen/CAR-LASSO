@@ -95,8 +95,7 @@ List Multinomial_CAR_LASSO_Cpp(const arma::mat & data, // col composition data, 
     Omega_delta_post = (delta_Omega+sum(sum(abs(Omega_curr)))/2);
     lambda_Omega = R::rgamma(Omega_r_post,1/Omega_delta_post);
                                           
-    // Update Latent Zs using ars
-    // TODO: write a CAR based helper, since the prior changed
+    
     
     
     //Update betas:

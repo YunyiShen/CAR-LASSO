@@ -92,7 +92,7 @@ List Pois_CAR_ALASSO_Cpp(const arma::mat & data, // col composition data, ROW as
                                        delta_Omega);    
     
     // Update Latent Zs using ars
-    // TODO: write a CAR based helper, since the prior changed
+    
     update_Z_helper_Pois_CAR(Z_curr,
                              data, design,mu_curr, beta_curr, Omega_curr,
                              k,p,n,ns,m,emax);

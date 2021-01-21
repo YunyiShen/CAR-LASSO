@@ -98,9 +98,6 @@ List Multinomial_CAR_ALASSO_Cpp(const arma::mat & data, // col composition data,
                                        r_Omega,
                                        delta_Omega); 
                                           
-    // Update Latent Zs using ars
-    // TODO: write a CAR based helper, since the prior changed
-    
     
     //Update betas:
     beta_curr = update_car_beta_helper(Z_curr, design, mu_curr,
