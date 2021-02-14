@@ -166,3 +166,4 @@ List Probit_CAR_ALASSO_Cpp(const arma::mat & data, // col composition data, ROW 
   ));
 }
 
+//TODO: add back shrinkage to diagonal entries
