@@ -156,9 +156,9 @@ void spl1_(const int *ns, int *n, int *ilow, int *ihigh, int *ipt,
   } /** end of while (! sampld) **/
   //Necesario al terminar de utilizar los generadores de numeros aleatorios del R
   PutRNGstate();
-  if (attempts >= max_attempt)
-    Rcout << "Trap in ARS: Maximum number of attempts reached by routine spl1_\n"
-          << endl;
+  //if (attempts >= max_attempt)
+  //  Rcout << "Trap in ARS: Maximum number of attempts reached by routine spl1_\n"
+  //        << endl;
   Z_curr(l, w) = *beta;
   return;
 } /* end of the routine spl1_ */
@@ -305,11 +305,11 @@ void update_Z_helper_Pois(arma::mat &Z_curr,
               y,
               k, p, n, &ifault);
       //Rcout << "after:\n" << Z_curr(i,j) <<endl;
-      if (ifault != 0)
-      {
-        Rcout << "ARS failed with code" << ifault << endl;
+      //if (ifault != 0)
+      //{
+        //Rcout << "ARS failed with code" << ifault << endl;
         //stop("ARS failed with code %i \n",ifault);
-      }
+      //}
       delete[] iwv;
       delete[] rwv;
       delete[] x;
@@ -382,6 +382,31 @@ void update_Z_helper_Pois_CAR(arma::mat &Z_curr, // persumably large, thus will 
 }
 
 // try parallel version of update_Z_helper_multinomial()
+
+
+// [[Rcpp::export]]
+void update_Z_helper_Pois_CAR_randeff(arma::mat &Z_curr, // persumably large, thus will not copy
+                                     const arma::mat &data,
+                                     const arma::mat &design,
+                                     const arma::mat &design_r,
+                                     const arma::vec &mu_curr,
+                                     const arma::mat &beta_curr,
+                                     const arma::mat &nu_curr,
+                                     const arma::mat &Omega_curr,
+                                     int k, int p, int n,
+                                     int ns, int m, double emax // ars parameters
+)
+{
+  arma::mat mu_Zmat = design * beta_curr + design_r * nu_curr;
+  mu_Zmat.each_row() += mu_curr.t(); // calculate the expectation of latent
+  arma::mat Sigma_Z = inv_sympd(Omega_curr);
+  mu_Zmat = mu_Zmat * Sigma_Z; // slightly different from regression, CAR need to times Sigma to mu
+  update_Z_helper_Pois(Z_curr, mu_Zmat, Sigma_Z, data,
+                              k, p, n, ns, m, emax);
+  return;
+}
+
+
 
 struct get_Z_worker : public Worker
 {
