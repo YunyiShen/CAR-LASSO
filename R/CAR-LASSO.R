@@ -74,7 +74,7 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
   }
 
   if (verbos) {
-    cat(warr_centering)
+    warning(warr_centering)
   }
 
   design <- apply(design, 2, function(w) {
@@ -99,7 +99,7 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
     if (is.null(delta_beta)) delta_beta <- 0.01
     if (verbos & (length(r_beta) > 1 | length(delta_beta) > 1)) {
       warning("Algorithm set to be non-adapive, 
-        will take the first entry of hyper prior for B shrinkage\n\n")
+        will take the first entry of hyperprior for B shrinkage\n\n")
     }
     r_beta <- r_beta[1]
     delta_beta <- delta_beta[1]
@@ -109,7 +109,7 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
     if (is.null(delta_beta)) delta_beta <- 1e-6
     if ((length(r_beta) == 1 & length(delta_beta) == 1)) {
       if (verbos) warning("Algorithm set to be adapive. 
-        Assuming all hyper parameters are the same \n\n")
+        Assuming all hyper parameters are the same for Omega \n\n")
       r_beta <- matrix(r_beta, p, k)
       delta_beta <- matrix(delta_beta, p, k)
     }
@@ -156,7 +156,7 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
     if (is.null(delta_Omega)) delta_Omega <- 1e-6
     if ((length(r_Omega) == 1 & length(delta_Omega) == 1)) {
       if (verbos) warning("Algorithm set to be adapive. 
-        Assuming all hyper parameters are the same \n\n")
+        Assuming all hyper parameters are the same for Omega \n\n")
       r_Omega <- rep(r_Omega, .5 * (k - 1) * k)
       delta_Omega <- rep(delta_Omega, .5 * (k - 1) * k)
     }
