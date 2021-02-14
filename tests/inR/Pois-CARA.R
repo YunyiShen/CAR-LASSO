@@ -5,7 +5,7 @@ library(RcppProgress)
 
 rm(list = ls())
 
-k = 30
+k = 10
 n = 100
 p = 2
 
@@ -44,9 +44,9 @@ for( i in 1:n ){
 
 test <- Pois_CAR_ALASSO_Cpp(Y,  Design, n_iter = 5000, 
                             n_burn_in = 1000, thin_by = 10, 
-                            r_beta = 1+0*beta, delta_beta = .01 + 0 * beta,
-                            r_Omega = rep(1,.5*(k-1)*k),
-                            delta_Omega = rep(.01,.5*(k-1)*k),
+                            r_beta = .1+0*beta, delta_beta = 1e-5 + 0 * beta,
+                            r_Omega = rep(.1,.5*(k-1)*k),
+                            delta_Omega = rep(1e-5,.5*(k-1)*k),
                             ns = 300,m = 8, emax = 64,
                             progress = T)
 

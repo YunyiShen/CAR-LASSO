@@ -27,12 +27,12 @@ design_r <- lapply(1:n,
 design_r <- Reduce(rbind,design_r)
 
 beta <- matrix(rnorm(p*k,0,.1),p,k)
-mu <- rnorm(k,0,1)
+mu <- rnorm(k,2,1)
 xi <- matrix(rgamma(k*m,10,1),m,k)
 
 Graph_raw <- g_model1(k)
-Omega <- Graph_raw$Omega
-Sigma <- Graph_raw$Sigma
+Omega <- 2 * Graph_raw$Omega
+Sigma <- 0.5 * Graph_raw$Sigma
 
 #Sigma <- 0.1 * diag(k)
 membership <- matrix(0,pr,m)
