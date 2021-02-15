@@ -5,7 +5,7 @@ library(RcppProgress)
 
 rm(list = ls())
 
-k = 100
+k = 10
 n = 200
 p = 10
 
@@ -18,7 +18,7 @@ source("./R/misc.R")
 source("./tests/Formal/Accurancy/Graph_generator.R")
 
 set.seed(12345)
-Graph_raw <- g_model5(k)
+Graph_raw <- g_model1(k)
 Omega <- Graph_raw$Omega
 #image(Omega)
 
@@ -72,6 +72,7 @@ CAR_A_test <- CAR_ALASSO_Cpp(Z,  Design, n_iter = 10000,
                           r_beta = 1e-2+0*beta, delta_beta = 1e-6 + 0 * beta,
                           r_Omega = rep(1e-2,.5*(k-1)*k),
                           delta_Omega = rep(1e-6,.5*(k-1)*k),
+                          lambda_diag = rep(0,k),
                           progress = T)
 
 A_Graph <- 0 * Omega

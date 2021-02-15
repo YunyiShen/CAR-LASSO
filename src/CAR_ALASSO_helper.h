@@ -8,6 +8,17 @@ void update_car_Omega_adp_helper(arma::mat & Omega,
                              const arma::mat & beta,
                              const arma::vec & lambda_curr,// different lambda for different entries
                              int k, int p,int n);
+
+
+//the one allow panalty on digonal entries
+void update_car_Omega_adp_helper2(arma::mat & Omega,
+                             const arma::mat & data,
+                             const arma::mat & design,
+                             const arma::vec & mu,
+                             const arma::mat & beta,
+                             const arma::vec & lambda_curr,// different lambda for different entries
+                             const arma::vec & lambda_diag, 
+                             int k, int p,int n);
                              
 arma::vec update_car_tau2_adp_helper(const arma::mat & beta,
                              const arma::vec & lambda2,

@@ -5,13 +5,13 @@ library(RcppProgress)
 
 rm(list = ls())
 
-k = 5
-n = 300
-p = 3
+k = 3
+n = 500
+p = 1
 
 sourceCpp("./src/Probit-CAR-ALASSO.cpp")
 sourceCpp("./src/Probit-CAR-LASSO.cpp")
-sourceCpp("./src/Probit-SRG-LASSO.cpp")
+#sourceCpp("./src/Probit-SRG-LASSO.cpp")
 source("./tests/Formal/Accurancy/Graph_generator.R")
 
 #set.seed(12345)
@@ -36,10 +36,10 @@ Design <- (Design-mean(Design))/sd(Design)
 colnames(Design) <- paste0("x",1:p)
 
 
-beta <- matrix(rnorm(p*k,0,0.5),p,k)
+beta <- matrix(rnorm(p*k,0,1),p,k)
 #beta[sample(p*k,floor(0.3*p*k))] = 0
 
-mu <- 0*rnorm(k,0,1)
+mu <- rnorm(k,0,1)
 #mu
 
 Xbeta <- Design %*% beta
@@ -57,11 +57,12 @@ for( i in 1:n ){
 
 
 
-test <- Probit_CAR_ALASSO_Cpp(Y,  Design, n_iter = 5000, 
-                            n_burn_in = 1000, thin_by = 5, 
-                            r_beta = 0.01+0*beta, delta_beta = 1e-6 + 0 * beta,
-                            r_Omega = rep(0.01,.5*(k-1)*k),
-                            delta_Omega = rep(1e-6,.5*(k-1)*k),
+test <- Probit_CAR_ALASSO_Cpp(Y,  Design, n_iter = 20000, 
+                            n_burn_in = 10000, thin_by = 5, 
+                            r_beta = 1+0*beta, delta_beta = 1 + 0 * beta,
+                            r_Omega = rep(1,.5*(k-1)*k),
+                            delta_Omega = rep(1,.5*(k-1)*k),
+                            lambda_diag = rep(1,k),
                             progress = T)
 
 Graph <- 0 * Omega
@@ -70,10 +71,10 @@ Graph <- Graph+t(Graph)
 diag(Graph) <- 0.5 * diag(Graph)
 
 test1 <- Probit_CAR_LASSO_Cpp(Y,  Design, n_iter = 50000, 
-                            n_burn_in = 20000, thin_by = 10, 
+                            n_burn_in = 15000, thin_by = 10, 
                             r_beta = 1, delta_beta = .01,
-                            r_Omega = 10,
-                            delta_Omega = 10,
+                            r_Omega = 1,
+                            delta_Omega = .01,
                             progress = T)
 
 #test1 <- Probit_SRG_LASSO_Cpp(Y,  Design, n_iter = 20000, 

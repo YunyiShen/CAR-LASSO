@@ -5,8 +5,8 @@ library(RcppProgress)
 
 rm(list = ls())
 
-k = 30
-n = 100
+k = 10
+n = 200
 p = 2
 
 sourceCpp("./src/Multinomial-CAR-ALASSO.cpp")
@@ -47,6 +47,7 @@ test <- Multinomial_CAR_ALASSO_Cpp(Y,  Design, n_iter = 15000,
                             r_beta = 1+0*beta, delta_beta = .01 + 0 * beta,
                             r_Omega = rep(1,.5*(k-1)*k),
                             delta_Omega = rep(.01,.5*(k-1)*k),
+                            lambda_diag = rep(0,k),
                             ns = 100,m = 10, emax = 64,
                             progress = T)
 

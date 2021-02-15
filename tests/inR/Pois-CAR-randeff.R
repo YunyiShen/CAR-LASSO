@@ -6,7 +6,7 @@ library(RcppProgress)
 rm(list = ls())
 
 k <- 5
-n <- 500
+n <- 300
 p <- 8
 pr <- 10
 m <- 1
@@ -27,7 +27,7 @@ design_r <- lapply(1:n,
 design_r <- Reduce(rbind,design_r)
 
 beta <- matrix(rnorm(p*k,0,.1),p,k)
-mu <- rnorm(k,2,1)
+mu <- rnorm(k,0,1)
 xi <- matrix(rgamma(k*m,10,1),m,k)
 
 Graph_raw <- g_model1(k)

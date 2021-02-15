@@ -32,6 +32,7 @@ test <- Multinomial_CAR_ALASSO_Cpp(comp_mat,  Design_dummy, n_iter = 50000,
                                    r_beta = matrix(1e-2,p,k), delta_beta = matrix(1e-6,p,k),
                                    r_Omega = rep(1e-2,.5*(k-1)*k),
                                    delta_Omega = rep(1e-6,.5*(k-1)*k),
+                                   lambda_diag = rep(0,k),
                                    ns = 100,m = 10, emax = 64,
                                    progress = T)
 

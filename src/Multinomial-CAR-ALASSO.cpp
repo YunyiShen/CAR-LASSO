@@ -31,6 +31,7 @@ List Multinomial_CAR_ALASSO_Cpp(const arma::mat & data, // col composition data,
                    const arma::mat delta_beta,
                    const arma::vec r_Omega, // prior on lambda of Omega
                    const arma::vec delta_Omega,
+                   const arma::vec & lambda_diag,// penalty for diagonals 
                    const int ns, const int m, const double emax, // ars parameters
                    bool progress){
   int k = data.n_cols-1; // number of nodes
@@ -108,9 +109,10 @@ List Multinomial_CAR_ALASSO_Cpp(const arma::mat & data, // col composition data,
     
     // update Omega
     //Rcout<<Z_curr<<endl;
-    update_car_Omega_adp_helper(Omega_curr, Z_curr, design, 
+    update_car_Omega_adp_helper2(Omega_curr, Z_curr, design, 
                                      mu_curr, beta_curr,
                                      lambda_Omega,
+                                     lambda_diag,// penalty for diagonal
                                      k, p, n);
     
     
