@@ -8,7 +8,7 @@
 #' @param delta_beta Hyper-parameter for regression coefficient, rate parameter of Gamma, if adaptive, should have row number same as number pf predictors while column number of responses
 #' @param r_Omega Hyper-parameter for precision matrix, shape parameter of Gamma. If adaptive, can be a matrix with same size as precision matrix, if this is the case, only upper triangular part without diagonal will be used, or can be a vector whose size was the upper triangular part of precision matrix, if non-adaptive, a scalar.
 #' @param delta_Omega Hyper-parameter for precision matrix, rate parameter of Gamma, If adaptive, can be a matrix with same size as precision matrix, if this is the case, only upper triangular part without diagonal will be used, or can be a vector whose size was the upper triangular part of precision matrix, if non-adaptive, a scalar.
-#' 
+#' @param lambda_diag adaptive only hyper-parameter for panalties on diagonal entries of Omega, should have dimension k and non-negative
 #' @param n_iter Number of sampling iterations (i.e. after burn in) for the Gibbs sampler
 #' @param n_burn_in Number of burn in iterations for the Gibbs sampler
 #' @param thin_by Final sample was thin by this number
@@ -36,6 +36,7 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
                      delta_beta = ifelse(adaptive,1e-6,0.01),
                      r_Omega = ifelse(adaptive,0.01,1), 
                      delta_Omega = ifelse(adaptive,1e-6,0.01),
+                     lambda_diag = 0,
                      n_iter = 2000,
                      n_burn_in = 1000, thin_by = 10,
                      progress = T, verbos = T) {
@@ -154,6 +155,7 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
   else {
     if (is.null(r_Omega)) r_Omega <- 0.01
     if (is.null(delta_Omega)) delta_Omega <- 1e-6
+    if (is.null(lambda_diag)) lambda_diag <- 0
     if ((length(r_Omega) == 1 & length(delta_Omega) == 1)) {
       if (verbos) warning("Algorithm set to be adapive. 
         Assuming all hyper parameters are the same for Omega \n\n")
@@ -166,6 +168,17 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
         errmsg <- "Dimension mismatch for hyper prior of Omega shrinkage \n\n"
         stop(errmsg)
       }
+    }
+    if ((length(lambda_diag) == 1 )) {
+      if (verbos) warning("Algorithm set to be adapive. 
+        Assuming prior on diagonals are all the same for Omega's diagonals \n\n")
+      lambda_diag <- rep(lambda_diag, k)
+    }
+    else {
+       if(length(lambda_diag) != k ){
+         errmsg <- "Dimension mismatch for hyper prior of Omega diagonal shrinkage \n\n"
+        stop(errmsg)
+       }
     }
   }
   ## end checking Omega hyper parameters
@@ -189,7 +202,8 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
         y, design,
         n_iter, n_burn_in,
         thin_by, r_beta, delta_beta,
-        r_Omega, delta_Omega, progress
+        r_Omega, delta_Omega, lambda_diag,
+        progress
       )
     }
     else {
@@ -210,7 +224,8 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
         y, design,
         n_iter, n_burn_in,
         thin_by, r_beta, delta_beta,
-        r_Omega, delta_Omega, progress
+        r_Omega, delta_Omega, lambda_diag,
+        progress
       )
     }
     else {
@@ -231,7 +246,8 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
         y, design,
         n_iter, n_burn_in,
         thin_by, r_beta, delta_beta,
-        r_Omega, delta_Omega, progress
+        r_Omega, delta_Omega, lambda_diag,
+        progress
       )
     }
     else {
@@ -253,7 +269,8 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
         y, design,
         n_iter, n_burn_in,
         thin_by, r_beta, delta_beta,
-        r_Omega, delta_Omega, progress
+        r_Omega, delta_Omega, lambda_diag,
+        progress
       )
     }
     else {
