@@ -5,14 +5,14 @@ library(RcppProgress)
 
 rm(list = ls())
 
-k = 10
+k = 8
 n = 200
-p = 2
+p = 5
 
 sourceCpp("./src/Multinomial-CAR-ALASSO.cpp")
 source("./tests/Formal/Accurancy/Graph_generator.R")
 
-set.seed(12345)
+set.seed(42)
 Graph_raw <- g_model1(k)
 Omega <- Graph_raw$Omega
 #image(Omega)
@@ -22,7 +22,7 @@ Sigma <- Graph_raw$Sigma
 Design <- matrix(rnorm(n*p,0,1),n,p)
 Design <- (Design-mean(Design))/sd(Design)
 
-beta <- matrix(rnorm(p*k,0,1),p,k)
+beta <- as.matrix( rsparsematrix(p,k,0.5))
 
 mu <- rnorm(k,0,1)
 
@@ -42,11 +42,11 @@ for( i in 1:n ){
 
 
 
-test <- Multinomial_CAR_ALASSO_Cpp(Y,  Design, n_iter = 15000, 
+test <- Multinomial_CAR_ALASSO_Cpp(Y,  Design, n_iter = 5000, 
                             n_burn_in = 1000, thin_by = 10, 
-                            r_beta = 1+0*beta, delta_beta = .01 + 0 * beta,
-                            r_Omega = rep(1,.5*(k-1)*k),
-                            delta_Omega = rep(.01,.5*(k-1)*k),
+                            r_beta = .01+0*beta, delta_beta = 1e-6 + 0 * beta,
+                            r_Omega = rep(.01,.5*(k-1)*k),
+                            delta_Omega = rep(1e-6,.5*(k-1)*k),
                             lambda_diag = rep(0,k),
                             ns = 100,m = 10, emax = 64,
                             progress = T)
