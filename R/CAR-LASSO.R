@@ -283,7 +283,29 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
     }
   }
 
-  cat("\ndone\n\n")
+
+  omega_post <- get_graph(res,k)
+  b_post <- matrix(colMeans(res$beta),p,k)
+  CAR_post <- get_CAR_MB(b_post,omega_post)
+  CAR_post$Partial_corr <- get_partial_correlation(omega_post)
+
+  point_est <- list(Omega = omega_post, beta = b_post, CAR = CAR_post)
+
   res <- lapply(res, coda::mcmc)
+
+  settings <- list(formula, link, adaptive,
+                     r_beta , delta_beta , r_Omega, 
+                     delta_Omega, lambda_diag, n_iter,
+                     n_burn_in, thin_by, progress, verbos)
+
+  nodes <- list(response = colnames(y), predictors = colnames(design))
+  res <- list(point_est = point_est, nodes = nodes,  
+              data = list(response = y, design = design),
+              settings = settings, MCMC_output = res)
+
+  class(res) <- "carlasso-out"
+
+  if(verbos) cat("\ndone\n\n")
+
   return(res)
 }
