@@ -76,6 +76,7 @@ List CAR_ALASSO_randeff_Cpp(const arma::mat &data,       // col composition data
                             const arma::vec delta_Omega,
                             const double alpha, // prior for random effect
                             const double beta,  // prior for random effect
+                            const arma::vec & lambda_diag,// penalty for diagonals 
                             bool progress)
 {                                       // whether to report progress
   int k = data.n_cols;                  // number of nodes

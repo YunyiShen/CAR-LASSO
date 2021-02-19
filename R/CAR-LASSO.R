@@ -8,26 +8,66 @@
 #' @param delta_beta Hyper-parameter for regression coefficient, rate parameter of Gamma, if adaptive, should have row number same as number pf predictors while column number of responses
 #' @param r_Omega Hyper-parameter for precision matrix, shape parameter of Gamma. If adaptive, can be a matrix with same size as precision matrix, if this is the case, only upper triangular part without diagonal will be used, or can be a vector whose size was the upper triangular part of precision matrix, if non-adaptive, a scalar.
 #' @param delta_Omega Hyper-parameter for precision matrix, rate parameter of Gamma, If adaptive, can be a matrix with same size as precision matrix, if this is the case, only upper triangular part without diagonal will be used, or can be a vector whose size was the upper triangular part of precision matrix, if non-adaptive, a scalar.
-#' 
+#' @param lambda_diag adaptive only hyper-parameter for panalties on diagonal entries of Omega, should have dimension k and non-negative
 #' @param n_iter Number of sampling iterations (i.e. after burn in) for the Gibbs sampler
 #' @param n_burn_in Number of burn in iterations for the Gibbs sampler
 #' @param thin_by Final sample was thin by this number
 #' @param prograss Bool, whether report progress from C++
 #' @param verbos Bool, whether show warnings and messages.
 #' 
-#' @return A list of MCMC samples. 
-#' \item{beta}{A coda::mcmc object, each row was an MCMC sample of the (column) vectorization of regression coefficient B}
-#' \item{mu}{A coda::mcmc object, each row was an MCMC sample of the mean vector}
-#' \item{Omega}{A coda::mcmc object, each row was an MCMC sample of the upper triangular part (with diagonal) of precision matrix Omega}
-#' \item{lambda}{\strong{Non-adaptive only}, A coda::mcmc object, first column was the shrinkage parameter lambda for regression coefficient and the second column was shrinkage parameter lambda for precision matrix}
-#' \item{lambda_beta}{\strong{Adaptive only}, A coda::mcmc object, each row was an MCMC sample of the (column) vectorization of shrinkage parameter for regression coefficient B}
-#' \item{lambda_Omega}{\strong{Adaptive only}, A coda::mcmc object, each row was an MCMC sample of the shrinage parameter for the upper triangular part (without diagonal) of precision matrix Omega}
+#' @return A `carlasso_out` object with elements: 
+#' \itemize{
+#'    \item{`$point_est`}{
+#'        \itemize{
+#'          \item{`$Omega`}{: Posterior mean of precision matrix}
+#'          \item{`$beta`}{: Posterior mean of regression coefficient}
+#'          \item{`$CAR`}{
+#'            \itemize{
+#'              \item{`$C`}{: The conditional regression coefficients among responses}
+#'              \item{`$B`}{: The conditional regression coefficients between response and predictors}
+#'              \item{`$M`}{: The conditional variance}
+#'            }
+#'          }
+#'        }
+#'    }
+#'    \item{`$nodes`}{
+#'        \itemize{
+#'            \item{`$responses`}{: node name of responses}
+#'            \item{`$predictors`}{: node name of predictors}
+#'        }
+#'    }
+#' 
+#'    \item{`$data`}{
+#'        \itemize{
+#'            \item{`$response`}{: response matrix}
+#'            \item{`$design`}{: design matrix}
+#'        }
+#'    }
+#' 
+#'    \item{`$settings`}{: all settings sent to the algorithm, exclude data}
+#'    \item{`$MCMC_output`}{
+#'        \itemize{
+#'            \item{`$beta`}{: A coda::mcmc object, each row was an MCMC sample of the (column) vectorization of regression coefficient B}
+#'            \item{`$mu`}{: A coda::mcmc object, each row was an MCMC sample of the mean vector}
+#'            \item{`$Omega`}{: A coda::mcmc object, each row was an MCMC sample of the upper triangular part (with diagonal) of precision matrix Omega}
+#'            \item{`$lambda`}{: \strong{Non-adaptive only}, A coda::mcmc object, first column was the shrinkage parameter lambda for regression coefficient and the second column was shrinkage parameter lambda for precision matrix}
+#'            \item{`$lambda_beta`}{: \strong{Adaptive only}, A coda::mcmc object, each row was an MCMC sample of the (column) vectorization of shrinkage parameter for regression coefficient B}
+#'            \item{`$lambda_Omega`}{: \strong{Adaptive only}, A coda::mcmc object, each row was an MCMC sample of the shrinage parameter for the upper triangular part (without diagonal) of precision matrix Omega}
+#'        }
+#'    }
+#' 
+#' 
+#' 
 #' 
 #' @examples
-#' 
-#' 
+#' dt <- data.frame(y1 = rnorm(100),y2 = rnorm(100),y3=rnorm(100),x1 = rnorm(100),x2 = rnorm(100),x3=rnorm(100))
+#' car_res <- CARlasso(y1+y2+y3~x1+x2+x3, data = dt)
+#' plot(car_res)
+#' @export
 
-
+### res <- list(point_est = point_est, nodes = nodes,  
+#              data = list(response = y, design = design),
+#              settings = settings, MCMC_output = res)
 
 CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
                      data, link = "identity",
@@ -36,6 +76,7 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
                      delta_beta = ifelse(adaptive,1e-6,0.01),
                      r_Omega = ifelse(adaptive,0.01,1), 
                      delta_Omega = ifelse(adaptive,1e-6,0.01),
+                     lambda_diag = 0,
                      n_iter = 2000,
                      n_burn_in = 1000, thin_by = 10,
                      progress = T, verbos = T) {
@@ -51,7 +92,7 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
 
   # omit NAs
   if (!all(!is.na(data)) & verbos) {
-    warning("NA in data will be omitted")
+    warning("NAs in data are omitted")
     data <- na.omit(data)
   }
 
@@ -74,7 +115,7 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
   }
 
   if (verbos) {
-    cat(warr_centering)
+    warning(warr_centering)
   }
 
   design <- apply(design, 2, function(w) {
@@ -92,14 +133,14 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
     "nrow delta_beta", "ncol delta_beta"
   )
   if (!all(c(c(r_beta), c(delta_beta)) > 0)) {
-    stop("Hyper parameters for B shrinkage must be positive\n\n")
+    stop("Hyperparameters for B shrinkage must be positive\n\n")
   }
   if (!adaptive) {
     if (is.null(r_beta)) r_beta <- 1
     if (is.null(delta_beta)) delta_beta <- 0.01
     if (verbos & (length(r_beta) > 1 | length(delta_beta) > 1)) {
-      warning("Algorithm set to be non-adapive, 
-        will take the first entry of hyper prior for B shrinkage\n\n")
+      cat("Algorithm set to be non-adapive, 
+        will take the first entry of hyperprior for B shrinkage\n\n")
     }
     r_beta <- r_beta[1]
     delta_beta <- delta_beta[1]
@@ -108,8 +149,8 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
     if (is.null(r_beta)) r_beta <- 0.01
     if (is.null(delta_beta)) delta_beta <- 1e-6
     if ((length(r_beta) == 1 & length(delta_beta) == 1)) {
-      if (verbos) warning("Algorithm set to be adapive. 
-        Assuming all hyper parameters are the same \n\n")
+      if (verbos) cat("Algorithm set to be adapive. 
+        Assuming all hyper parameters are the same for Omega \n\n")
       r_beta <- matrix(r_beta, p, k)
       delta_beta <- matrix(delta_beta, p, k)
     }
@@ -130,13 +171,13 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
 
   ## checking r_Omega, delta_Omega
   if (is.matrix(r_Omega)) {
-    if (verbos) warning("Supplied matrix for hyper parameter for r_Omega, 
+    if (verbos) cat("Supplied matrix for hyper parameter for r_Omega, 
       will only take upper triangular part\n\n")
     r_Omega <- c(r_Omega[upper.tri(r_Omega)])
   }
 
   if (is.matrix(delta_Omega)) {
-    if (verbos) warning("Supplied matrix for hyper parameter for delta_Omega, 
+    if (verbos) cat("Supplied matrix for hyper parameter for delta_Omega, 
       will only take upper triangular part\n\n")
     delta_Omega <- c(delta_Omega[upper.tri(delta_Omega)])
   }
@@ -145,7 +186,7 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
     if (is.null(r_Omega)) r_Omega <- 1
     if (is.null(delta_Omega)) delta_Omega <- 0.01
     if (verbos & (length(r_Omega) > 1 | length(delta_Omega) > 1)) {
-      warning("Algorithm set to be non-adapive, 
+      cat("Algorithm set to be non-adapive, 
         will take the first entry of hyper prior for Omega shrinkage\n\n")
     }
     r_Omega <- r_Omega[1]
@@ -154,9 +195,10 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
   else {
     if (is.null(r_Omega)) r_Omega <- 0.01
     if (is.null(delta_Omega)) delta_Omega <- 1e-6
+    if (is.null(lambda_diag)) lambda_diag <- 0
     if ((length(r_Omega) == 1 & length(delta_Omega) == 1)) {
-      if (verbos) warning("Algorithm set to be adapive. 
-        Assuming all hyper parameters are the same \n\n")
+      if (verbos) cat("Algorithm set to be adapive. 
+        Assuming all hyper parameters are the same for Omega \n\n")
       r_Omega <- rep(r_Omega, .5 * (k - 1) * k)
       delta_Omega <- rep(delta_Omega, .5 * (k - 1) * k)
     }
@@ -166,6 +208,17 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
         errmsg <- "Dimension mismatch for hyper prior of Omega shrinkage \n\n"
         stop(errmsg)
       }
+    }
+    if ((length(lambda_diag) == 1 )) {
+      if (verbos) cat("Algorithm set to be adapive. 
+        Assuming prior on diagonals are all the same for Omega's diagonals \n\n")
+      lambda_diag <- rep(lambda_diag, k)
+    }
+    else {
+       if(length(lambda_diag) != k ){
+         errmsg <- "Dimension mismatch for hyper prior of Omega diagonal shrinkage \n\n"
+        stop(errmsg)
+       }
     }
   }
   ## end checking Omega hyper parameters
@@ -189,7 +242,8 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
         y, design,
         n_iter, n_burn_in,
         thin_by, r_beta, delta_beta,
-        r_Omega, delta_Omega, progress
+        r_Omega, delta_Omega, lambda_diag,
+        progress
       )
     }
     else {
@@ -210,7 +264,8 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
         y, design,
         n_iter, n_burn_in,
         thin_by, r_beta, delta_beta,
-        r_Omega, delta_Omega, progress
+        r_Omega, delta_Omega, lambda_diag,
+        progress
       )
     }
     else {
@@ -231,7 +286,8 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
         y, design,
         n_iter, n_burn_in,
         thin_by, r_beta, delta_beta,
-        r_Omega, delta_Omega, progress
+        r_Omega, delta_Omega, lambda_diag,
+        progress
       )
     }
     else {
@@ -245,7 +301,7 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
   }
 
   if (link == "logit") {
-    if (verbos) warning("Last response will be used as reference group\n\n")
+    if (verbos) cat("Last response will be used as reference group\n\n")
     if (verbos) cat("Algorithm start...\n\n")
     if (verbos & progress) cat("progress:\n\n")
     if (adaptive) {
@@ -253,7 +309,8 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
         y, design,
         n_iter, n_burn_in,
         thin_by, r_beta, delta_beta,
-        r_Omega, delta_Omega, progress
+        r_Omega, delta_Omega, lambda_diag,
+        progress
       )
     }
     else {
@@ -266,7 +323,28 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
     }
   }
 
-  cat("\ndone\n\n")
+
+  omega_post <- get_graph(res,k)
+  b_post <- matrix(colMeans(res$beta),p,k)
+  CAR_post <- get_CAR_MB(b_post,omega_post)
+
+  point_est <- list(Omega = omega_post, beta = b_post, CAR = CAR_post)
+
   res <- lapply(res, coda::mcmc)
+
+  settings <- list(formula, link, adaptive,
+                     r_beta , delta_beta , r_Omega, 
+                     delta_Omega, lambda_diag, n_iter,
+                     n_burn_in, thin_by, progress, verbos)
+
+  nodes <- list(response = colnames(y), predictors = colnames(design))
+  res <- list(point_est = point_est, nodes = nodes,  
+              data = list(response = y, design = design),
+              settings = settings, MCMC_output = res)
+
+  class(res) <- "carlasso_out"
+
+  if(verbos) cat("\ndone\n\n")
+
   return(res)
 }
