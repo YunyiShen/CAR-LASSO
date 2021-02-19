@@ -19,44 +19,43 @@
 #' \itemize{
 #'    \item{`$point_est`}{
 #'        \itemize{
-#'          \item{`$Omega`}{Posterior mean of precision matrix}
-#'          \item{`$beta`}{Posterior mean of regression coefficient}
+#'          \item{`$Omega`}{: Posterior mean of precision matrix}
+#'          \item{`$beta`}{: Posterior mean of regression coefficient}
 #'          \item{`$CAR`}{
 #'            \itemize{
-#'              \item{`$C`}{The conditional regression coefficients among responses}
-#'              \item{`$B`}{The conditional regression coefficients between response and predictors}
-#'              \item{`$M`}{The conditional variance}
+#'              \item{`$C`}{: The conditional regression coefficients among responses}
+#'              \item{`$B`}{: The conditional regression coefficients between response and predictors}
+#'              \item{`$M`}{: The conditional variance}
 #'            }
 #'          }
 #'        }
 #'    }
 #'    \item{`$nodes`}{
 #'        \itemize{
-#'            \item{`$responses`}{node name of responses}
-#'            \item{`$predictors`}{node name of predictors}
+#'            \item{`$responses`}{: node name of responses}
+#'            \item{`$predictors`}{: node name of predictors}
 #'        }
 #'    }
 #' 
 #'    \item{`$data`}{
 #'        \itemize{
-#'            \item{`$response`}{response matrix}
-#'            \item{`$design`}{design matrix}
+#'            \item{`$response`}{: response matrix}
+#'            \item{`$design`}{: design matrix}
 #'        }
 #'    }
 #' 
-#'    \item{`$settings`}{all settings sent to the algorithm, exclude data}
+#'    \item{`$settings`}{: all settings sent to the algorithm, exclude data}
 #'    \item{`$MCMC_output`}{
 #'        \itemize{
-#'            \item{`$beta`}{A coda::mcmc object, each row was an MCMC sample of the (column) vectorization of regression coefficient B}
-#'            \item{`$mu`}{A coda::mcmc object, each row was an MCMC sample of the mean vector}
-#'            \item{`$Omega`}{A coda::mcmc object, each row was an MCMC sample of the upper triangular part (with diagonal) of precision matrix Omega}
-#'            \item{`$lambda`}{\strong{Non-adaptive only}, A coda::mcmc object, first column was the shrinkage parameter lambda for regression coefficient and the second column was shrinkage parameter lambda for precision matrix}
-#'            \item{`$lambda_beta`}{\strong{Adaptive only}, A coda::mcmc object, each row was an MCMC sample of the (column) vectorization of shrinkage parameter for regression coefficient B}
-#'            \item{`$lambda_Omega`}{\strong{Adaptive only}, A coda::mcmc object, each row was an MCMC sample of the shrinage parameter for the upper triangular part (without diagonal) of precision matrix Omega}
-#' 
+#'            \item{`$beta`}{: A coda::mcmc object, each row was an MCMC sample of the (column) vectorization of regression coefficient B}
+#'            \item{`$mu`}{: A coda::mcmc object, each row was an MCMC sample of the mean vector}
+#'            \item{`$Omega`}{: A coda::mcmc object, each row was an MCMC sample of the upper triangular part (with diagonal) of precision matrix Omega}
+#'            \item{`$lambda`}{: \strong{Non-adaptive only}, A coda::mcmc object, first column was the shrinkage parameter lambda for regression coefficient and the second column was shrinkage parameter lambda for precision matrix}
+#'            \item{`$lambda_beta`}{: \strong{Adaptive only}, A coda::mcmc object, each row was an MCMC sample of the (column) vectorization of shrinkage parameter for regression coefficient B}
+#'            \item{`$lambda_Omega`}{: \strong{Adaptive only}, A coda::mcmc object, each row was an MCMC sample of the shrinage parameter for the upper triangular part (without diagonal) of precision matrix Omega}
 #'        }
 #'    }
-#' }
+#' 
 #' 
 #' 
 #' 
