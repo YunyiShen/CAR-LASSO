@@ -64,7 +64,7 @@ plot.carlasso_out <- function(obj, tol = 0.01) {
     E(full_graph)$abs_weight <- abs(E(full_graph)$weight)
 
 
-    V(full_graph)$name <- c(obj$nodes$responses, obj$nodes$predictors)
+    V(full_graph)$name <- c(obj$nodes$response, obj$nodes$predictors)
 
     V(full_graph)$alpha_centrality <- alpha_centrality(full_graph)
     V(full_graph)$type <- type[c(rep(2, n_resp), rep(1, n_pred))]
