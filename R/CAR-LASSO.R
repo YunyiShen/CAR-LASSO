@@ -15,19 +15,58 @@
 #' @param prograss Bool, whether report progress from C++
 #' @param verbos Bool, whether show warnings and messages.
 #' 
-#' @return A list of MCMC samples. 
-#' \item{beta}{A coda::mcmc object, each row was an MCMC sample of the (column) vectorization of regression coefficient B}
-#' \item{mu}{A coda::mcmc object, each row was an MCMC sample of the mean vector}
-#' \item{Omega}{A coda::mcmc object, each row was an MCMC sample of the upper triangular part (with diagonal) of precision matrix Omega}
-#' \item{lambda}{\strong{Non-adaptive only}, A coda::mcmc object, first column was the shrinkage parameter lambda for regression coefficient and the second column was shrinkage parameter lambda for precision matrix}
-#' \item{lambda_beta}{\strong{Adaptive only}, A coda::mcmc object, each row was an MCMC sample of the (column) vectorization of shrinkage parameter for regression coefficient B}
-#' \item{lambda_Omega}{\strong{Adaptive only}, A coda::mcmc object, each row was an MCMC sample of the shrinage parameter for the upper triangular part (without diagonal) of precision matrix Omega}
+#' @return A `carlasso_out` object with elements: 
+#' \itemize{
+#'    \item{`$point_est`}{
+#'        \itemize{
+#'          \item{`$Omega`}{Posterior mean of precision matrix}
+#'          \item{`$beta`}{Posterior mean of regression coefficient}
+#'          \item{`$CAR`}{
+#'            \itemize{
+#'              \item{`$C`}{The conditional regression coefficients among responses}
+#'              \item{`$B`}{The conditional regression coefficients between response and predictors}
+#'              \item{`$M`}{The conditional variance}
+#'            }
+#'          }
+#'        }
+#'    }
+#'    \item{`$nodes`}{
+#'        \itemize{
+#'            \item{`$responses`}{node name of responses}
+#'            \item{`$predictors`}{node name of predictors}
+#'        }
+#'    }
+#' 
+#'    \item{`$data`}{
+#'        \itemize{
+#'            \item{`$response`}{response matrix}
+#'            \item{`$design`}{design matrix}
+#'        }
+#'    }
+#' 
+#'    \item{`$settings`}{all settings sent to the algorithm, exclude data}
+#'    \item{`$MCMC_output`}{
+#'        \itemize{
+#'            \item{`$beta`}{A coda::mcmc object, each row was an MCMC sample of the (column) vectorization of regression coefficient B}
+#'            \item{`$mu`}{A coda::mcmc object, each row was an MCMC sample of the mean vector}
+#'            \item{`$Omega`}{A coda::mcmc object, each row was an MCMC sample of the upper triangular part (with diagonal) of precision matrix Omega}
+#'            \item{`$lambda`}{\strong{Non-adaptive only}, A coda::mcmc object, first column was the shrinkage parameter lambda for regression coefficient and the second column was shrinkage parameter lambda for precision matrix}
+#'            \item{`$lambda_beta`}{\strong{Adaptive only}, A coda::mcmc object, each row was an MCMC sample of the (column) vectorization of shrinkage parameter for regression coefficient B}
+#'            \item{`$lambda_Omega`}{\strong{Adaptive only}, A coda::mcmc object, each row was an MCMC sample of the shrinage parameter for the upper triangular part (without diagonal) of precision matrix Omega}
+#' 
+#'        }
+#'    }
+#' }
+#' 
+#' 
 #' 
 #' @examples
 #' 
 #' 
 
-
+### res <- list(point_est = point_est, nodes = nodes,  
+#              data = list(response = y, design = design),
+#              settings = settings, MCMC_output = res)
 
 CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
                      data, link = "identity",
@@ -287,7 +326,6 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
   omega_post <- get_graph(res,k)
   b_post <- matrix(colMeans(res$beta),p,k)
   CAR_post <- get_CAR_MB(b_post,omega_post)
-  CAR_post$Partial_corr <- get_partial_correlation(omega_post)
 
   point_est <- list(Omega = omega_post, beta = b_post, CAR = CAR_post)
 
@@ -303,7 +341,7 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
               data = list(response = y, design = design),
               settings = settings, MCMC_output = res)
 
-  class(res) <- "carlasso-out"
+  class(res) <- "carlasso_out"
 
   if(verbos) cat("\ndone\n\n")
 

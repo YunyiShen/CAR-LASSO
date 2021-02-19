@@ -8,7 +8,6 @@
 # V: k*k pdf location para for prior on Sigma
 
 CAR_multireg <- function(data,design,n_sample, Bbar=NULL, A = NULL, nu=3, V=NULL){
-    n <- nrow(data)
     k <- ncol(data)
     p <- ncol(design)
     if(is.null(Bbar)) Bbar <- matrix(0,p+1,k)
