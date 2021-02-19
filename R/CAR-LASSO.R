@@ -61,7 +61,7 @@
 #' 
 #' @examples
 #' 
-#' 
+#' @export
 
 ### res <- list(point_est = point_est, nodes = nodes,  
 #              data = list(response = y, design = design),
