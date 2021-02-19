@@ -100,3 +100,34 @@ plot.carlasso_out <- function(obj, tol = 0.01) {
         )
     p
 }
+
+
+
+g_model1 <- function(k, rho=.7){
+    temp <- matrix(rep(1:k,k),ncol = k)
+    Sigma <- rho ^ (abs(temp-t(temp)))
+    Omega <- solve(Sigma)
+    Omega <- Omega * (abs(Omega)>1e-15)
+    return(list(Sigma = Sigma, Omega = Omega))
+}
+
+
+#' Simulate a simple AR1 model 
+#'
+#' @param n sample size
+#' @param k number of responses
+#' @return rho partial correlation in AR1
+#' @export
+
+
+simu_AR1 <- function(n=100, k=5, rho = .7){
+  graph <- g_model1(k,rho)
+  X <- matrix(rnorm(k*n),nrow = n)
+  Y <- matrix(0,n,k)
+  for(i in 1:n){
+    Y[i,] <- MASS::mvrnorm(1,graph$Sigma %*% X[i,],graph$Sigma)
+  }
+  res <- as.data.frame(cbind(Y,X))
+  colnames(res) <- c(paste0("y",1:k),paste0("x",1:k))
+  return(res)
+}

@@ -25,3 +25,6 @@ get_partial_correlation <- function(Omega) {
   D <- diag(sqrt(diag(Sigma)))
   D %*% Omega %*% D
 }
+
+
+
