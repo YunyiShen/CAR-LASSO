@@ -90,7 +90,7 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
 
   # omit NAs
   if (!all(!is.na(data)) & verbos) {
-    warning("NA in data will be omitted")
+    warning("NAs in data are omitted")
     data <- na.omit(data)
   }
 
@@ -131,13 +131,13 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
     "nrow delta_beta", "ncol delta_beta"
   )
   if (!all(c(c(r_beta), c(delta_beta)) > 0)) {
-    stop("Hyper parameters for B shrinkage must be positive\n\n")
+    stop("Hyperparameters for B shrinkage must be positive\n\n")
   }
   if (!adaptive) {
     if (is.null(r_beta)) r_beta <- 1
     if (is.null(delta_beta)) delta_beta <- 0.01
     if (verbos & (length(r_beta) > 1 | length(delta_beta) > 1)) {
-      warning("Algorithm set to be non-adapive, 
+      cat("Algorithm set to be non-adapive, 
         will take the first entry of hyperprior for B shrinkage\n\n")
     }
     r_beta <- r_beta[1]
@@ -147,7 +147,7 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
     if (is.null(r_beta)) r_beta <- 0.01
     if (is.null(delta_beta)) delta_beta <- 1e-6
     if ((length(r_beta) == 1 & length(delta_beta) == 1)) {
-      if (verbos) warning("Algorithm set to be adapive. 
+      if (verbos) cat("Algorithm set to be adapive. 
         Assuming all hyper parameters are the same for Omega \n\n")
       r_beta <- matrix(r_beta, p, k)
       delta_beta <- matrix(delta_beta, p, k)
@@ -169,13 +169,13 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
 
   ## checking r_Omega, delta_Omega
   if (is.matrix(r_Omega)) {
-    if (verbos) warning("Supplied matrix for hyper parameter for r_Omega, 
+    if (verbos) cat("Supplied matrix for hyper parameter for r_Omega, 
       will only take upper triangular part\n\n")
     r_Omega <- c(r_Omega[upper.tri(r_Omega)])
   }
 
   if (is.matrix(delta_Omega)) {
-    if (verbos) warning("Supplied matrix for hyper parameter for delta_Omega, 
+    if (verbos) cat("Supplied matrix for hyper parameter for delta_Omega, 
       will only take upper triangular part\n\n")
     delta_Omega <- c(delta_Omega[upper.tri(delta_Omega)])
   }
@@ -184,7 +184,7 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
     if (is.null(r_Omega)) r_Omega <- 1
     if (is.null(delta_Omega)) delta_Omega <- 0.01
     if (verbos & (length(r_Omega) > 1 | length(delta_Omega) > 1)) {
-      warning("Algorithm set to be non-adapive, 
+      cat("Algorithm set to be non-adapive, 
         will take the first entry of hyper prior for Omega shrinkage\n\n")
     }
     r_Omega <- r_Omega[1]
@@ -195,7 +195,7 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
     if (is.null(delta_Omega)) delta_Omega <- 1e-6
     if (is.null(lambda_diag)) lambda_diag <- 0
     if ((length(r_Omega) == 1 & length(delta_Omega) == 1)) {
-      if (verbos) warning("Algorithm set to be adapive. 
+      if (verbos) cat("Algorithm set to be adapive. 
         Assuming all hyper parameters are the same for Omega \n\n")
       r_Omega <- rep(r_Omega, .5 * (k - 1) * k)
       delta_Omega <- rep(delta_Omega, .5 * (k - 1) * k)
@@ -208,7 +208,7 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
       }
     }
     if ((length(lambda_diag) == 1 )) {
-      if (verbos) warning("Algorithm set to be adapive. 
+      if (verbos) cat("Algorithm set to be adapive. 
         Assuming prior on diagonals are all the same for Omega's diagonals \n\n")
       lambda_diag <- rep(lambda_diag, k)
     }
@@ -299,7 +299,7 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
   }
 
   if (link == "logit") {
-    if (verbos) warning("Last response will be used as reference group\n\n")
+    if (verbos) cat("Last response will be used as reference group\n\n")
     if (verbos) cat("Algorithm start...\n\n")
     if (verbos & progress) cat("progress:\n\n")
     if (adaptive) {
