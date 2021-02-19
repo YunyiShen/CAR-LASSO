@@ -1,4 +1,6 @@
 #' Gibbs sampler for Conditional Auto Regressive LASSO and extensions
+#' 
+#' @description Main sampling algorithm of CAR-LASSO model
 #'
 #' @param formula A double sided formula with response at left hand side and predictors at right hand side
 #' @param data A data.frame with all response and predictors, row as observations
@@ -55,7 +57,7 @@
 #'            \item{`$lambda_Omega`}{: \strong{Adaptive only}, A coda::mcmc object, each row was an MCMC sample of the shrinage parameter for the upper triangular part (without diagonal) of precision matrix Omega}
 #'        }
 #'    }
-#' 
+#' }
 #' 
 #' 
 #' 
@@ -63,11 +65,9 @@
 #' dt <- data.frame(y1 = rnorm(100),y2 = rnorm(100),y3=rnorm(100),x1 = rnorm(100),x2 = rnorm(100),x3=rnorm(100))
 #' car_res <- CARlasso(y1+y2+y3~x1+x2+x3, data = dt)
 #' plot(car_res)
-#' @export
+#' 
+#' 
 
-### res <- list(point_est = point_est, nodes = nodes,  
-#              data = list(response = y, design = design),
-#              settings = settings, MCMC_output = res)
 
 CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
                      data, link = "identity",
@@ -115,7 +115,7 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
   }
 
   if (verbos) {
-    warning(warr_centering)
+    cat(warr_centering)
   }
 
   design <- apply(design, 2, function(w) {
