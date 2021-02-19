@@ -69,6 +69,7 @@
 #' 
 #' 
 
+
 CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
                      data, link = "identity",
                      adaptive = F,
@@ -133,14 +134,14 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
     "nrow delta_beta", "ncol delta_beta"
   )
   if (!all(c(c(r_beta), c(delta_beta)) > 0)) {
-    stop("Hyperparameters for B shrinkage must be positive\n\n")
+    stop("Hyperparameters for beta shrinkage must be positive\n\n")
   }
   if (!adaptive) {
     if (is.null(r_beta)) r_beta <- 1
     if (is.null(delta_beta)) delta_beta <- 0.01
     if (verbos & (length(r_beta) > 1 | length(delta_beta) > 1)) {
       cat("Algorithm set to be non-adapive, 
-        will take the first entry of hyperprior for B shrinkage\n\n")
+        will take the first entry of hyperprior for beta shrinkage\n\n")
     }
     r_beta <- r_beta[1]
     delta_beta <- delta_beta[1]
@@ -150,7 +151,7 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
     if (is.null(delta_beta)) delta_beta <- 1e-6
     if ((length(r_beta) == 1 & length(delta_beta) == 1)) {
       if (verbos) cat("Algorithm set to be adapive. 
-        Assuming all hyper parameters are the same for Omega \n\n")
+        Assuming all hyper parameters are the same for beta \n\n")
       r_beta <- matrix(r_beta, p, k)
       delta_beta <- matrix(delta_beta, p, k)
     }
@@ -160,7 +161,7 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
       mismatch <- dimname1[dims != prop_dim]
       if (length(mismatch) > 0) {
         errmsg <- paste(
-          "Dimension mismatch for hyper prior of B shrinkage: ",
+          "Dimension mismatch for hyper prior of beta shrinkage: ",
           paste(mismatch, collapse = " "), "\n\n"
         )
         stop(errmsg)
