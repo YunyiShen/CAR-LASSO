@@ -62,8 +62,8 @@
 #' 
 #' 
 #' @examples
-#' dt <- data.frame(y1 = rnorm(100),y2 = rnorm(100),y3=rnorm(100),x1 = rnorm(100),x2 = rnorm(100),x3=rnorm(100))
-#' car_res <- CARlasso(y1+y2+y3~x1+x2+x3, data = dt)
+#' dt <- simu_AR1()
+#' car_res <- CARlasso(y1+y2+y3+y4+y5~x1+x2+x3+x4+x5, data = dt)
 #' plot(car_res)
 #' 
 #' 
