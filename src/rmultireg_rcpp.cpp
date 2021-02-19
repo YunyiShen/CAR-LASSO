@@ -11,7 +11,7 @@ using namespace arma;
 using namespace Rcpp;
 
 
-List rwishart(double nu, mat const& V){
+List rwishart(double nu, arma::mat const& V){
 
 // Wayne Taylor 4/7/2015
 
@@ -25,7 +25,7 @@ List rwishart(double nu, mat const& V){
   
   // T has sqrt chisqs on diagonal and normals below diagonal
   int m = V.n_rows;
-  mat T = zeros(m,m);
+  arma::mat T = zeros(m,m);
   
   for(int i = 0; i < m; i++) {
     T(i,i) = sqrt(rchisq(1,nu-i)[0]); //rchisq returns a vectorized object, so using [0] allows for the conversion to double
@@ -36,8 +36,8 @@ List rwishart(double nu, mat const& V){
       T(i,j) = rnorm(1)[0]; //rnorm returns a NumericVector, so using [0] allows for conversion to double
   }}
   
-  mat C = trans(T)*chol(V);
-  mat CI = solve(trimatu(C),eye(m,m)); //trimatu interprets the matrix as upper triangular and makes solve more efficient
+  arma::mat C = trans(T)*chol(V);
+  arma::mat CI = solve(trimatu(C),eye(m,m)); //trimatu interprets the matrix as upper triangular and makes solve more efficient
   
   // C is the upper triangular root of Wishart therefore, W=C'C
   // this is the LU decomposition Inv(W) = CICI' Note: this is
@@ -55,7 +55,7 @@ List rwishart(double nu, mat const& V){
 
 
 // [[Rcpp::export]]
-List rmultireg(mat const& Y, mat const& X, mat const& Bbar, mat const& A, double nu, mat const& V) {
+List rmultireg(arma::mat const& Y, arma::mat const& X, arma::mat const& Bbar, arma::mat const& A, double nu, arma::mat const& V) {
 
 // Keunwoo Kim 09/09/2014
 
@@ -85,21 +85,21 @@ List rmultireg(mat const& Y, mat const& X, mat const& Bbar, mat const& A, double
   int k = X.n_cols;
   
   //first draw Sigma
-  mat RA = chol(A);
-  mat W = join_cols(X, RA); //analogous to rbind() in R
-  mat Z = join_cols(Y, RA*Bbar);
+  arma::mat RA = chol(A);
+  arma::mat W = join_cols(X, RA); //analogous to rbind() in R
+  arma::mat Z = join_cols(Y, RA*Bbar);
   // note:  Y,X,A,Bbar must be matrices!
-  mat IR = solve(trimatu(chol(trans(W)*W)), eye(k,k)); //trimatu interprets the matrix as upper triangular and makes solve more efficient
+  arma::mat IR = solve(trimatu(chol(trans(W)*W)), eye(k,k)); //trimatu interprets the matrix as upper triangular and makes solve more efficient
   // W'W = R'R  &  (W'W)^-1 = IRIR'  -- this is the UL decomp!
-  mat Btilde = (IR*trans(IR)) * (trans(W)*Z);
+  arma::mat Btilde = (IR*trans(IR)) * (trans(W)*Z);
   // IRIR'(W'Z) = (X'X+A)^-1(X'Y + ABbar)
-  mat E = Z-W*Btilde;
-  mat S = trans(E)*E;
+  arma::mat E = Z-W*Btilde;
+  arma::mat S = trans(E)*E;
   // E'E
   
   // compute the inverse of V+S
-  mat ucholinv = solve(trimatu(chol(V+S)), eye(m,m));
-  mat VSinv = ucholinv*trans(ucholinv);
+  arma::mat ucholinv = solve(trimatu(chol(V+S)), eye(m,m));
+  arma::mat VSinv = ucholinv*trans(ucholinv);
   
   List rwout = rwishart(nu+n, VSinv);
   
@@ -113,10 +113,10 @@ List rmultireg(mat const& Y, mat const& X, mat const& Bbar, mat const& A, double
   //	since vec(ABC) = (C' (x) A)vec(B), we have 
   //		B = Btilde + IR Z_mk CI'
 
-  mat CI = rwout["CI"]; //there is no need to use as<mat>(rwout["CI"]) since CI is being initiated as a mat in the same line
-  mat draw = mat(rnorm(k*m));
+  arma::mat CI = rwout["CI"]; //there is no need to use as<arma::mat>(rwout["CI"]) since CI is being initiated as a arma::mat in the same line
+  arma::mat draw = arma::mat(rnorm(k*m));
   draw.reshape(k,m);
-  mat B = Btilde + IR*draw*trans(CI);
+  arma::mat B = Btilde + IR*draw*trans(CI);
     
   return List::create(
       Named("B") = B, 
