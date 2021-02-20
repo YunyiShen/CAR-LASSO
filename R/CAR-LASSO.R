@@ -6,8 +6,8 @@
 #' @param data A data.frame with all response and predictors, row as observations
 #' @param link String name of link function? Currently can be "identity" for normal response, "probit" for binary, "log" for counting, "logit" for compositional. Note that when use "logit", the last response will be used as reference. 
 #' @param adaptive Bool, whether run the adaptive version of the model
-#' @param r_beta Hyper-parameter for regression coefficient, shape parameter of Gamma, if adaptive, should have row number same as number pf predictors while column number of responses
-#' @param delta_beta Hyper-parameter for regression coefficient, rate parameter of Gamma, if adaptive, should have row number same as number pf predictors while column number of responses
+#' @param r_beta Hyper-parameter for regression coefficient, shape parameter of Gamma, if adaptive, should have row number same as number of predictors while column number of responses
+#' @param delta_beta Hyper-parameter for regression coefficient, rate parameter of Gamma, if adaptive, should have row number same as number of predictors while column number of responses
 #' @param r_Omega Hyper-parameter for precision matrix, shape parameter of Gamma. If adaptive, can be a matrix with same size as precision matrix, if this is the case, only upper triangular part without diagonal will be used, or can be a vector whose size was the upper triangular part of precision matrix, if non-adaptive, a scalar.
 #' @param delta_Omega Hyper-parameter for precision matrix, rate parameter of Gamma, If adaptive, can be a matrix with same size as precision matrix, if this is the case, only upper triangular part without diagonal will be used, or can be a vector whose size was the upper triangular part of precision matrix, if non-adaptive, a scalar.
 #' @param lambda_diag adaptive only hyper-parameter for panalties on diagonal entries of Omega, should have dimension k and non-negative
@@ -140,8 +140,7 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
     if (is.null(r_beta)) r_beta <- 1
     if (is.null(delta_beta)) delta_beta <- 0.01
     if (verbos & (length(r_beta) > 1 | length(delta_beta) > 1)) {
-      cat("Algorithm set to be non-adapive, 
-        will take the first entry of hyperprior for beta shrinkage\n\n")
+      cat("Algorithm set to be non-adapive, will take the first entry of hyperprior for beta shrinkage\n\n")
     }
     r_beta <- r_beta[1]
     delta_beta <- delta_beta[1]
@@ -150,8 +149,7 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
     if (is.null(r_beta)) r_beta <- 0.01
     if (is.null(delta_beta)) delta_beta <- 1e-6
     if ((length(r_beta) == 1 & length(delta_beta) == 1)) {
-      if (verbos) cat("Algorithm set to be adapive. 
-        Assuming all hyper parameters are the same for beta \n\n")
+      if (verbos) cat("Algorithm set to be adapive. Assuming all hyper parameters are the same for beta \n\n")
       r_beta <- matrix(r_beta, p, k)
       delta_beta <- matrix(delta_beta, p, k)
     }
@@ -172,14 +170,12 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
 
   ## checking r_Omega, delta_Omega
   if (is.matrix(r_Omega)) {
-    if (verbos) cat("Supplied matrix for hyper parameter for r_Omega, 
-      will only take upper triangular part\n\n")
+    if (verbos) cat("Supplied matrix for hyper parameter for r_Omega, will only take upper triangular part\n\n")
     r_Omega <- c(r_Omega[upper.tri(r_Omega)])
   }
 
   if (is.matrix(delta_Omega)) {
-    if (verbos) cat("Supplied matrix for hyper parameter for delta_Omega, 
-      will only take upper triangular part\n\n")
+    if (verbos) cat("Supplied matrix for hyper parameter for delta_Omega, will only take upper triangular part\n\n")
     delta_Omega <- c(delta_Omega[upper.tri(delta_Omega)])
   }
 
@@ -187,8 +183,7 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
     if (is.null(r_Omega)) r_Omega <- 1
     if (is.null(delta_Omega)) delta_Omega <- 0.01
     if (verbos & (length(r_Omega) > 1 | length(delta_Omega) > 1)) {
-      cat("Algorithm set to be non-adapive, 
-        will take the first entry of hyper prior for Omega shrinkage\n\n")
+      cat("Algorithm set to be non-adapive, will take the first entry of hyper prior for Omega shrinkage\n\n")
     }
     r_Omega <- r_Omega[1]
     delta_Omega <- delta_Omega[1]
@@ -198,8 +193,7 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
     if (is.null(delta_Omega)) delta_Omega <- 1e-6
     if (is.null(lambda_diag)) lambda_diag <- 0
     if ((length(r_Omega) == 1 & length(delta_Omega) == 1)) {
-      if (verbos) cat("Algorithm set to be adapive. 
-        Assuming all hyper parameters are the same for Omega \n\n")
+      if (verbos) cat("Algorithm set to be adapive. Assuming all hyper parameters are the same for Omega's off diagonal entries \n\n")
       r_Omega <- rep(r_Omega, .5 * (k - 1) * k)
       delta_Omega <- rep(delta_Omega, .5 * (k - 1) * k)
     }
@@ -211,8 +205,7 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
       }
     }
     if ((length(lambda_diag) == 1 )) {
-      if (verbos) cat("Algorithm set to be adapive. 
-        Assuming prior on diagonals are all the same for Omega's diagonals \n\n")
+      if (verbos) cat("Algorithm set to be adapive. Assuming priors are all the same for Omega's diagonals \n\n")
       lambda_diag <- rep(lambda_diag, k)
     }
     else {
@@ -232,8 +225,7 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
       length(unique(w))
     })
     if (!all(unique_values == 2)) {
-      stop("Response has multiple unique values, 
-        cannot use probit link, do you want logit?\n")
+      stop("Response has multiple unique values, cannot use probit link, do you mean logit?\n")
     }
 
     if (verbos) cat("Algorithm start...\n\n")

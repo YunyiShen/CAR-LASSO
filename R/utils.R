@@ -112,11 +112,12 @@ g_model1 <- function(k, rho=.7){
 }
 
 
-#' Simulate a simple AR1 model 
-#'
+#' Simulate a simple AR1 model with specific predictor
+#' @details Simulate a simple AR1 model with k responses and k predictors, each predictor has effect on exact one response node
 #' @param n sample size
 #' @param k number of responses
-#' @return rho partial correlation in AR1
+#' @param rho partial correlation in AR1
+#' @return a dataframe, with y1 to yk as responses and x1 to xk as predictors
 #' @export
 
 

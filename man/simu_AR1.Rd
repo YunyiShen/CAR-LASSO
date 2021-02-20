@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{simu_AR1}
 \alias{simu_AR1}
-\title{Simulate a simple AR1 model}
+\title{Simulate a simple AR1 model with specific predictor}
 \usage{
 simu_AR1(n = 100, k = 5, rho = 0.7)
 }
@@ -10,10 +10,15 @@ simu_AR1(n = 100, k = 5, rho = 0.7)
 \item{n}{sample size}
 
 \item{k}{number of responses}
+
+\item{rho}{partial correlation in AR1}
 }
 \value{
-rho partial correlation in AR1
+a dataframe, with y1 to yk as responses and x1 to xk as predictors
 }
 \description{
-Simulate a simple AR1 model
+Simulate a simple AR1 model with specific predictor
+}
+\details{
+Simulate a simple AR1 model with k responses and k predictors, each predictor has effect on exact one response node
 }
