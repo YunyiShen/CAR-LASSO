@@ -160,7 +160,7 @@ Pobit_CAR_multireg <- function(data,design,n_burn_in,n_sample, thin_by, Bbar=NUL
 
         # update Z, probit model
         update_Z_helper_CAR(Z_curr,data,
-            design,mu_curr,beta_curr,Omega_curr,k,p,n,ns,m,emax)
+            design,mu_curr,beta_curr,Omega_curr,k,p,n)
 
         if(i>n_burn_in & ((i-n_burn_in) %% thin_by == 0) ){
             mu_mcmc[i_store,] <- mu_curr
