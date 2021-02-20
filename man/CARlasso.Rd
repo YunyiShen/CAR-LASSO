@@ -30,9 +30,9 @@ CARlasso(
 
 \item{adaptive}{Bool, whether run the adaptive version of the model}
 
-\item{r_beta}{Hyper-parameter for regression coefficient, shape parameter of Gamma, if adaptive, should have row number same as number pf predictors while column number of responses}
+\item{r_beta}{Hyper-parameter for regression coefficient, shape parameter of Gamma, if adaptive, should have row number same as number of predictors while column number of responses}
 
-\item{delta_beta}{Hyper-parameter for regression coefficient, rate parameter of Gamma, if adaptive, should have row number same as number pf predictors while column number of responses}
+\item{delta_beta}{Hyper-parameter for regression coefficient, rate parameter of Gamma, if adaptive, should have row number same as number of predictors while column number of responses}
 
 \item{r_Omega}{Hyper-parameter for precision matrix, shape parameter of Gamma. If adaptive, can be a matrix with same size as precision matrix, if this is the case, only upper triangular part without diagonal will be used, or can be a vector whose size was the upper triangular part of precision matrix, if non-adaptive, a scalar.}
 
