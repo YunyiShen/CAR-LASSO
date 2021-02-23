@@ -2,18 +2,18 @@
 % Please edit documentation in R/utils.R
 \name{plot.carlasso_out}
 \alias{plot.carlasso_out}
-\title{plot the chain graph estimated by CAR-LASSO with threshold method using ggraph}
+\title{plot the chain graph estimated by CAR-LASSO with threshold or horseshoe method using ggraph}
 \usage{
 \method{plot}{carlasso_out}(obj, tol = 0.01)
 }
 \arguments{
 \item{obj}{The carlasso_out object}
 
-\item{tol}{threshold default 0.01}
+\item{tol}{threshold default 0.01, if horseshoed, then horseshoe result is used}
 }
 \value{
 A \code{ggplot} object
 }
 \description{
-plot the chain graph estimated by CAR-LASSO with threshold method using ggraph
+plot the chain graph estimated by CAR-LASSO with threshold or horseshoe method using ggraph
 }
