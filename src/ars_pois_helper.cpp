@@ -408,133 +408,133 @@ void update_Z_helper_Pois_CAR_randeff(arma::mat &Z_curr, // persumably large, th
 
 
 
-struct get_Z_worker : public Worker
-{
-  arma::mat &Z_curr;
-  const arma::mat &mu_Z;
-  const arma::mat &Sigma_Z; // this is Sigma (cov) not Omega (percision)
-  const arma::mat &y;
-  const int &k;
-  const int &p;
-  const int &n;
-  const int &ns;
-  const int &m;
-  const double &emax; // ars parameters
+// struct get_Z_worker : public Worker
+// {
+//   arma::mat &Z_curr;
+//   const arma::mat &mu_Z;
+//   const arma::mat &Sigma_Z; // this is Sigma (cov) not Omega (percision)
+//   const arma::mat &y;
+//   const int &k;
+//   const int &p;
+//   const int &n;
+//   const int &ns;
+//   const int &m;
+//   const double &emax; // ars parameters
 
-  get_Z_worker(arma::mat &Z_curr,
-               const arma::mat &mu_Z,
-               const arma::mat &Sigma_Z, // this is Sigma (cov) not Omega (percision)
-               const arma::mat &y,
-               const int &k,
-               const int &p,
-               const int &n,
-               const int &ns,
-               const int &m,
-               const double &emax) : Z_curr(Z_curr), mu_Z(mu_Z), Sigma_Z(Sigma_Z),
-                                     y(y), k(k), p(p), n(n), ns(ns), m(m), emax(emax)
-  {
-  }
+//   get_Z_worker(arma::mat &Z_curr,
+//                const arma::mat &mu_Z,
+//                const arma::mat &Sigma_Z, // this is Sigma (cov) not Omega (percision)
+//                const arma::mat &y,
+//                const int &k,
+//                const int &p,
+//                const int &n,
+//                const int &ns,
+//                const int &m,
+//                const double &emax) : Z_curr(Z_curr), mu_Z(mu_Z), Sigma_Z(Sigma_Z),
+//                                      y(y), k(k), p(p), n(n), ns(ns), m(m), emax(emax)
+//   {
+//   }
 
-  void operator()(std::size_t begin, std::size_t end)
-  {
-    arma::uvec ind = linspace<uvec>(0, k - 1, k);
-    arma::uvec indi = linspace<uvec>(0, n - 1, n);
-    arma::uvec ind_noj;
-    double Sigmabb, mu_Zij, sigma2_Zij;
-    arma::mat Sigmac, Sigmaa;
-    arma::mat Z__j; // Z w/o the column focuing on
-    double normalizingwoZi;
-    arma::vec N = sum(y, 1);
+//   void operator()(std::size_t begin, std::size_t end)
+//   {
+//     arma::uvec ind = linspace<uvec>(0, k - 1, k);
+//     arma::uvec indi = linspace<uvec>(0, n - 1, n);
+//     arma::uvec ind_noj;
+//     double Sigmabb, mu_Zij, sigma2_Zij;
+//     arma::mat Sigmac, Sigmaa;
+//     arma::mat Z__j; // Z w/o the column focuing on
+//     double normalizingwoZi;
+//     arma::vec N = sum(y, 1);
 
-    for (int i = begin; i < end; ++i)
-    {
-      for (int j = 0; j < k; ++j)
-      {
+//     for (int i = begin; i < end; ++i)
+//     {
+//       for (int j = 0; j < k; ++j)
+//       {
 
-        ind_noj = find(ind != j);
+//         ind_noj = find(ind != j);
 
-        Sigmabb = Sigma_Z(j, j);
-        Sigmac = Sigma_Z(ind_noj, find(ind == j));
-        Sigmaa = Sigma_Z(ind_noj, ind_noj);
+//         Sigmabb = Sigma_Z(j, j);
+//         Sigmac = Sigma_Z(ind_noj, find(ind == j));
+//         Sigmaa = Sigma_Z(ind_noj, ind_noj);
 
-        mu_Zij = mu_Z(i, j) + as_scalar(trans(Sigmac) * solve(Sigmaa, trans(Z_curr(find(indi == i), ind_noj) - mu_Z(find(indi == i), ind_noj))));
-        sigma2_Zij = Sigmabb - as_scalar(trans(Sigmac) * solve(Sigmaa, Sigmac));
+//         mu_Zij = mu_Z(i, j) + as_scalar(trans(Sigmac) * solve(Sigmaa, trans(Z_curr(find(indi == i), ind_noj) - mu_Z(find(indi == i), ind_noj))));
+//         sigma2_Zij = Sigmabb - as_scalar(trans(Sigmac) * solve(Sigmaa, Sigmac));
 
-        int *iwv = new int[ns + 7]();
-        double *rwv = new double[6 * (ns + 1) + 9]();
-        //double *x = new double[ns]();
-        //double *hx = new double[ns]();
-        //double *hpx = new double[ns]();
+//         int *iwv = new int[ns + 7]();
+//         double *rwv = new double[6 * (ns + 1) + 9]();
+//         //double *x = new double[ns]();
+//         //double *hx = new double[ns]();
+//         //double *hpx = new double[ns]();
 
-        double *x = new double[m]();
-        double *hx = new double[m]();
-        double *hpx = new double[m]();
-        vec h_hprime_temp(2);
+//         double *x = new double[m]();
+//         double *hx = new double[m]();
+//         double *hpx = new double[m]();
+//         vec h_hprime_temp(2);
 
-        int lb = 0;
-        int ub = 0;
-        double xlb = 0;
-        double xub = 0;
-        int ifault = 0;
-        //Rcout<< "before ars" << i << " " << j << "\n" << Z_curr(i,j) <<endl;
-        for (int ww = 0; ww < m; ++ww)
-        {
-          x[ww] = (log(y(i, j) + .01) + mu_Zij) / 2 + ((double)ww - ((double)m / 2)) * ((8 * sqrt(sigma2_Zij)) / (double)m);
-          //Rcout << log(y(i,j)+.01) + ((double)ww-((double)m/2)) * (4/(double)m) << "  " << x[ww] <<endl;
-          //Z_curr(i,j) = x[ww];
-          //Rcout << "ars working" <<endl;
-          //Rcout << "i:" << i << "  j:" << j << "  ww:" << ww <<endl;
-          //Rcout << "flag" <<endl;
+//         int lb = 0;
+//         int ub = 0;
+//         double xlb = 0;
+//         double xub = 0;
+//         int ifault = 0;
+//         //Rcout<< "before ars" << i << " " << j << "\n" << Z_curr(i,j) <<endl;
+//         for (int ww = 0; ww < m; ++ww)
+//         {
+//           x[ww] = (log(y(i, j) + .01) + mu_Zij) / 2 + ((double)ww - ((double)m / 2)) * ((8 * sqrt(sigma2_Zij)) / (double)m);
+//           //Rcout << log(y(i,j)+.01) + ((double)ww-((double)m/2)) * (4/(double)m) << "  " << x[ww] <<endl;
+//           //Z_curr(i,j) = x[ww];
+//           //Rcout << "ars working" <<endl;
+//           //Rcout << "i:" << i << "  j:" << j << "  ww:" << ww <<endl;
+//           //Rcout << "flag" <<endl;
 
-          //Rcout << h_hprime_temp <<endl;
-          hx[ww] = -(0.5 * (x[ww] - mu_Zij) * (x[ww] - mu_Zij) / sigma2_Zij) + (y(i, j) * (x[ww]) - exp(x[ww]));
+//           //Rcout << h_hprime_temp <<endl;
+//           hx[ww] = -(0.5 * (x[ww] - mu_Zij) * (x[ww] - mu_Zij) / sigma2_Zij) + (y(i, j) * (x[ww]) - exp(x[ww]));
 
-          hpx[ww] = -((x[ww] - mu_Zij) / sigma2_Zij) + (y(i, j) - exp(x[ww]));
+//           hpx[ww] = -((x[ww] - mu_Zij) / sigma2_Zij) + (y(i, j) - exp(x[ww]));
 
-          //cout << x[ww] << "  " << hx[ww] << "  " << hpx[ww] <<endl;
-        } //initial support
+//           //cout << x[ww] << "  " << hx[ww] << "  " << hpx[ww] <<endl;
+//         } //initial support
 
-        initial_(&ns, &m, &emax, x, hx, hpx,
-                 &lb, &xlb, &ub, &xub, &ifault, iwv, rwv);
-        //for(int kkk = 0 ; kkk < 7 ; kkk++) Rcout << "iwv "<< kkk <<": " << iwv[kkk]<<" ";
-        //Rcout<<endl;
-        //Rcout<< "i: " << i << " j: " << j << " y:  " << y(i,j)<< "  sigma2: " << sigma2_Zij << " mu: " << mu_Zij << endl;
-        sample_(iwv, rwv,
-                i, j, // which node
-                Z_curr,
-                mu_Z,
-                Sigma_Z, // this is Sigma (cov) not Omega (percision)
-                y,
-                k, p, n, &ifault);
-        //Rcout << "after:\n" << Z_curr(i,j) <<endl;
-        if (ifault != 0)
-        {
-          Rcout << "ARS failed with code" << ifault << endl;
-          //stop("ARS failed with code %i \n",ifault);
-        }
-        delete[] iwv;
-        delete[] rwv;
-        delete[] x;
-        delete[] hx;
-        delete[] hpx;
-      }
-    }
-  }
-};
+//         initial_(&ns, &m, &emax, x, hx, hpx,
+//                  &lb, &xlb, &ub, &xub, &ifault, iwv, rwv);
+//         //for(int kkk = 0 ; kkk < 7 ; kkk++) Rcout << "iwv "<< kkk <<": " << iwv[kkk]<<" ";
+//         //Rcout<<endl;
+//         //Rcout<< "i: " << i << " j: " << j << " y:  " << y(i,j)<< "  sigma2: " << sigma2_Zij << " mu: " << mu_Zij << endl;
+//         sample_(iwv, rwv,
+//                 i, j, // which node
+//                 Z_curr,
+//                 mu_Z,
+//                 Sigma_Z, // this is Sigma (cov) not Omega (percision)
+//                 y,
+//                 k, p, n, &ifault);
+//         //Rcout << "after:\n" << Z_curr(i,j) <<endl;
+//         if (ifault != 0)
+//         {
+//           Rcout << "ARS failed with code" << ifault << endl;
+//           //stop("ARS failed with code %i \n",ifault);
+//         }
+//         delete[] iwv;
+//         delete[] rwv;
+//         delete[] x;
+//         delete[] hx;
+//         delete[] hpx;
+//       }
+//     }
+//   }
+// };
 
-// [[Rcpp::export]]
-void update_Z_helper_Pois_para(arma::mat &Z_curr,
-                                      const arma::mat &mu_Z,
-                                      const arma::mat &Sigma_Z, // this is Sigma (cov) not Omega (percision)
-                                      const arma::mat &y,
-                                      int k, int p, int n,
-                                      int ns, int m, double emax // ars parameters
-)
-{
+// // [[Rcpp::export]]
+// void update_Z_helper_Pois_para(arma::mat &Z_curr,
+//                                       const arma::mat &mu_Z,
+//                                       const arma::mat &Sigma_Z, // this is Sigma (cov) not Omega (percision)
+//                                       const arma::mat &y,
+//                                       int k, int p, int n,
+//                                       int ns, int m, double emax // ars parameters
+// )
+// {
 
-  get_Z_worker Z_worker(Z_curr, mu_Z, Sigma_Z, y,
-                        k, p, n, ns, m, emax);
+//   get_Z_worker Z_worker(Z_curr, mu_Z, Sigma_Z, y,
+//                         k, p, n, ns, m, emax);
 
-  parallelFor(0, n, Z_worker);
-  return;
-}
+//   parallelFor(0, n, Z_worker);
+//   return;
+// }
