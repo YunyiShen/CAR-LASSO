@@ -1,21 +1,21 @@
-// [[Rcpp::depends(RcppArmadillo)]]
-#include <RcppArmadillo.h>
-#include <tgmath.h>
-using namespace Rcpp;
-using namespace arma;
-//#include "Error.h"
-#include <R.h>
-#include <Rmath.h>
-#include <Rdefines.h>
-#include <iostream>
-#include <climits>
-#include <cmath>
+// // [[Rcpp::depends(RcppArmadillo)]]
+// #include <RcppArmadillo.h>
+// #include <tgmath.h>
+// using namespace Rcpp;
+// using namespace arma;
+// //#include "Error.h"
+// #include <R.h>
+// #include <Rmath.h>
+// #include <Rdefines.h>
+// #include <iostream>
+// #include <climits>
+// #include <cmath>
 #include "ars_helper.h"
 //#include "ars_pois_helper.h"
 
 // [[Rcpp::depends(RcppParallel)]]
-#include <RcppParallel.h>
-using namespace RcppParallel;
+// #include <RcppParallel.h>
+// using namespace RcppParallel;
 
 void spl1_(const int *ns, int *n, int *ilow, int *ihigh, int *ipt,
            double *scum, double *cu, double *x, double *hx, double *hpx,
