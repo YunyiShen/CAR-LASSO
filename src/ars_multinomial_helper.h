@@ -59,13 +59,13 @@ void update_Z_helper_multinomial_gra(arma::mat & Z_curr, // persumably large, th
                               int ns, int m, double emax // ars parameters
 );
 
-void update_Z_helper_multinomial_para(arma::mat &Z_curr,
-                                 const arma::mat &mu_Z,
-                                 const arma::mat &Sigma_Z, // this is Sigma (cov) not Omega (percision)
-                                 const arma::mat &y,
-                                 int k, int p, int n,
-                                 int ns, int m, double emax // ars parameters
-);
+// void update_Z_helper_multinomial_para(arma::mat &Z_curr,
+//                                  const arma::mat &mu_Z,
+//                                  const arma::mat &Sigma_Z, // this is Sigma (cov) not Omega (percision)
+//                                  const arma::mat &y,
+//                                  int k, int p, int n,
+//                                  int ns, int m, double emax // ars parameters
+// );
 
 void update_Z_helper_multinomial_CAR_randeff(arma::mat &Z_curr, // persumably large, thus will not copy
                                      const arma::mat &data,

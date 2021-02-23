@@ -8,17 +8,17 @@
 //
 /* ********************************************************************************* */
 // [[Rcpp::depends(RcppArmadillo)]]
-#include <RcppArmadillo.h>
-#include <tgmath.h>
-using namespace Rcpp;
-using namespace arma;
-//#include "Error.h"
-#include <R.h>
-#include <Rmath.h>
-#include <Rdefines.h>
-#include <iostream>
-#include <climits>
-#include <cmath>
+//#include <RcppArmadillo.h>
+// #include <tgmath.h>
+// using namespace Rcpp;
+// using namespace arma;
+// //#include "Error.h"
+// #include <R.h>
+// #include <Rmath.h>
+// #include <Rdefines.h>
+// #include <iostream>
+// #include <climits>
+// #include <cmath>
 #include "ars_helper.h"
 
 // Subroutine initial_:
