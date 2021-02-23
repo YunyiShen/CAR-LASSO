@@ -325,10 +325,10 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
 
   res <- lapply(res, coda::mcmc)
 
-  settings <- list(formula, link, adaptive,
-                     r_beta , delta_beta , r_Omega, 
-                     delta_Omega, lambda_diag, n_iter,
-                     n_burn_in, thin_by, progress, verbos)
+  settings <- list(formula = formula, link = link, adaptive = adaptive,
+                     r_beta = r_beta , delta_beta = delta_beta , r_Omega = r_Omega, 
+                     delta_Omega = delta_Omega, lambda_diag = lambda_diag, n_iter = n_iter,
+                     n_burn_in = n_burn_in, thin_by = thin_by, progress = progress, verbos = verbos)
 
   nodes <- list(response = colnames(y), predictors = colnames(design))
   res <- list(point_est = point_est, nodes = nodes,  
