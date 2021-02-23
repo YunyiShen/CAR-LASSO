@@ -78,10 +78,20 @@ plot.carlasso_out <- function(obj, tol = 0.01) {
     cbPalette_node <- c("#0815d3", "#682d01")
 
     set_graph_style(plot_margin = margin(10, 10, 10, 10))
-    p <- ggraph(full_graph, layout = "circle") +
-        geom_edge_link(aes(color = direction.,
+    p <- ggraph(full_graph, layout = "circle") 
+    
+    if(length(unique(E(full_graph)$direction.))==1){
+        p <- p + geom_edge_link(aes(
+            width = abs_weight, alpha = abs_weight), 
+            color = ifelse(E(full_graph)$direction.[1]=="positive",cbPalette_edge[2], cbPalette_edge[1]))
+    }
+    else {
+       p <- p + geom_edge_link(aes(color = direction.,
             width = abs_weight, alpha = abs_weight)) +
-        scale_edge_color_manual(values = (cbPalette_edge)) +
+        scale_edge_color_manual(values = (cbPalette_edge))
+    }
+    
+    p <-  p +
         geom_node_point(mapping = aes(shape = type,
                 size = alpha_centrality, stroke = 1.5),
             col = "#000000", fill = "white", alpha = 1) +
