@@ -1,7 +1,7 @@
-#' plot the chain graph estimated by CAR-LASSO with threshold method using ggraph
+#' plot the chain graph estimated by CAR-LASSO with threshold or horseshoe method using ggraph
 #'
 #' @param obj The carlasso_out object
-#' @param tol threshold default 0.01
+#' @param tol threshold default 0.01, if horseshoed, then horseshoe result is used
 #' @return A `ggplot` object
 #' @export
 
@@ -10,9 +10,14 @@
 plot.carlasso_out <- function(obj, tol = 0.01) {
     col_pn <- c("lightblue","pink")
     # graph structure using threshold:
-    B_binary <- abs(obj$point_est$beta) > tol
-    Graph_binary <- abs(obj$point_est$Omega) > tol
-
+    if(is.null(obj$horseshoe_binary)){
+        B_binary <- abs(obj$point_est$beta) > tol
+        Graph_binary <- abs(obj$point_est$Omega) > tol
+    }
+    else {
+        B_binary <- obj$horseshoe_binary$B_binary
+        Graph_binary <- obj$horseshoe_binary$Omega_binary
+    }
     diag(Graph_binary) <- 1
     CAR <- get_CAR_MB(obj$point_est$beta*B_binary,
         Graph_binary*obj$point_est$Omega)
