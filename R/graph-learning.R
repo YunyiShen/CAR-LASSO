@@ -17,7 +17,7 @@
 #' plot(car_res)
 
 
-horseshoe.carlasso_out <- function(obj, Bbar=NULL, A = NULL, nu=3, V=NULL, thr = 0.5 ){
+horseshoe <- function(obj, Bbar=NULL, A = NULL, nu=3, V=NULL, thr = 0.5 ){
     y <- obj$data$response
     design <- obj$data$design
     if(obj$settings$link == "identity"){
@@ -50,7 +50,7 @@ horseshoe.carlasso_out <- function(obj, Bbar=NULL, A = NULL, nu=3, V=NULL, thr =
     horseshoe_binary <- list(Omega_binary = abs(obj$point_est$Omega/graph_multireg)>thr,
                             B_binary = abs(abs(obj$point_est$beta/B_multireg)>thr))
 
-    obj$horseshow_binary <- horseshoe_binary
+    obj$horseshoe_binary <- horseshoe_binary
     obj$multireg_mcmc <- multireg_res
     return(obj)
 
