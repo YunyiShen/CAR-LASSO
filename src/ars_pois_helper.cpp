@@ -13,9 +13,6 @@
 #include "ars_helper.h"
 //#include "ars_pois_helper.h"
 
-// [[Rcpp::depends(RcppParallel)]]
-// #include <RcppParallel.h>
-// using namespace RcppParallel;
 
 void spl1_(const int *ns, int *n, int *ilow, int *ihigh, int *ipt,
            double *scum, double *cu, double *x, double *hx, double *hpx,

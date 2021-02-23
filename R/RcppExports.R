@@ -89,10 +89,6 @@ Pois_CAR_LASSO_Cpp <- function(data, design, n_iter, n_burn_in, thin_by, r_beta,
     .Call(`_CARlasso_Pois_CAR_LASSO_Cpp`, data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, ns, m, emax, progress)
 }
 
-Pois_SRG_LASSO_Cpp <- function(data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, ns, m, emax, progress) {
-    .Call(`_CARlasso_Pois_SRG_LASSO_Cpp`, data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, ns, m, emax, progress)
-}
-
 Probit_CAR_ALASSO_Cpp <- function(data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, lambda_diag, progress) {
     .Call(`_CARlasso_Probit_CAR_ALASSO_Cpp`, data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, lambda_diag, progress)
 }
@@ -105,28 +101,8 @@ Probit_Graphical_LASSO_Cpp <- function(data, n_iter, n_burn_in, thin_by, lambda_
     .Call(`_CARlasso_Probit_Graphical_LASSO_Cpp`, data, n_iter, n_burn_in, thin_by, lambda_a, lambda_b, progress)
 }
 
-Probit_SRG_LASSO_Cpp <- function(data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, progress) {
-    .Call(`_CARlasso_Probit_SRG_LASSO_Cpp`, data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, progress)
-}
-
 update_Z_helper_CAR <- function(Z_curr, data, design, mu_curr, beta_curr, Omega_curr, k, p, n) {
     invisible(.Call(`_CARlasso_update_Z_helper_CAR`, Z_curr, data, design, mu_curr, beta_curr, Omega_curr, k, p, n))
-}
-
-SRG_LASSO_Cpp <- function(data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, progress) {
-    .Call(`_CARlasso_SRG_LASSO_Cpp`, data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, progress)
-}
-
-update_beta1_helper <- function(data, design, mu, tau2, Omega, k, p, n) {
-    .Call(`_CARlasso_update_beta1_helper`, data, design, mu, tau2, Omega, k, p, n)
-}
-
-update_beta_helper <- function(data, design, mu, tau2, Omega, k, p, n) {
-    .Call(`_CARlasso_update_beta_helper`, data, design, mu, tau2, Omega, k, p, n)
-}
-
-Sigma_to_CAR_Cpp <- function(Sigma) {
-    .Call(`_CARlasso_Sigma_to_CAR_Cpp`, Sigma)
 }
 
 rtn1 <- function(mean, sd, low, high) {
@@ -135,10 +111,6 @@ rtn1 <- function(mean, sd, low, high) {
 
 update_Z_helper_multinomial <- function(Z_curr, mu_Z, Sigma_Z, y, k, p, n, ns, m, emax) {
     invisible(.Call(`_CARlasso_update_Z_helper_multinomial`, Z_curr, mu_Z, Sigma_Z, y, k, p, n, ns, m, emax))
-}
-
-update_Z_helper_multinomial_para <- function(Z_curr, mu_Z, Sigma_Z, y, k, p, n, ns, m, emax) {
-    invisible(.Call(`_CARlasso_update_Z_helper_multinomial_para`, Z_curr, mu_Z, Sigma_Z, y, k, p, n, ns, m, emax))
 }
 
 update_Z_helper_multinomial_SRG <- function(Z_curr, data, design, mu_curr, beta_curr, Omega_curr, k, p, n, ns, m, emax) {
@@ -167,10 +139,6 @@ update_Z_helper_Pois_CAR <- function(Z_curr, data, design, mu_curr, beta_curr, O
 
 update_Z_helper_Pois_CAR_randeff <- function(Z_curr, data, design, design_r, mu_curr, beta_curr, nu_curr, Omega_curr, k, p, n, ns, m, emax) {
     invisible(.Call(`_CARlasso_update_Z_helper_Pois_CAR_randeff`, Z_curr, data, design, design_r, mu_curr, beta_curr, nu_curr, Omega_curr, k, p, n, ns, m, emax))
-}
-
-update_Z_helper_Pois_para <- function(Z_curr, mu_Z, Sigma_Z, y, k, p, n, ns, m, emax) {
-    invisible(.Call(`_CARlasso_update_Z_helper_Pois_para`, Z_curr, mu_Z, Sigma_Z, y, k, p, n, ns, m, emax))
 }
 
 Graphical_ALASSO_Cpp <- function(data, n_iter, n_burn_in, thin_by, lambda_a, lambda_b, progress) {
