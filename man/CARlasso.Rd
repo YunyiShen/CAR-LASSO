@@ -8,7 +8,7 @@ CARlasso(
   formula,
   data,
   link = "identity",
-  adaptive = F,
+  adaptive = FALSE,
   r_beta = ifelse(adaptive, 0.01, 1),
   delta_beta = ifelse(adaptive, 1e-06, 0.01),
   r_Omega = ifelse(adaptive, 0.01, 1),
@@ -17,8 +17,8 @@ CARlasso(
   n_iter = 2000,
   n_burn_in = 1000,
   thin_by = 10,
-  progress = T,
-  verbos = T
+  progress = TRUE,
+  verbos = TRUE
 )
 }
 \arguments{
@@ -46,9 +46,9 @@ CARlasso(
 
 \item{thin_by}{Final sample was thin by this number}
 
-\item{verbos}{Bool, whether show warnings and messages.}
+\item{progress}{Bool, whether report progress from C++}
 
-\item{prograss}{Bool, whether report progress from C++}
+\item{verbos}{Bool, whether show warnings and messages.}
 }
 \value{
 A \code{carlasso_out} object with elements:
@@ -99,7 +99,7 @@ Main sampling algorithm of CAR-LASSO model
 \examples{
 set.seed(42)
 dt <- simu_AR1()
-car_res <- CARlasso(y1+y2+y3+y4+y5~x1+x2+x3+x4+x5, data = dt, adaptive = T)
+car_res <- CARlasso(y1+y2+y3+y4+y5~x1+x2+x3+x4+x5, data = dt, adaptive = TRUE)
 plot(car_res,0.05)
 # with horseshoe inference
 car_res <- horseshoe(car_res)

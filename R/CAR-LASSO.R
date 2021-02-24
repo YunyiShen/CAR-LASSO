@@ -14,7 +14,7 @@
 #' @param n_iter Number of sampling iterations (i.e. after burn in) for the Gibbs sampler
 #' @param n_burn_in Number of burn in iterations for the Gibbs sampler
 #' @param thin_by Final sample was thin by this number
-#' @param prograss Bool, whether report progress from C++
+#' @param progress Bool, whether report progress from C++
 #' @param verbos Bool, whether show warnings and messages.
 #' 
 #' @return A `carlasso_out` object with elements: 
@@ -83,7 +83,7 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
                      lambda_diag = 0,
                      n_iter = 2000,
                      n_burn_in = 1000, thin_by = 10,
-                     progress = T, verbos = T) {
+                     progress = TRUE, verbos = TRUE) {
   # some waring messages
   err_no_predictor <- "No predictor supplied.\n\n"
   warr_centering <- "Predictors will be centered.\n\n"
