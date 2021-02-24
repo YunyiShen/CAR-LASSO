@@ -14,7 +14,7 @@
 #' @param n_iter Number of sampling iterations (i.e. after burn in) for the Gibbs sampler
 #' @param n_burn_in Number of burn in iterations for the Gibbs sampler
 #' @param thin_by Final sample was thin by this number
-#' @param prograss Bool, whether report progress from C++
+#' @param progress Bool, whether report progress from C++
 #' @param verbos Bool, whether show warnings and messages.
 #' 
 #' @return A `carlasso_out` object with elements: 
@@ -64,8 +64,8 @@
 #' @examples
 #' set.seed(42)
 #' dt <- simu_AR1()
-#' car_res <- CARlasso(y1+y2+y3+y4+y5~x1+x2+x3+x4+x5, data = dt, adaptive = T)
-#' plot(car_res,0.05)
+#' car_res <- CARlasso(y1+y2+y3+y4+y5~x1+x2+x3+x4+x5, data = dt, adaptive = TRUE)
+#' plot(car_res,tol = 0.05)
 #' # with horseshoe inference
 #' car_res <- horseshoe(car_res)
 #' plot(car_res)
@@ -75,7 +75,7 @@
 
 CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
                      data, link = "identity",
-                     adaptive = F,
+                     adaptive = FALSE,
                      r_beta = ifelse(adaptive,0.01,1), 
                      delta_beta = ifelse(adaptive,1e-6,0.01),
                      r_Omega = ifelse(adaptive,0.01,1), 
@@ -83,7 +83,7 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
                      lambda_diag = 0,
                      n_iter = 2000,
                      n_burn_in = 1000, thin_by = 10,
-                     progress = T, verbos = T) {
+                     progress = TRUE, verbos = TRUE) {
   # some waring messages
   err_no_predictor <- "No predictor supplied.\n\n"
   warr_centering <- "Predictors will be centered.\n\n"
