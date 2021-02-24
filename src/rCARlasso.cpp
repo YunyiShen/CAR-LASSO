@@ -5,8 +5,10 @@ using namespace Rcpp;
 using namespace arma;
 #include "CAR_LASSO_helper.h"
 
-//' Block Gibbs sampler for CAR-LASSO
-//' @description \strong{This function is for advanced users to build their own sampler use CARlasso as core.} It will take one round of Gibbs sampler of CAR-LASSO model. Be aware that the function is a `void` function implemented in C++, and all updated parameters e.g. Omega will be manipulate directly in memory to save space. Users should manage to do their own work to save the state. Also be aware that R uses shallow copy by default, which means one cannot save the state by simply give it to another object e.g. first `Omega_old <- Omega_curr` then update `Omega_curr`, `Omega_old` will also change. \strong{This function will NOT check dimensions of input.} Below we assule n data, k responses and p predictors.
+//' @title Block Gibbs sampler for CAR-LASSO
+//'
+//' @description \strong{This function is for advanced users to build their own sampler use CARlasso as core.} It will execute one round of Gibbs sampler of CAR-LASSO model. Be aware that the function is a `void` function implemented in C++, and all updated parameters e.g. Omega will be manipulate directly in memory to save space. Users should manage to do their own work to save the state. Also be aware that R uses shallow copy by default, which means one cannot save the state by simply give it to another object e.g. first `Omega_old <- Omega_curr` then update `Omega_curr`, `Omega_old` will also change. \strong{This function will NOT check dimensions of input.} Below we assume n samples, k responses and p predictors.
+//' 
 //' @param Z_curr the current (latent) normal data, should be n*k. Will not be changed
 //' @param design the design matrix, should be n*p. Will not be changed
 //' @param lambda2_beta the current shrinkage parameter of regression coefficients, should be a scalar of type `double`. Will be updated
@@ -18,15 +20,14 @@ using namespace arma;
 //' @param r_beta hyperprior's parameter of shrinkage for regression coefficients, should be a scalar of type 'double' and positive. Will not be updated.
 //' @param delta_beta hyperprior's parameter of shrinkage for regression coefficients, should be a scalar of type 'double' and positive. Will not be updated.
 //' @param r_Omega hyperprior's parameter of shrinkage for precision Omega, should be a scalar of type 'double' and positive. Will not be updated.
-//' @param delta_beta hyperprior's parameter of shrinkage for rprecision Omega, should be a scalar of type 'double' and positive. Will not be updated.
+//' @param delta_Omega hyperprior's parameter of shrinkage for rprecision Omega, should be a scalar of type 'double' and positive. Will not be updated.
 //' @param k integer, number of responses
 //' @param p integer, number of predictors
 //' @param n integer, number of data points
-//' @return Again this is a `void` function and will not return anything. All update happened in memory dirrectly. 
-
-
+//' @return Again this is a `void` function and will not return anything. All update happened in memory directly. 
+//' @export
 // [[Rcpp::export]]
-void rCARlasso(const arma::mat &Z_curr,
+void rCARlasso_(const arma::mat &Z_curr,
                const arma::mat &design, //design matrix
                double &lambda2_beta,    // lambda2, the shrinkage for beta, double
                arma::vec &tau2_curr,    // tau2 for beta, should be (k*p) entries vector
