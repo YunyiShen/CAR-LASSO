@@ -792,6 +792,55 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// rCARAlasso_
+void rCARAlasso_(const arma::mat& Z_curr, const arma::mat& design, arma::vec& lambda2_beta, arma::vec& tau2_curr, arma::mat& beta_curr, arma::vec& lambda_Omega, arma::mat& Omega_curr, arma::vec& mu_curr, const arma::mat& r_beta, const arma::mat& delta_beta, const arma::vec& r_Omega, const arma::vec& delta_Omega, const arma::vec& lambda_diag, int k, int p, int n);
+RcppExport SEXP _CARlasso_rCARAlasso_(SEXP Z_currSEXP, SEXP designSEXP, SEXP lambda2_betaSEXP, SEXP tau2_currSEXP, SEXP beta_currSEXP, SEXP lambda_OmegaSEXP, SEXP Omega_currSEXP, SEXP mu_currSEXP, SEXP r_betaSEXP, SEXP delta_betaSEXP, SEXP r_OmegaSEXP, SEXP delta_OmegaSEXP, SEXP lambda_diagSEXP, SEXP kSEXP, SEXP pSEXP, SEXP nSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat& >::type Z_curr(Z_currSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type design(designSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type lambda2_beta(lambda2_betaSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type tau2_curr(tau2_currSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type beta_curr(beta_currSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type lambda_Omega(lambda_OmegaSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type Omega_curr(Omega_currSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type mu_curr(mu_currSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type r_beta(r_betaSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type delta_beta(delta_betaSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type r_Omega(r_OmegaSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type delta_Omega(delta_OmegaSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type lambda_diag(lambda_diagSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< int >::type p(pSEXP);
+    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    rCARAlasso_(Z_curr, design, lambda2_beta, tau2_curr, beta_curr, lambda_Omega, Omega_curr, mu_curr, r_beta, delta_beta, r_Omega, delta_Omega, lambda_diag, k, p, n);
+    return R_NilValue;
+END_RCPP
+}
+// rCARlasso_
+void rCARlasso_(const arma::mat& Z_curr, const arma::mat& design, double& lambda2_beta, arma::vec& tau2_curr, arma::mat& beta_curr, double& lambda_Omega, arma::mat& Omega_curr, arma::vec& mu_curr, const double r_beta, const double delta_beta, const double r_Omega, const double delta_Omega, int k, int p, int n);
+RcppExport SEXP _CARlasso_rCARlasso_(SEXP Z_currSEXP, SEXP designSEXP, SEXP lambda2_betaSEXP, SEXP tau2_currSEXP, SEXP beta_currSEXP, SEXP lambda_OmegaSEXP, SEXP Omega_currSEXP, SEXP mu_currSEXP, SEXP r_betaSEXP, SEXP delta_betaSEXP, SEXP r_OmegaSEXP, SEXP delta_OmegaSEXP, SEXP kSEXP, SEXP pSEXP, SEXP nSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat& >::type Z_curr(Z_currSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type design(designSEXP);
+    Rcpp::traits::input_parameter< double& >::type lambda2_beta(lambda2_betaSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type tau2_curr(tau2_currSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type beta_curr(beta_currSEXP);
+    Rcpp::traits::input_parameter< double& >::type lambda_Omega(lambda_OmegaSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type Omega_curr(Omega_currSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type mu_curr(mu_currSEXP);
+    Rcpp::traits::input_parameter< const double >::type r_beta(r_betaSEXP);
+    Rcpp::traits::input_parameter< const double >::type delta_beta(delta_betaSEXP);
+    Rcpp::traits::input_parameter< const double >::type r_Omega(r_OmegaSEXP);
+    Rcpp::traits::input_parameter< const double >::type delta_Omega(delta_OmegaSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< int >::type p(pSEXP);
+    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    rCARlasso_(Z_curr, design, lambda2_beta, tau2_curr, beta_curr, lambda_Omega, Omega_curr, mu_curr, r_beta, delta_beta, r_Omega, delta_Omega, k, p, n);
+    return R_NilValue;
+END_RCPP
+}
 // rmultireg
 List rmultireg(arma::mat const& Y, arma::mat const& X, arma::mat const& Bbar, arma::mat const& A, double nu, arma::mat const& V);
 RcppExport SEXP _CARlasso_rmultireg(SEXP YSEXP, SEXP XSEXP, SEXP BbarSEXP, SEXP ASEXP, SEXP nuSEXP, SEXP VSEXP) {
@@ -851,6 +900,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_CARlasso_Intercept_Graphical_LASSO_Cpp", (DL_FUNC) &_CARlasso_Intercept_Graphical_LASSO_Cpp, 7},
     {"_CARlasso_rinvGau", (DL_FUNC) &_CARlasso_rinvGau, 2},
     {"_CARlasso_stein_loss_cpp", (DL_FUNC) &_CARlasso_stein_loss_cpp, 2},
+    {"_CARlasso_rCARAlasso_", (DL_FUNC) &_CARlasso_rCARAlasso_, 16},
+    {"_CARlasso_rCARlasso_", (DL_FUNC) &_CARlasso_rCARlasso_, 15},
     {"_CARlasso_rmultireg", (DL_FUNC) &_CARlasso_rmultireg, 6},
     {NULL, NULL, 0}
 };
