@@ -1,29 +1,35 @@
 #' plot the chain graph estimated by CAR-LASSO with threshold or horseshoe method using ggraph
 #'
-#' @param obj The carlasso_out object
-#' @param tol threshold default 0.01, if horseshoed, then horseshoe result is used
-#' @return A `ggplot` object
+#' @param x The carlasso_out xect
+#' @param ... 
+#' \itemize{
+#'  \item{`tol`}{: threshold for ploting default 0.01, if horseshoed, then horseshoe result is used}
+#' }
+#' @return A `ggplot` xect
 #' @export
 
 
 
-plot.carlasso_out <- function(obj, tol = 0.01) {
+plot.carlasso_out <- function(x, ...) {
+    dots <- list(...)
+    tol <- dots$tol
+    if(is.null(tol)) tol = 0.01
     col_pn <- c("lightblue","pink")
     # graph structure using threshold:
-    if(is.null(obj$horseshoe_binary)){
-        B_binary <- abs(obj$point_est$beta) > tol
-        Graph_binary <- abs(obj$point_est$Omega) > tol
+    if(is.null(x$horseshoe_binary)){
+        B_binary <- abs(x$point_est$beta) > tol
+        Graph_binary <- abs(x$point_est$Omega) > tol
     }
     else {
-        B_binary <- obj$horseshoe_binary$B_binary
-        Graph_binary <- obj$horseshoe_binary$Omega_binary
+        B_binary <- x$horseshoe_binary$B_binary
+        Graph_binary <- x$horseshoe_binary$Omega_binary
     }
     diag(Graph_binary) <- 1
-    CAR <- get_CAR_MB(obj$point_est$beta*B_binary,
-        Graph_binary*obj$point_est$Omega)
+    CAR <- get_CAR_MB(x$point_est$beta*B_binary,
+        Graph_binary*x$point_est$Omega)
     
-    n_resp <- length(obj$nodes$response)
-    n_pred <- length(obj$nodes$predictors)
+    n_resp <- length(x$nodes$response)
+    n_pred <- length(x$nodes$predictors)
 
     vertices_df <- data.frame(id = c(paste0("resp", 1:n_resp), 
         paste0("pred", 1:n_pred)),
@@ -69,7 +75,7 @@ plot.carlasso_out <- function(obj, tol = 0.01) {
     E(full_graph)$abs_weight <- abs(E(full_graph)$weight)
 
 
-    V(full_graph)$name <- c(obj$nodes$response, obj$nodes$predictors)
+    V(full_graph)$name <- c(x$nodes$response, x$nodes$predictors)
 
     V(full_graph)$alpha_centrality <- alpha_centrality(full_graph)
     V(full_graph)$type <- type[c(rep(2, n_resp), rep(1, n_pred))]
