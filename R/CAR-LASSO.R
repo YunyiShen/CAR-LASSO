@@ -64,7 +64,7 @@
 #' @examples
 #' set.seed(42)
 #' dt <- simu_AR1()
-#' car_res <- CARlasso(y1+y2+y3+y4+y5~x1+x2+x3+x4+x5, data = dt, adaptive = T)
+#' car_res <- CARlasso(y1+y2+y3+y4+y5~x1+x2+x3+x4+x5, data = dt, adaptive = TRUE)
 #' plot(car_res,0.05)
 #' # with horseshoe inference
 #' car_res <- horseshoe(car_res)
@@ -75,7 +75,7 @@
 
 CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
                      data, link = "identity",
-                     adaptive = F,
+                     adaptive = FALSE,
                      r_beta = ifelse(adaptive,0.01,1), 
                      delta_beta = ifelse(adaptive,1e-6,0.01),
                      r_Omega = ifelse(adaptive,0.01,1), 
