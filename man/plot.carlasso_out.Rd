@@ -4,15 +4,17 @@
 \alias{plot.carlasso_out}
 \title{plot the chain graph estimated by CAR-LASSO with threshold or horseshoe method using ggraph}
 \usage{
-\method{plot}{carlasso_out}(obj, tol = 0.01)
+\method{plot}{carlasso_out}(x, ...)
 }
 \arguments{
-\item{obj}{The carlasso_out object}
+\item{x}{The carlasso_out xect}
 
-\item{tol}{threshold default 0.01, if horseshoed, then horseshoe result is used}
+\item{...}{\itemize{
+\item{\code{tol}}{: threshold for ploting default 0.01, if horseshoed, then horseshoe result is used}
+}}
 }
 \value{
-A \code{ggplot} object
+A \code{ggplot} xect
 }
 \description{
 plot the chain graph estimated by CAR-LASSO with threshold or horseshoe method using ggraph
