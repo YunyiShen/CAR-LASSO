@@ -17,7 +17,7 @@ Example run, we generated data from a 5-node AR1 model with each node has a spec
 set.seed(42)
 dt <- simu_AR1(n=100,k=5, rho=0.7)
 car_res <- CARlasso(y1+y2+y3+y4+y5~x1+x2+x3+x4+x5, data = dt, adaptive = TRUE)
-plot(car_res,0.05)
+plot(car_res,tol = 0.05)
 # with horseshoe inference
 car_res <- horseshoe(car_res)
 plot(car_res)
