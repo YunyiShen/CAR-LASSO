@@ -30,6 +30,7 @@ List Probit_CAR_ALASSO_Cpp(const arma::mat & data, // col composition data, ROW 
                    const arma::mat & delta_beta,
                    const arma::vec & r_Omega,
                    const arma::vec & delta_Omega,
+                   const arma::vec & lambda_diag,// penalty for diagonals 
                    bool progress){
   int k = data.n_cols; // number of nodes
   int p = design.n_cols; //number of predictors
@@ -107,9 +108,10 @@ List Probit_CAR_ALASSO_Cpp(const arma::mat & data, // col composition data, ROW 
     
     
     // update Omega
-    update_car_Omega_adp_helper(Omega_curr, Z_curr, design, 
+    update_car_Omega_adp_helper2(Omega_curr, Z_curr, design, 
                                      mu_curr, beta_curr,
                                      lambda_Omega,
+                                     lambda_diag, 
                                      k, p, n);
     
     
@@ -166,3 +168,4 @@ List Probit_CAR_ALASSO_Cpp(const arma::mat & data, // col composition data, ROW 
   ));
 }
 
+//TODO: add back shrinkage to diagonal entries

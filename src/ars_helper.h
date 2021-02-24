@@ -1,11 +1,10 @@
 #ifndef ARS_HELPER_H
 #define ARS_HELPER_H
 // [[Rcpp::depends(RcppArmadillo)]]
-#include <RcppArmadillo.h> // to use sparse matrix
+#include <RcppArmadillo.h> 
 #include <tgmath.h>
 using namespace Rcpp;
 using namespace arma;
-//#include "Error.h"
 #include <R.h>
 #include <Rmath.h>
 #include <Rdefines.h>

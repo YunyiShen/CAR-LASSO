@@ -13,6 +13,7 @@ CARlasso(
   delta_beta = ifelse(adaptive, 1e-06, 0.01),
   r_Omega = ifelse(adaptive, 0.01, 1),
   delta_Omega = ifelse(adaptive, 1e-06, 0.01),
+  lambda_diag = 0,
   n_iter = 2000,
   n_burn_in = 1000,
   thin_by = 10,
@@ -29,13 +30,15 @@ CARlasso(
 
 \item{adaptive}{Bool, whether run the adaptive version of the model}
 
-\item{r_beta}{Hyper-parameter for regression coefficient, shape parameter of Gamma, if adaptive, should have row number same as number pf predictors while column number of responses}
+\item{r_beta}{Hyper-parameter for regression coefficient, shape parameter of Gamma, if adaptive, should have row number same as number of predictors while column number of responses}
 
-\item{delta_beta}{Hyper-parameter for regression coefficient, rate parameter of Gamma, if adaptive, should have row number same as number pf predictors while column number of responses}
+\item{delta_beta}{Hyper-parameter for regression coefficient, rate parameter of Gamma, if adaptive, should have row number same as number of predictors while column number of responses}
 
 \item{r_Omega}{Hyper-parameter for precision matrix, shape parameter of Gamma. If adaptive, can be a matrix with same size as precision matrix, if this is the case, only upper triangular part without diagonal will be used, or can be a vector whose size was the upper triangular part of precision matrix, if non-adaptive, a scalar.}
 
 \item{delta_Omega}{Hyper-parameter for precision matrix, rate parameter of Gamma, If adaptive, can be a matrix with same size as precision matrix, if this is the case, only upper triangular part without diagonal will be used, or can be a vector whose size was the upper triangular part of precision matrix, if non-adaptive, a scalar.}
+
+\item{lambda_diag}{adaptive only hyper-parameter for panalties on diagonal entries of Omega, should have dimension k and non-negative}
 
 \item{n_iter}{Number of sampling iterations (i.e. after burn in) for the Gibbs sampler}
 
@@ -48,18 +51,59 @@ CARlasso(
 \item{prograss}{Bool, whether report progress from C++}
 }
 \value{
-A list of MCMC samples.
-\item{beta}{A coda::mcmc object, each row was an MCMC sample of the (column) vectorization of regression coefficient B}
-\item{mu}{A coda::mcmc object, each row was an MCMC sample of the mean vector}
-\item{Omega}{A coda::mcmc object, each row was an MCMC sample of the upper triangular part (with diagonal) of precision matrix Omega}
-\item{lambda}{\strong{Non-adaptive only}, A coda::mcmc object, first column was the shrinkage parameter lambda for regression coefficient and the second column was shrinkage parameter lambda for precision matrix}
-\item{lambda_beta}{\strong{Adaptive only}, A coda::mcmc object, each row was an MCMC sample of the (column) vectorization of shrinkage parameter for regression coefficient B}
-\item{lambda_Omega}{\strong{Adaptive only}, A coda::mcmc object, each row was an MCMC sample of the shrinage parameter for the upper triangular part (without diagonal) of precision matrix Omega}
+A \code{carlasso_out} object with elements:
+\itemize{
+\item{\verb{$point_est}}{
+\itemize{
+\item{\verb{$Omega}}{: Posterior mean of precision matrix}
+\item{\verb{$beta}}{: Posterior mean of regression coefficient}
+\item{\verb{$CAR}}{
+\itemize{
+\item{\verb{$C}}{: The conditional regression coefficients among responses}
+\item{\verb{$B}}{: The conditional regression coefficients between response and predictors}
+\item{\verb{$M}}{: The conditional variance}
+}
+}
+}
+}
+\item{\verb{$nodes}}{
+\itemize{
+\item{\verb{$responses}}{: node name of responses}
+\item{\verb{$predictors}}{: node name of predictors}
+}
+}
+
+\item{\verb{$data}}{
+\itemize{
+\item{\verb{$response}}{: response matrix}
+\item{\verb{$design}}{: design matrix}
+}
+}
+
+\item{\verb{$settings}}{: all settings sent to the algorithm, exclude data}
+\item{\verb{$MCMC_output}}{
+\itemize{
+\item{\verb{$beta}}{: A coda::mcmc object, each row was an MCMC sample of the (column) vectorization of regression coefficient B}
+\item{\verb{$mu}}{: A coda::mcmc object, each row was an MCMC sample of the mean vector}
+\item{\verb{$Omega}}{: A coda::mcmc object, each row was an MCMC sample of the upper triangular part (with diagonal) of precision matrix Omega}
+\item{\verb{$lambda}}{: \strong{Non-adaptive only}, A coda::mcmc object, first column was the shrinkage parameter lambda for regression coefficient and the second column was shrinkage parameter lambda for precision matrix}
+\item{\verb{$lambda_beta}}{: \strong{Adaptive only}, A coda::mcmc object, each row was an MCMC sample of the (column) vectorization of shrinkage parameter for regression coefficient B}
+\item{\verb{$lambda_Omega}}{: \strong{Adaptive only}, A coda::mcmc object, each row was an MCMC sample of the shrinage parameter for the upper triangular part (without diagonal) of precision matrix Omega}
+}
+}
+}
 }
 \description{
-Gibbs sampler for Conditional Auto Regressive LASSO and extensions
+Main sampling algorithm of CAR-LASSO model
 }
 \examples{
+set.seed(42)
+dt <- simu_AR1()
+car_res <- CARlasso(y1+y2+y3+y4+y5~x1+x2+x3+x4+x5, data = dt, adaptive = T)
+plot(car_res,0.05)
+# with horseshoe inference
+car_res <- horseshoe(car_res)
+plot(car_res)
 
 
 }

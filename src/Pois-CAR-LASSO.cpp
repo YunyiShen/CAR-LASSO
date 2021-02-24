@@ -93,13 +93,10 @@ List Pois_CAR_LASSO_Cpp(const arma::mat & data, // col composition data, ROW as 
     
     
     // Update Latent Zs using ars
-    // TODO: write a CAR based helper, since the prior changed
     update_Z_helper_Pois_CAR(Z_curr,
                              data, design,mu_curr, beta_curr, Omega_curr,
                              k,p,n,ns,m,emax);
-    //Rcout << "updated:\n" << Z_curr <<endl;
-    //Update betas:
-    //Update betas:
+    
     beta_curr = update_car_beta_helper(Z_curr,design,mu_curr,
                                    tau2_curr,Omega_curr, 
                                    k,p,n);

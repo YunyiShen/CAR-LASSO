@@ -12,7 +12,7 @@ Suggests: testthat
 RoxygenNote: 7.1.1
 Roxygen: list(markdown = TRUE)
 LinkingTo: 
-    Rcpp, RcppArmadillo, RcppProgress, RcppParallel, coda, Matrix
-Imports: 
-    Rcpp, RcppArmadillo, RcppProgress, RcppParallel, coda, Matrix
+    Rcpp, RcppArmadillo, RcppProgress, coda, Matrix, igraph, ggraph, ggplot2, MASS
+Imports:  
+    Rcpp, RcppArmadillo, RcppProgress, coda, Matrix, igraph, ggraph, ggplot2, MASS
 SystemRequirements: C++11

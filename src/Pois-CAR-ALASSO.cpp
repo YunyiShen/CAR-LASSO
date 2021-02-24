@@ -30,6 +30,7 @@ List Pois_CAR_ALASSO_Cpp(const arma::mat & data, // col composition data, ROW as
                    const arma::mat delta_beta,
                    const arma::vec r_Omega, // prior on lambda of Omega
                    const arma::vec delta_Omega,
+                   const arma::vec & lambda_diag,// penalty for diagonals 
                    const int ns, const int m, const double emax, // ars parameters
                    bool progress){
   int k = data.n_cols; // number of nodes
@@ -92,7 +93,7 @@ List Pois_CAR_ALASSO_Cpp(const arma::mat & data, // col composition data, ROW as
                                        delta_Omega);    
     
     // Update Latent Zs using ars
-    // TODO: write a CAR based helper, since the prior changed
+    
     update_Z_helper_Pois_CAR(Z_curr,
                              data, design,mu_curr, beta_curr, Omega_curr,
                              k,p,n,ns,m,emax);
@@ -106,9 +107,10 @@ List Pois_CAR_ALASSO_Cpp(const arma::mat & data, // col composition data, ROW as
     
     // update Omega
     //Rcout<<Z_curr<<endl;
-    update_car_Omega_adp_helper(Omega_curr, Z_curr, design, 
+    update_car_Omega_adp_helper2(Omega_curr, Z_curr, design, 
                                      mu_curr, beta_curr,
                                      lambda_Omega,
+                                     lambda_diag,
                                      k, p, n);
     
     
