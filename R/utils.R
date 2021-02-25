@@ -13,6 +13,12 @@
 plot.carlasso_out <- function(x, ...) {
     dots <- list(...)
     tol <- dots$tol
+    if(x$settings$link=="logit"){
+        response_name <- x$nodes$response[-length(x$nodes$response)]
+    }
+    else{
+        response_name <- x$nodes$response
+    }
     if(is.null(tol)) tol = 0.01
     col_pn <- c("lightblue","pink")
     # graph structure using threshold:
@@ -28,7 +34,7 @@ plot.carlasso_out <- function(x, ...) {
     CAR <- get_CAR_MB(x$point_est$beta*B_binary,
         Graph_binary*x$point_est$Omega)
     
-    n_resp <- length(x$nodes$response)
+    n_resp <- length(response_name)
     n_pred <- length(x$nodes$predictors)
 
     vertices_df <- data.frame(id = c(paste0("resp", 1:n_resp), 
@@ -75,7 +81,7 @@ plot.carlasso_out <- function(x, ...) {
     E(full_graph)$abs_weight <- abs(E(full_graph)$weight)
 
 
-    V(full_graph)$name <- c(x$nodes$response, x$nodes$predictors)
+    V(full_graph)$name <- c(response_name, x$nodes$predictors)
 
     V(full_graph)$alpha_centrality <- alpha_centrality(full_graph)
     V(full_graph)$type <- type[c(rep(2, n_resp), rep(1, n_pred))]
