@@ -45,7 +45,9 @@ gut_res <- CARlasso(Alistipes+Bacteroides+
                         Eubacterium+Parabacteroides+all_others~
                         BMI+Age+Gender+Stratum,
                     data = mgp154,link = "log", 
-                    adaptive = FALSE, n_iter = 5000, 
+                    adaptive = TRUE, 
+                    r_beta = 0.1, # default sometimes cause singularity in Poisson model due to exponential transformation, slightly change can fix it.
+                    n_iter = 5000, 
                     n_burn_in = 1000, thin_by = 10)
 # horseshoe will take a while, as it's currently implemented in R rather than C++
 gut_res <- horseshoe(gut_res)
