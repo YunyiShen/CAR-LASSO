@@ -14,6 +14,9 @@
 #' @param n_iter Number of sampling iterations (i.e. after burn in) for the Gibbs sampler
 #' @param n_burn_in Number of burn in iterations for the Gibbs sampler
 #' @param thin_by Final sample was thin by this number
+#' @param ns parameter for ARS, maximum number of hulls, only used when link is "log" and "logit"
+#' @param m parameter for ARS, initial number of hulls, only used when link is "log" and "logit"
+#' @param emax parameter for ARS, tolerence for small values being 0, larger meaning we tolerent smaller values, only used when link is "log" and "logit"
 #' @param progress Bool, whether report progress from C++
 #' @param verbos Bool, whether show warnings and messages.
 #' 
@@ -83,6 +86,7 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
                      lambda_diag = 0,
                      n_iter = 2000,
                      n_burn_in = 1000, thin_by = 10,
+                     ns = 1000, m=20, emax=64, 
                      progress = TRUE, verbos = TRUE) {
   # some waring messages
   err_no_predictor <- "No predictor supplied.\n\n"
@@ -283,6 +287,7 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
         n_iter, n_burn_in,
         thin_by, r_beta, delta_beta,
         r_Omega, delta_Omega, lambda_diag,
+        ns, m, emax, 
         progress
       )
     }
@@ -291,7 +296,9 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
         y, design,
         n_iter, n_burn_in,
         thin_by, r_beta, delta_beta,
-        r_Omega, delta_Omega, progress
+        r_Omega, delta_Omega, 
+        ns, m, emax, 
+        progress
       )
     }
   }
@@ -306,6 +313,7 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
         n_iter, n_burn_in,
         thin_by, r_beta, delta_beta,
         r_Omega, delta_Omega, lambda_diag,
+        ns, m, emax, 
         progress
       )
     }
@@ -314,7 +322,9 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
         y, design,
         n_iter, n_burn_in,
         thin_by, r_beta, delta_beta,
-        r_Omega, delta_Omega, progress
+        r_Omega, delta_Omega, 
+        ns, m, emax, 
+        progress
       )
     }
   }
@@ -331,7 +341,7 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
   settings <- list(formula = formula, link = link, adaptive = adaptive,
                      r_beta = r_beta , delta_beta = delta_beta , r_Omega = r_Omega, 
                      delta_Omega = delta_Omega, lambda_diag = lambda_diag, n_iter = n_iter,
-                     n_burn_in = n_burn_in, thin_by = thin_by, progress = progress, verbos = verbos)
+                     n_burn_in = n_burn_in, thin_by = thin_by, ns=ns,m=m,emax=emax,progress = progress, verbos = verbos)
 
   nodes <- list(response = colnames(y), predictors = colnames(design))
   res <- list(point_est = point_est, nodes = nodes,  

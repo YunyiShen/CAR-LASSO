@@ -17,6 +17,9 @@ CARlasso(
   n_iter = 2000,
   n_burn_in = 1000,
   thin_by = 10,
+  ns = 1000,
+  m = 20,
+  emax = 64,
   progress = TRUE,
   verbos = TRUE
 )
@@ -45,6 +48,12 @@ CARlasso(
 \item{n_burn_in}{Number of burn in iterations for the Gibbs sampler}
 
 \item{thin_by}{Final sample was thin by this number}
+
+\item{ns}{parameter for ARS, maximum number of hulls, only used when link is "log" and "logit"}
+
+\item{m}{parameter for ARS, initial number of hulls, only used when link is "log" and "logit"}
+
+\item{emax}{parameter for ARS, tolerence for small values being 0, larger meaning we tolerent smaller values, only used when link is "log" and "logit"}
 
 \item{progress}{Bool, whether report progress from C++}
 

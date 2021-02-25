@@ -1,6 +1,8 @@
 import(Rcpp, RcppArmadillo, RcppProgress)
 import(coda, Matrix, MASS)
 import(igraph, ggraph, ggplot2)
+importFrom("stats", "as.formula", "formula", "model.matrix", "na.omit",
+                "rnorm", "sd", "terms")
 useDynLib("CARlasso", .registration = TRUE)
 export(CARlasso)
 export(plot.carlasso_out)
