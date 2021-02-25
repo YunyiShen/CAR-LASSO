@@ -45,8 +45,7 @@ gut_res <- CARlasso(Alistipes+Bacteroides+
                         Eubacterium+Parabacteroides+all_others~
                         BMI+Age+Gender+Stratum,
                     data = mgp154,link = "log", 
-                    r_Omega = 0.1, delta_Omega = 1e-5, # the default option sometimes cause singular problem, slight change will fix it
-                    adaptive = TRUE, n_iter = 5000, 
+                    adaptive = FALSE, n_iter = 5000, 
                     n_burn_in = 1000, thin_by = 10)
 # horseshoe will take a while, as it's currently implemented in R rather than C++
 gut_res <- horseshoe(gut_res)
