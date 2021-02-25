@@ -26,9 +26,29 @@ plot(car_res)
 To run a reduced version of the analysis on human gut microbiome (with less predictors and responses), try:
 
 ```r
-gut_res <- CARlasso(Alistipes+Bacteroides+Eubacterium+Parabacteroides+all_others~BMI+Age+Gender+Stratum,data = mgp154,link = "logit", adaptive = TRUE, n_iter = 10000, n_burn_in = 1000, thin_by = 10)
+gut_res <- CARlasso(Alistipes+Bacteroides+
+                        Eubacterium+Parabacteroides+all_others~
+                        BMI+Age+Gender+Stratum,
+                    data = mgp154,link = "logit", 
+                    adaptive = TRUE, n_iter = 5000, 
+                    n_burn_in = 1000, thin_by = 10)
 # horseshoe will take a while, as it's currently implemented in R rather than C++
 gut_res <- horseshoe(gut_res)
 plot(gut_res)
 ```
 It might take a little while due to the sampling process of the latent normal variable 
+
+Though we don't recommend treating compositional data as counts, as a illustration, we can run the counting model:
+
+```r
+gut_res <- CARlasso(Alistipes+Bacteroides+
+                        Eubacterium+Parabacteroides+all_others~
+                        BMI+Age+Gender+Stratum,
+                    data = mgp154,link = "logit", 
+                    r_Omega = 0.1, delta_Omega = 1e-5, # the default option sometimes cause singular problem, slight change will fix it
+                    adaptive = TRUE, n_iter = 5000, 
+                    n_burn_in = 1000, thin_by = 10)
+# horseshoe will take a while, as it's currently implemented in R rather than C++
+gut_res <- horseshoe(gut_res)
+plot(gut_res)
+```
