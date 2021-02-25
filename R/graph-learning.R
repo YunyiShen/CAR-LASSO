@@ -20,6 +20,9 @@
 horseshoe <- function(obj, Bbar=NULL, A = NULL, nu=3, V=NULL, thr = 0.5 ){
     y <- obj$data$response
     design <- obj$data$design
+    ns <- obj$settings$ns
+    m <- obj$settings$m
+    emax <- obj$settings$emax
     if(obj$settings$link == "identity"){
         multireg_res <- CAR_multireg(y,design,nrow(obj$MCMC_output$beta),
                                      Bbar, A, nu, V)
@@ -34,13 +37,13 @@ horseshoe <- function(obj, Bbar=NULL, A = NULL, nu=3, V=NULL, thr = 0.5 ){
     if(obj$settings$link == "log"){
         multireg_res <- Pois_CAR_multireg(y,design,obj$settings$n_burn_in,obj$settings$n_iter,
                                      obj$settings$thin_by, 
-                                     Bbar, A, nu, V)
+                                     Bbar, A, nu, V, ns, m, emax)
     }
 
     if(obj$settings$link == "logit"){
         multireg_res <- Multinomial_CAR_multireg(y,design,obj$settings$n_burn_in,obj$settings$n_iter,
                                      obj$settings$thin_by, 
-                                     Bbar, A, nu, V)
+                                     Bbar, A, nu, V, ns, m, emax)
     }
 
 
