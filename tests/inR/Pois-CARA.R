@@ -15,10 +15,10 @@ source("./tests/Formal/Accurancy/Graph_generator.R")
 
 set.seed(12345)
 Graph_raw <- g_model1(k)
-Omega <- 2 * Graph_raw$Omega
+Omega <-  Graph_raw$Omega
 #image(Omega)
 
-Sigma <- 0.5 * Graph_raw$Sigma
+Sigma <- Graph_raw$Sigma
 
 Design <- matrix(rnorm(n*p,0,1),n,p)
 Design <- (Design-mean(Design))/sd(Design)
@@ -47,7 +47,8 @@ test <- Pois_CAR_ALASSO_Cpp(Y,  Design, n_iter = 5000,
                             r_beta = .1+0*beta, delta_beta = 1e-5 + 0 * beta,
                             r_Omega = rep(.1,.5*(k-1)*k),
                             delta_Omega = rep(1e-5,.5*(k-1)*k),
-                            ns = 300,m = 8, emax = 64,
+                            lambda_diag = rep(0,k), 
+                            ns = 300,m = 80, emax = 64,
                             progress = T)
 
 A_Graph <- 0 * Omega
@@ -60,5 +61,5 @@ test_C <- Pois_CAR_LASSO_Cpp(Y,  Design, n_iter = 5000,
                             r_beta = 1, delta_beta = .01,
                             r_Omega = 1,
                             delta_Omega = .01,
-                            ns = 100,m = 8, emax = 64,
+                            ns = 1000,m = 80, emax = 64,
                             progress = T)
