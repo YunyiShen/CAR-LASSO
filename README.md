@@ -44,7 +44,7 @@ Though we don't recommend treating compositional data as counts, as a illustrati
 gut_res <- CARlasso(Alistipes+Bacteroides+
                         Eubacterium+Parabacteroides+all_others~
                         BMI+Age+Gender+Stratum,
-                    data = mgp154,link = "logit", 
+                    data = mgp154,link = "log", 
                     r_Omega = 0.1, delta_Omega = 1e-5, # the default option sometimes cause singular problem, slight change will fix it
                     adaptive = TRUE, n_iter = 5000, 
                     n_burn_in = 1000, thin_by = 10)
