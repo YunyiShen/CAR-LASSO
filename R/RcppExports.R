@@ -165,6 +165,55 @@ stein_loss_cpp <- function(Omega, Omega_hat) {
     .Call(`_CARlasso_stein_loss_cpp`, Omega, Omega_hat)
 }
 
+#' @title Block Gibbs sampler for adaptive CAR-LASSO
+#'
+#' @description \strong{This function is for advanced users to build their own sampler use adaptive CARlasso as core.} It will execute one round of Gibbs sampler of adaptive CAR-LASSO model. Be aware that the function is a `void` function implemented in C++, and all updated parameters e.g. Omega will be manipulate directly in memory to save space. Users should manage to do their own work to save the state. Also be aware that R uses shallow copy by default, which means one cannot save the state by simply give it to another object e.g. first `Omega_old <- Omega_curr` then update `Omega_curr`, `Omega_old` will also change. \strong{This function will NOT check dimensions of input.} Below we assume n samples, k responses and p predictors.
+#' @param Z_curr the current (latent) normal Z_curr, should be n*k. Will not be changed
+#' @param design the design matrix, should be n*p. Will not be changed
+#' @param lambda2_beta the current shrinkage parameter of regression coefficients, should be a vector with p*k entries. Will be updated
+#' @param tau2_curr the current latent scale parameter in the normal mixture representation of Laplace, for regression coefficients, should be a vector with p*k entries. Will be updated.
+#' @param beta_curr the current regression coefficients, should be a matrix sized p*k (p row and k columns). Will be updated.
+#' @param lambda_Omega the current shrinkage parameter for Omega, should be a vector with k*(k-1)/2 entries. Will be updated.
+#' @param Omega_curr the current Omega matrix, should be a matrix of size k*k. Will be updated.
+#' @param mu_curr the current mu, intercept, should be a vector of size k. Will be updated.
+#' @param r_beta hyperprior's parameter of shrinkage for regression coefficients, should be a scalar of type 'double' and positive. Will not be updated.
+#' @param delta_beta hyperprior's parameter of shrinkage for regression coefficients, should be a scalar of type 'double' and positive. Will not be updated.
+#' @param r_Omega hyperprior's parameter of shrinkage for precision Omega, should be a scalar of type 'double' and positive. Will not be updated.
+#' @param delta_Omega hyperprior's parameter of shrinkage for rprecision Omega, should be a scalar of type 'double' and positive. Will not be updated.
+#' @param lambda_diag shrinkage parameter of the diagonal of Omega, should be a vector of size k, should be non-negative. Will not be updated
+#' @param k integer, number of responses
+#' @param p integer, number of predictors
+#' @param n integer, number of Z_curr points
+#' @return Again this is a `void` function and will not return anything. All update happened in memory directly. 
+rCARAlasso_ <- function(Z_curr, design, lambda2_beta, tau2_curr, beta_curr, lambda_Omega, Omega_curr, mu_curr, r_beta, delta_beta, r_Omega, delta_Omega, lambda_diag, k, p, n) {
+    invisible(.Call(`_CARlasso_rCARAlasso_`, Z_curr, design, lambda2_beta, tau2_curr, beta_curr, lambda_Omega, Omega_curr, mu_curr, r_beta, delta_beta, r_Omega, delta_Omega, lambda_diag, k, p, n))
+}
+
+#' @title Block Gibbs sampler for CAR-LASSO
+#'
+#' @description \strong{This function is for advanced users to build their own sampler use CARlasso as core.} It will execute one round of Gibbs sampler of CAR-LASSO model. Be aware that the function is a `void` function implemented in C++, and all updated parameters e.g. Omega will be manipulate directly in memory to save space. Users should manage to do their own work to save the state. Also be aware that R uses shallow copy by default, which means one cannot save the state by simply give it to another object e.g. first `Omega_old <- Omega_curr` then update `Omega_curr`, `Omega_old` will also change. \strong{This function will NOT check dimensions of input.} Below we assume n samples, k responses and p predictors.
+#' 
+#' @param Z_curr the current (latent) normal data, should be n*k. Will not be changed
+#' @param design the design matrix, should be n*p. Will not be changed
+#' @param lambda2_beta the current shrinkage parameter of regression coefficients, should be a scalar of type `double`. Will be updated
+#' @param tau2_curr the current latent scale parameter in the normal mixture representation of Laplace, for regression coefficients, should be a vector with p*k entries. Will be updated.
+#' @param beta_curr the current regression coefficients, should be a matrix sized p*k (p row and k columns). Will be updated.
+#' @param lambda_Omega the current shrinkage parameter for Omega, should be a scalar of tyoe `double`. Will be updated.
+#' @param Omega_curr the current Omega matrix, should be a matrix of size k*k. Will be updated.
+#' @param mu_curr the current mu, intercept, should be a vector of size k. Will be updated.
+#' @param r_beta hyperprior's parameter of shrinkage for regression coefficients, should be a scalar of type 'double' and positive. Will not be updated.
+#' @param delta_beta hyperprior's parameter of shrinkage for regression coefficients, should be a scalar of type 'double' and positive. Will not be updated.
+#' @param r_Omega hyperprior's parameter of shrinkage for precision Omega, should be a scalar of type 'double' and positive. Will not be updated.
+#' @param delta_Omega hyperprior's parameter of shrinkage for rprecision Omega, should be a scalar of type 'double' and positive. Will not be updated.
+#' @param k integer, number of responses
+#' @param p integer, number of predictors
+#' @param n integer, number of data points
+#' @return Again this is a `void` function and will not return anything. All update happened in memory directly. 
+#' @export
+rCARlasso_ <- function(Z_curr, design, lambda2_beta, tau2_curr, beta_curr, lambda_Omega, Omega_curr, mu_curr, r_beta, delta_beta, r_Omega, delta_Omega, k, p, n) {
+    invisible(.Call(`_CARlasso_rCARlasso_`, Z_curr, design, lambda2_beta, tau2_curr, beta_curr, lambda_Omega, Omega_curr, mu_curr, r_beta, delta_beta, r_Omega, delta_Omega, k, p, n))
+}
+
 rmultireg <- function(Y, X, Bbar, A, nu, V) {
     .Call(`_CARlasso_rmultireg`, Y, X, Bbar, A, nu, V)
 }
