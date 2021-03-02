@@ -10,13 +10,13 @@
 #' @param delta_beta Hyper-parameter for regression coefficient, rate parameter of Gamma, if adaptive, should have row number same as number of predictors while column number of responses
 #' @param r_Omega Hyper-parameter for precision matrix, shape parameter of Gamma. If adaptive, can be a matrix with same size as precision matrix, if this is the case, only upper triangular part without diagonal will be used, or can be a vector whose size was the upper triangular part of precision matrix, if non-adaptive, a scalar.
 #' @param delta_Omega Hyper-parameter for precision matrix, rate parameter of Gamma, If adaptive, can be a matrix with same size as precision matrix, if this is the case, only upper triangular part without diagonal will be used, or can be a vector whose size was the upper triangular part of precision matrix, if non-adaptive, a scalar.
-#' @param lambda_diag adaptive only hyper-parameter for panalties on diagonal entries of Omega, should have dimension k and non-negative
+#' @param lambda_diag adaptive only hyper-parameter for penalties on diagonal entries of Omega, should have dimension k and non-negative
 #' @param n_iter Number of sampling iterations (i.e. after burn in) for the Gibbs sampler
 #' @param n_burn_in Number of burn in iterations for the Gibbs sampler
 #' @param thin_by Final sample was thin by this number
 #' @param ns parameter for ARS, maximum number of hulls, only used when link is "log" and "logit"
 #' @param m parameter for ARS, initial number of hulls, only used when link is "log" and "logit"
-#' @param emax parameter for ARS, tolerence for small values being 0, larger meaning we tolerent smaller values, only used when link is "log" and "logit"
+#' @param emax parameter for ARS, tolerance for small values being 0, larger meaning we tolerate smaller values, only used when link is "log" and "logit"
 #' @param progress Bool, whether report progress from C++
 #' @param verbos Bool, whether show warnings and messages.
 #' 
@@ -57,7 +57,7 @@
 #'            \item{`$Omega`}{: A coda::mcmc object, each row was an MCMC sample of the upper triangular part (with diagonal) of precision matrix Omega}
 #'            \item{`$lambda`}{: \strong{Non-adaptive only}, A coda::mcmc object, first column was the shrinkage parameter lambda for regression coefficient and the second column was shrinkage parameter lambda for precision matrix}
 #'            \item{`$lambda_beta`}{: \strong{Adaptive only}, A coda::mcmc object, each row was an MCMC sample of the (column) vectorization of shrinkage parameter for regression coefficient B}
-#'            \item{`$lambda_Omega`}{: \strong{Adaptive only}, A coda::mcmc object, each row was an MCMC sample of the shrinage parameter for the upper triangular part (without diagonal) of precision matrix Omega}
+#'            \item{`$lambda_Omega`}{: \strong{Adaptive only}, A coda::mcmc object, each row was an MCMC sample of the shrinkage parameter for the upper triangular part (without diagonal) of precision matrix Omega}
 #'        }
 #'    }
 #' }
@@ -88,7 +88,7 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
                      n_burn_in = 1000, thin_by = 10,
                      ns = 1000, m=20, emax=64, 
                      progress = TRUE, verbos = TRUE) {
-  # some waring messages
+  # some warning messages
   err_no_predictor <- "No predictor supplied.\n\n"
   warr_centering <- "Predictors will be centered.\n\n"
 
