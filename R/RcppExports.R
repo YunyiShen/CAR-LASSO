@@ -45,18 +45,6 @@ update_car_tau2_helper <- function(beta, lambda2, Omega, k, p, n) {
     .Call(`_CARlasso_update_car_tau2_helper`, beta, lambda2, Omega, k, p, n)
 }
 
-update_car_nu_helper <- function(data, design, design_r, membership, beta, mu, xi, Omega, k, pr, n) {
-    .Call(`_CARlasso_update_car_nu_helper`, data, design, design_r, membership, beta, mu, xi, Omega, k, pr, n)
-}
-
-update_xi_helper <- function(xi, nu, membership, alpha, beta, k, pr, m) {
-    invisible(.Call(`_CARlasso_update_xi_helper`, xi, nu, membership, alpha, beta, k, pr, m))
-}
-
-get_data_centered <- function(centered_data, data, design_r, nu, Omega) {
-    invisible(.Call(`_CARlasso_get_data_centered`, centered_data, data, design_r, nu, Omega))
-}
-
 sample_Omega_prior_cpp <- function(k, n_iter, n_burn_in, thin_by, lambda_a, lambda_b, progress) {
     .Call(`_CARlasso_sample_Omega_prior_cpp`, k, n_iter, n_burn_in, thin_by, lambda_a, lambda_b, progress)
 }
@@ -165,6 +153,22 @@ stein_loss_cpp <- function(Omega, Omega_hat) {
     .Call(`_CARlasso_stein_loss_cpp`, Omega, Omega_hat)
 }
 
+CAR_multireg_cpp <- function(data, design, n_sample, Bbar, A, nu, V) {
+    .Call(`_CARlasso_CAR_multireg_cpp`, data, design, n_sample, Bbar, A, nu, V)
+}
+
+Multinomial_CAR_multireg_cpp <- function(data, design, n_burn_in, n_iter, thin_by, Bbar, A, nu, V, ns, m, emax) {
+    .Call(`_CARlasso_Multinomial_CAR_multireg_cpp`, data, design, n_burn_in, n_iter, thin_by, Bbar, A, nu, V, ns, m, emax)
+}
+
+Pois_CAR_multireg_cpp <- function(data, design, n_burn_in, n_iter, thin_by, Bbar, A, nu, V, ns, m, emax) {
+    .Call(`_CARlasso_Pois_CAR_multireg_cpp`, data, design, n_burn_in, n_iter, thin_by, Bbar, A, nu, V, ns, m, emax)
+}
+
+Probit_CAR_multireg_cpp <- function(data, design, n_burn_in, n_iter, thin_by, Bbar, A, nu, V) {
+    .Call(`_CARlasso_Probit_CAR_multireg_cpp`, data, design, n_burn_in, n_iter, thin_by, Bbar, A, nu, V)
+}
+
 #' @title Block Gibbs sampler for adaptive CAR-LASSO
 #'
 #' @description \strong{This function is for advanced users to build their own sampler use adaptive CARlasso as core.} It will execute one round of Gibbs sampler of adaptive CAR-LASSO model. Be aware that the function is a `void` function implemented in C++, and all updated parameters e.g. Omega will be manipulate directly in memory to save space. Users should manage to do their own work to save the state. Also be aware that R uses shallow copy by default, which means one cannot save the state by simply give it to another object e.g. first `Omega_old <- Omega_curr` then update `Omega_curr`, `Omega_old` will also change. \strong{This function will NOT check dimensions of input.} Below we assume n samples, k responses and p predictors.
@@ -212,9 +216,5 @@ rCARAlasso_ <- function(Z_curr, design, lambda2_beta, tau2_curr, beta_curr, lamb
 #' @export
 rCARlasso_ <- function(Z_curr, design, lambda2_beta, tau2_curr, beta_curr, lambda_Omega, Omega_curr, mu_curr, r_beta, delta_beta, r_Omega, delta_Omega, k, p, n) {
     invisible(.Call(`_CARlasso_rCARlasso_`, Z_curr, design, lambda2_beta, tau2_curr, beta_curr, lambda_Omega, Omega_curr, mu_curr, r_beta, delta_beta, r_Omega, delta_Omega, k, p, n))
-}
-
-rmultireg <- function(Y, X, Bbar, A, nu, V) {
-    .Call(`_CARlasso_rmultireg`, Y, X, Bbar, A, nu, V)
 }
 
