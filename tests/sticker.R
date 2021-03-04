@@ -20,8 +20,9 @@ pp <- p + theme(legend.position = "none") +
 )
 
 
-#ww <- sticker(pp, package = "CARlasso", s_width = 1.83, s_height=1.83, s_x=0.96, s_y=0.7, h_fill = "#4e8ff0", p_y = 1.45)
-#ww
+ww <- sticker(pp, package = "CARlasso", s_width = 1.83, s_height=1.83, s_x=0.96, s_y=0.7, h_fill = "#4e8ff0", p_y = 1.45)
+ww
 
-ww <- sticker(pp, package = "CARlasso", s_width = 2.45, s_height=2.45, s_x=0.96, s_y=0.7, h_fill = "
-    #4e8ff0", p_y = 1.55) 
+ggsave("CARlasso.png",width = 1,height = 1, unit = "in", dpi = 500, scale = 1)
+
+sticker(pp, package = "CARlasso", s_width = 2.3, s_height=2.3, s_x=0.96, s_y=0.65, h_fill = "#4e8ff0", p_y = 1.5, p_size = 15.5) 
