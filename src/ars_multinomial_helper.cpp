@@ -149,7 +149,7 @@ void spl1_multi_(const int *ns, int *n, int *ilow, int *ihigh, int *ipt,
   } /** end of while (! sampld) **/
   //Necesario al terminar de utilizar los generadores de numeros aleatorios del R
   PutRNGstate();
-  if (attempts >= max_attempt)
+  //if (attempts >= max_attempt)
     //Rcout << "Trap in ARS: Maximum number of attempts reached by routine spl1_\n"
     //      << endl;
   Z_curr(l, w) = *beta;
