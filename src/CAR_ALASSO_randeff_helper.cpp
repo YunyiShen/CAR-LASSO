@@ -58,11 +58,11 @@ void update_car_randeff_Omega_adp_helper(arma::mat & Omega,
   
   arma::mat S11;
   arma::mat S12;
-  double S22;
+  //double S22;
   
   arma::mat U11;
   arma::mat U12;
-  double U22;
+  //double U22;
   
   arma::mat Omega_11;
   arma::mat inv_Omega_11;

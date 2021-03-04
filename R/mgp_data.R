@@ -20,7 +20,7 @@
 
 #' Hofmockel Soil Aggregate COB KBASE
 #'
-#' This study is based on pyrosequencing of 16S rDNA amplicons from faecal samples collected from 178 elderly Irish citizens and 13 healthy young control subjects. A subset of these samples were also subjected to shotgun sequencing using Illumina HiSeq 2000 2x91bp reads. Antibiotic treatment was an exclusion criterion.
+#' This study is to examine soil microbial community composition and structure of both bacteria and fungi at a microbially-relevant scale. The researchers isolated soil aggregates from three land management systems in central Iowa to test if the aggregate-level microbial responses are related to plant community and management practices. The clean dataset has 120 samples with 17 genus under consideration.
 #'
 #' @docType data
 #'
