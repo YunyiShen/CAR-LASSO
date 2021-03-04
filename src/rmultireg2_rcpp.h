@@ -1,3 +1,6 @@
+#ifndef RMULTIREG2_RCPP_H
+#define RMULTIREG2_RCPP_H
+
 // transplanted from package bayesm
 
 // [[Rcpp::depends(RcppArmadillo)]]
@@ -11,7 +14,15 @@ using namespace arma;
 using namespace Rcpp;
 
 
-List rwishart(double nu, arma::mat const& V){
+class rwishart2{
+    public:
+    arma::mat W, C, CI;
+    rwishart2(double, const arma::mat & );
+};
+
+
+
+inline rwishart2::rwishart2(double nu, const arma::mat & V){
 
 // Wayne Taylor 4/7/2015
 
@@ -36,8 +47,8 @@ List rwishart(double nu, arma::mat const& V){
       T(i,j) = rnorm(1)[0]; //rnorm returns a NumericVector, so using [0] allows for conversion to double
   }}
   
-  arma::mat C = trans(T)*chol(V);
-  arma::mat CI = solve(trimatu(C),eye(m,m)); //trimatu interprets the matrix as upper triangular and makes solve more efficient
+  C = trans(T)*chol(V);
+  CI = solve(trimatu(C),eye(m,m)); //trimatu interprets the matrix as upper triangular and makes solve more efficient
   
   // C is the upper triangular root of Wishart therefore, W=C'C
   // this is the LU decomposition Inv(W) = CICI' Note: this is
@@ -45,17 +56,21 @@ List rwishart(double nu, arma::mat const& V){
   
   // W is Wishart draw, IW is W^-1
   
-  return List::create(
-    Named("W") = trans(C) * C,
-    Named("IW") = CI * trans(CI),
-    Named("C") = C,
-    Named("CI") = CI);
+    W = trans(C) * C;
+    //IW = CI * trans(CI);
 }
 
+class rmultireg2{
+    public:
+    arma::mat B, Omega;
+    rmultireg2(const arma::mat &, const arma::mat &, 
+    const arma::mat &, const arma::mat &, 
+    double, const arma::mat & ); 
+};
 
 
-// [[Rcpp::export]]
-List rmultireg(arma::mat const& Y, arma::mat const& X, arma::mat const& Bbar, arma::mat const& A, double nu, arma::mat const& V) {
+
+inline rmultireg2::rmultireg2(const arma::mat & Y, const arma::mat & X, const arma::mat & Bbar, const arma::mat & A, double nu, const arma::mat & V) {
 
 // Keunwoo Kim 09/09/2014
 
@@ -101,7 +116,7 @@ List rmultireg(arma::mat const& Y, arma::mat const& X, arma::mat const& Bbar, ar
   arma::mat ucholinv = solve(trimatu(chol(V+S)), eye(m,m));
   arma::mat VSinv = ucholinv*trans(ucholinv);
   
-  List rwout = rwishart(nu+n, VSinv);
+  rwishart2 rwout(nu+n, VSinv);
   
   // now draw B given Sigma
   //   note beta ~ N(vec(Btilde),Sigma (x) Covxxa)
@@ -113,12 +128,12 @@ List rmultireg(arma::mat const& Y, arma::mat const& X, arma::mat const& Bbar, ar
   //	since vec(ABC) = (C' (x) A)vec(B), we have 
   //		B = Btilde + IR Z_mk CI'
 
-  arma::mat CI = rwout["CI"]; //there is no need to use as<arma::mat>(rwout["CI"]) since CI is being initiated as a arma::mat in the same line
-  arma::mat draw = arma::mat(rnorm(k*m));
-  draw.reshape(k,m);
-  arma::mat B = Btilde + IR*draw*trans(CI);
-    
-  return List::create(
-      Named("B") = B, 
-      Named("Sigma") = rwout["IW"]);
+  arma::mat draw(k,m,fill::randn);
+  
+  B = Btilde + IR*draw*trans(rwout.CI);
+  Omega = rwout.W; 
+  
 }
+
+
+#endif

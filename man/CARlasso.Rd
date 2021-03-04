@@ -41,7 +41,7 @@ CARlasso(
 
 \item{delta_Omega}{Hyper-parameter for precision matrix, rate parameter of Gamma, If adaptive, can be a matrix with same size as precision matrix, if this is the case, only upper triangular part without diagonal will be used, or can be a vector whose size was the upper triangular part of precision matrix, if non-adaptive, a scalar.}
 
-\item{lambda_diag}{adaptive only hyper-parameter for panalties on diagonal entries of Omega, should have dimension k and non-negative}
+\item{lambda_diag}{adaptive only hyper-parameter for penalties on diagonal entries of Omega, should have dimension k and non-negative}
 
 \item{n_iter}{Number of sampling iterations (i.e. after burn in) for the Gibbs sampler}
 
@@ -53,7 +53,7 @@ CARlasso(
 
 \item{m}{parameter for ARS, initial number of hulls, only used when link is "log" and "logit"}
 
-\item{emax}{parameter for ARS, tolerence for small values being 0, larger meaning we tolerent smaller values, only used when link is "log" and "logit"}
+\item{emax}{parameter for ARS, tolerance for small values being 0, larger meaning we tolerate smaller values, only used when link is "log" and "logit"}
 
 \item{progress}{Bool, whether report progress from C++}
 
@@ -97,7 +97,7 @@ A \code{carlasso_out} object with elements:
 \item{\verb{$Omega}}{: A coda::mcmc object, each row was an MCMC sample of the upper triangular part (with diagonal) of precision matrix Omega}
 \item{\verb{$lambda}}{: \strong{Non-adaptive only}, A coda::mcmc object, first column was the shrinkage parameter lambda for regression coefficient and the second column was shrinkage parameter lambda for precision matrix}
 \item{\verb{$lambda_beta}}{: \strong{Adaptive only}, A coda::mcmc object, each row was an MCMC sample of the (column) vectorization of shrinkage parameter for regression coefficient B}
-\item{\verb{$lambda_Omega}}{: \strong{Adaptive only}, A coda::mcmc object, each row was an MCMC sample of the shrinage parameter for the upper triangular part (without diagonal) of precision matrix Omega}
+\item{\verb{$lambda_Omega}}{: \strong{Adaptive only}, A coda::mcmc object, each row was an MCMC sample of the shrinkage parameter for the upper triangular part (without diagonal) of precision matrix Omega}
 }
 }
 }

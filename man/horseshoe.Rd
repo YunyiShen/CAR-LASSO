@@ -26,7 +26,7 @@ A \code{carlasso_out} object with learned binary adjacency matrix and multi-resp
 Horseshoe method for graphical structure inference
 }
 \details{
-This method fits a linear regression with less prior on any parameters and compare the posterior mean with the LASSO result. If LASSO is comparablely less than result without sparsity prior, we argue that the edge should be absent
+This method fits a linear regression with less informative prior on any parameters and compare the posterior mean with the LASSO result. If LASSO is comparably less than result without sparsity prior, we argue that the edge should be absent
 }
 \examples{
 set.seed(42)
