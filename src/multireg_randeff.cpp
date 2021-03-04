@@ -58,6 +58,8 @@ List CAR_multireg_randeff_cpp(const arma::mat &data, const arma::mat &design,
     arma::mat xi_curr(m, k, arma::fill::zeros);
     xi_curr += 1;
 
+    arma::mat B_curr;
+
     arma::mat design_full(n, p + 1, arma::fill::ones);
     design_full.cols(1, p) = design;
     Progress prog(n_iter + n_burn_in, false); // progress bar
