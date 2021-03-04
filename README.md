@@ -32,7 +32,7 @@ gut_res <- CARlasso(Alistipes+Bacteroides+
                     data = mgp154,link = "logit", 
                     adaptive = TRUE, n_iter = 5000, 
                     n_burn_in = 1000, thin_by = 10)
-# horseshoe will take a while, as it's currently implemented in R rather than C++
+# horseshoe will take a while, as it needs to sample the latent normal too
 gut_res <- horseshoe(gut_res)
 plot(gut_res)
 ```
