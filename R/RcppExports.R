@@ -153,6 +153,10 @@ stein_loss_cpp <- function(Omega, Omega_hat) {
     .Call(`_CARlasso_stein_loss_cpp`, Omega, Omega_hat)
 }
 
+CAR_multireg_randeff_cpp <- function(data, design, design_r, membership, n_burn_in, n_iter, thin_by, Bbar, A, nu, V, alpha, beta) {
+    .Call(`_CARlasso_CAR_multireg_randeff_cpp`, data, design, design_r, membership, n_burn_in, n_iter, thin_by, Bbar, A, nu, V, alpha, beta)
+}
+
 CAR_multireg_cpp <- function(data, design, n_sample, Bbar, A, nu, V) {
     .Call(`_CARlasso_CAR_multireg_cpp`, data, design, n_sample, Bbar, A, nu, V)
 }
