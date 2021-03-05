@@ -70,7 +70,7 @@ for(k in ks) {
                     cat("k =",k,",p =",p,",s =",s,",mod =",mod,",rep =",i,"\n")
                     Z <- makedata(Sigma,Design,beta,n)
 
-                    # CAR
+                    # GLASSO
                     cat("GLASSO:\n")
                     for(jj in 1:retry){
                         sample_GL <- tryCatch( Graphical_LASSO_Cpp(Z, 
@@ -88,7 +88,7 @@ for(k in ks) {
                     write.csv(res_loss,res_loss_file)
                     i_res_loss <- i_res_loss + 1
 
-                    # A-CAR
+                    # A-GLASSO
                     cat("GLASSO-A:\n")
                     for(jj in 1:retry){
                         sample_GL_A <- tryCatch( Graphical_ALASSO_Cpp(Z,  n_iter = 10000, 
@@ -110,7 +110,7 @@ for(k in ks) {
                     write.csv(res_loss,res_loss_file)
                     i_res_loss <- i_res_loss + 1
 
-                    # SRG
+                    # ad hoc
                     cat("ad-hoc:\n")
                     for(jj in 1:retry){
                         sample_adhoc <- tryCatch( MASS::ginv(cov(Z)),
@@ -146,7 +146,7 @@ for(k in ks) {
                     i_res_loss <- i_res_loss + 1
 
                     # now evaluate the graph_Omega
-                    ## CAR-A
+                    ## GLASSO-A
                     res_graph_Omega[i_res_graph_Omega,1:6] <- c(k,p,n,s,mod,i)
                     res_graph_Omega$algo[i_res_graph_Omega] <- "GALASSO"
                     res_graph_Omega[i_res_graph_Omega,8:11] <- 
@@ -158,7 +158,7 @@ for(k in ks) {
                     write.csv(res_graph_Omega,res_graph_Omega_file)
                     i_res_graph_Omega <- i_res_graph_Omega + 1
 
-                    ## CAR
+                    ## GLASSO
                     res_graph_Omega[i_res_graph_Omega,1:6] <- c(k,p,n,s,mod,i)
                     res_graph_Omega$algo[i_res_graph_Omega] <- "GLASSO"
                     res_graph_Omega[i_res_graph_Omega,8:11] <- 
@@ -170,7 +170,7 @@ for(k in ks) {
                     write.csv(res_graph_Omega,res_graph_Omega_file)
                     i_res_graph_Omega <- i_res_graph_Omega + 1
 
-                    ## SRG
+                    ## ad hoc
                     res_graph_Omega[i_res_graph_Omega,1:6] <- c(k,p,n,s,mod,i)
                     res_graph_Omega$algo[i_res_graph_Omega] <- "adhoc"
                     
