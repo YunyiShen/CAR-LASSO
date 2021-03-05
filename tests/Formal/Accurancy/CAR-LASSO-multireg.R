@@ -103,8 +103,8 @@ for(k in ks) {
                         sample_CAR_A <- tryCatch( CAR_ALASSO_Cpp(Z,  Design, n_iter = 10000, 
                             n_burn_in = 5000, thin_by = 10, 
                             r_beta = 1+0*beta, delta_beta = .01 + 0 * beta,
-                            r_Omega = rep(1,.5*(k+1)*k),
-                            delta_Omega = rep(.01,.5*(k+1)*k),
+                            r_Omega = rep(1,.5*(k-1)*k),
+                            delta_Omega = rep(.01,.5*(k-1)*k),
                             lambda_diag = rep(0,k), 
                             progress = T),error = function(e){return(list())} )
                         if(length(sample_CAR_A)>0) break
