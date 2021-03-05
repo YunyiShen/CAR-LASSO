@@ -105,6 +105,7 @@ for(k in ks) {
                             r_beta = 1e-2+0*beta, delta_beta = 1e-6 + 0 * beta,
                             r_Omega = rep(1e-2,.5*(k-1)*k),
                             delta_Omega = rep(1e-6,.5*(k-1)*k),
+                            lambda_diag = rep(0,k), 
                             progress = T),error = function(e){return(list())} )
                         if(length(sample_CAR_A)>0) break
                         else cat("retry ",jj,"\n")
