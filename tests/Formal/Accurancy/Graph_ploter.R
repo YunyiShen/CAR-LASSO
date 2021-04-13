@@ -33,7 +33,7 @@ p <- gplot(graphss) +
                       midpoint = 0,
                       na.value="transparent") +
   labs(fill = "value", x = "", y="") +
-  theme(text = element_text(size=14), 
+  theme(text = element_text(size=20), 
         axis.text.x = element_blank(),
         axis.text.y = element_blank(),
         axis.ticks = element_blank(),
