@@ -38,7 +38,7 @@ p <- gplot(graphss) +
         axis.text.y = element_blank(),
         axis.ticks = element_blank(),
         plot.margin = margin(.15, .15, .15, .15, "cm"),
-        legend.position = "bottom",
+        #legend.position = "bottom",
         legend.title = element_blank())+
   theme(
     panel.background = element_rect(fill = "transparent"), # bg of the panel
@@ -49,6 +49,6 @@ p <- gplot(graphss) +
 
 #ggsave("./simu_graphs.pdf",width = 10.5,height=7, scale = 0.8)
 
-pdf("model-grid.pdf", height=3, width=12)
+pdf("model-grid.pdf", height=3, width=18)
 p
 dev.off()
