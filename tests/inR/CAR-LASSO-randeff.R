@@ -43,8 +43,8 @@ sourceCpp("./src/CAR-ALASSO.cpp")
 source("./tests/Formal/Accurancy/Graph_generator.R")
 
 set.seed(12345)
-k <- 20
-n <- 50
+k <- 10
+n <- 500
 p <- 2
 pr <- 5
 m <- 1
@@ -116,13 +116,10 @@ tests_fix_A <- CAR_ALASSO_Cpp(data = Y, design = design,
                                r_beta = 1e-2+0*beta, delta_beta = 1e-6 + 0 * beta,
                                r_Omega = rep(1e-2,.5*(k-1)*k),
                                delta_Omega = rep(1e-6,.5*(k-1)*k),
+                               lambda_diag = rep(0,k),
                                progress = T)
 
-CAR_fix_A_Graph <- 0 * Omega
-CAR_fix_A_Graph[upper.tri(CAR_fix_A_Graph,T)] <- apply(tests_fix_A$Omega,2,mean)
-CAR_fix_A_Graph <- CAR_fix_A_Graph+t(CAR_fix_A_Graph)
-diag(CAR_fix_A_Graph) <- 0.5 * diag(CAR_fix_A_Graph)
-image((CAR_fix_A_Graph))
+CAR_fix_A_Graph <- CARlasso:::get_graph(tests_fix_A,k)
 
 
 
@@ -130,3 +127,33 @@ stein_loss_cpp(CAR_fix_Graph,Omega)
 stein_loss_cpp(CAR_rand_Graph,Omega)
 stein_loss_cpp(CAR_fix_A_Graph,Omega)
 stein_loss_cpp(CAR_rand_A_Graph,Omega)
+
+
+# multireg
+
+sourceCpp("./src/multireg-randeff.cpp")
+
+test_multireg <- CAR_multireg_randeff_cpp(data = Y, design = design,
+                               design_r = design_r,membership = membership,
+                               n_iter = 10000, n_burn_in = 1000, thin_by = 10,
+                               Bbar = matrix(0,p+1,k), A = diag(1e-8,p+1,p+1),
+                               nu = 3, V = 3*diag(2,k,k), 
+                               alpha = 1e-8, beta = 1e-2)
+
+Graph_multireg <- CARlasso:::get_graph(test_multireg, k=k)
+CARlasso:::stein_loss_cpp(Graph_multireg, Omega)
+
+
+
+tests_randA <- CAR_ALASSO_randeff_Cpp(data = Y, design = design,
+                               design_r = design_r,membership = membership,
+                               n_iter = 10000, n_burn_in = 1000, thin_by = 10,
+                               r_beta = 1e-2+0*beta, delta_beta = 1e-6 + 0 * beta,
+                               r_Omega = rep(1e-2,.5*(k-1)*k),
+                               delta_Omega = rep(1e-6,.5*(k-1)*k),
+                               alpha = 1e-8, beta = 1e-2,
+                               lambda_diag = matrix(0, k , 1),
+                               progress = T)
+
+CAR_rand_A_Graph <- CARlasso:::get_graph(tests_randA, k=k)
+CARlasso:::stein_loss_cpp(CAR_rand_A_Graph, Omega)

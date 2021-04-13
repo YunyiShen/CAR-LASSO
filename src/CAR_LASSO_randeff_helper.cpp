@@ -5,10 +5,6 @@
 using namespace Rcpp;
 using namespace arma;
 using namespace std;
-
-// [[Rcpp::depends(RcppProgress)]]
-#include <progress.hpp>
-#include <progress_bar.hpp>
 #include "helper.h"
 #include "GIG_helper.h"
 #include "CAR_LASSO_helper.h"
@@ -17,7 +13,6 @@ using namespace std;
 
 // helper function for updating random effect matrix, so that the conditional mean was design_r * res
 
-// [[Rcpp::export]]
 arma::mat update_car_nu_helper(const arma::mat & data,
                                const arma::mat & design, // design matrix
                                const arma::mat & design_r, // design mat for random effect
@@ -58,7 +53,50 @@ arma::mat update_car_nu_helper(const arma::mat & data,
   
 }
 
-// [[Rcpp::export]]
+// used in random effect using conjugate 
+arma::mat update_srg_nu_helper(const arma::mat & data,
+                               const arma::mat & design, // design matrix
+                               const arma::mat & design_r, // design mat for random effect
+                               const arma::mat & membership, // membership matrix for random precision, this should be something similar to a design matrix, that tells the algorithm which precision correspond to which random effect, important for multiple memberships, then the precision will be membership * xi
+                               const arma::mat & beta,
+                               const arma::vec & mu, // grand mean
+                               const arma::mat & xi, // the precision matrix of random effect, should be m rows k column, m is how many different distributions we have
+                               const arma::mat & Omega,
+                               int k, int pr, int n){
+
+  arma::mat Q_nu(k*pr,k*pr,fill::zeros);
+  
+  arma::mat XtX = design_r.t() * design_r ;
+
+  //arma::mat Sigma = inv_sympd(Omega);
+
+  arma::mat mu_nu_mat = data - design * beta;
+  mu_nu_mat.each_row() -= mu.t();
+  mu_nu_mat = design_r.t() * (mu_nu_mat);
+
+  arma::vec mu_nu = vectorise(mu_nu_mat);
+  
+  Q_nu = kron(Omega,XtX); // precision matrix of beta, more intuitive way was sum_i X_i^TSigmaX_i, but kron is faster
+  arma::mat perc_random = membership * xi;
+  //Rcout << perc_random << endl;
+  Q_nu.diag() += vectorise(perc_random);
+  //Rcout << Q_nu << endl;
+  //Rcout << mu_nu << endl;
+
+  arma::mat res(size(mu_nu),fill::randn);
+
+  arma::mat chol_Q = arma::chol(Q_nu);
+  res = arma::solve(chol_Q,res) + arma::solve(Q_nu,mu_nu);
+
+  res = reshape(res,pr,k);
+  
+  return(res);
+  
+}
+
+
+
+
 void update_xi_helper(arma::mat & xi,
                       const arma::mat & nu,
                       const arma::mat & membership,
@@ -82,14 +120,14 @@ void update_xi_helper(arma::mat & xi,
     return;
 }
 
-// [[Rcpp::export]]
+
 void get_data_centered(arma::mat & centered_data,
                        const arma::mat & data,
                        const arma::mat & design_r,
                        const arma::mat & nu,
                        const arma::mat & Omega){
-    arma::mat Sigma = inv(Omega);
-    centered_data = data - (design_r * nu) * Sigma;
+    //arma::mat Sigma = inv(Omega);
+    centered_data = data - arma::trans( arma::solve(Omega, arma::trans(design_r * nu))); //* Sigma;
     return;
 }
 
@@ -128,11 +166,11 @@ void update_car_randeff_Omega_helper(arma::mat & Omega,
   
   arma::mat S11;
   arma::mat S12;
-  double S22;
+  //double S22;
   
   arma::mat U11;
   arma::mat U12;
-  double U22;
+  //double U22;
   
   arma::mat Omega_11;
   arma::mat inv_Omega_11;

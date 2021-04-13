@@ -29,7 +29,7 @@ horseshoe <- function(obj, Bbar=NULL, A = NULL, nu=3, V=NULL, thr = 0.5 ){
     }
 
     if(obj$settings$link == "probit"){
-        multireg_res <- Pobit_CAR_multireg(y,design,obj$settings$n_burn_in,obj$settings$n_iter,
+        multireg_res <- Probit_CAR_multireg(y,design,obj$settings$n_burn_in,obj$settings$n_iter,
                                      obj$settings$thin_by, 
                                      Bbar, A, nu, V)
     }
