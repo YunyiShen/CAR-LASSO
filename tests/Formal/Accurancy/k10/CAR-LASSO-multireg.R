@@ -11,9 +11,29 @@ sourceCpp("./src/CAR-ALASSO.cpp")
 source("./tests/Formal/Accurancy/misc.R")
 source("./tests/Formal/Accurancy/Graph_generator.R")
 settings_link <- "./tests/Formal/Accurancy/settings/"
-res_loss_file <- "./tests/Formal/Accurancy/k10/results/loss_CAR.csv"
-res_graph_Omega_file <- "./tests/Formal/Accurancy/k10/results/graph_Omega_CAR.csv"
-res_graph_beta_file <- "./tests/Formal/Accurancy/k10/results/graph_beta_CAR.csv"
+
+file_num <- 1
+
+res_loss_file <- "./tests/Formal/Accurancy/k10/results/loss_CAR"
+res_graph_Omega_file <- "./tests/Formal/Accurancy/k10/results/graph_Omega_CAR"
+res_graph_beta_file <- "./tests/Formal/Accurancy/k10/results/graph_beta_CAR"
+
+res_loss_file <- paste0(res_loss_file,file_num,".csv")
+res_graph_Omega_file <- paste0(res_graph_Omega_file,file_num,".csv")
+res_graph_beta_file <- paste0(res_graph_beta_file,file_num,".csv")
+
+res_FP_CAR_file_root <- "./tests/Formal/Accurancy/k10/results/graph_visual/Omega/FP_CARO"
+res_FP_ACAR_file_root <- "./tests/Formal/Accurancy/k10/results/graph_visual/Omega/FP_ACARO"
+res_FP_multireg_file_root <- "./tests/Formal/Accurancy/k10/results/graph_visual/Omega/FP_multiregO"
+res_FP_SRG_file_root <- "./tests/Formal/Accurancy/k10/results/graph_visual/Omega/FP_SRGO1"
+
+res_FP_CAR_fileB_root <- "./tests/Formal/Accurancy/k10/results/graph_visual/B/FP_CARB"
+res_FP_ACAR_fileB_root <- "./tests/Formal/Accurancy/k10/results/graph_visual/B/FP_ACARB"
+res_FP_multireg_fileB_root <- "./tests/Formal/Accurancy/k10/results/graph_visual/B/FP_multiregB"
+res_FP_SRG_fileB_root <- "./tests/Formal/Accurancy/k10/results/graph_visual/B/FP_SRGB"
+
+
+
 
 
 ks <- c(10)
@@ -54,23 +74,48 @@ i_res_graph_Omega <- 1
 i_res_graph_beta <- 1
 
 for(k in ks) {
-    n <- 50 * (k==30) + 200 * (k==100)
+    n <- 50 
     for(p in ps){
         for(s in ss){
 
             beta <- read.csv(paste0(
-                settings_link, "beta_k", k, "_p", p , "_s",s, ".csv"
+                settings_link, "beta_k", 30, "_p", p , "_s",s, ".csv"
             ))
-            beta <- as.matrix(beta)
+            beta <- as.matrix(beta[,1:k])
             Design <- read.csv(paste0(
                 settings_link, "design_p",p,"_n",n,".csv"
             ))
             Design <- as.matrix(Design)
 
             for(mod in sigma_models){
+
+                res_FP_CAR_file <- paste0(res_FP_CAR_file_root,"design_p",p,"_n",n,"_mod",mod,".csv")
+                res_FP_ACAR_file <- paste0(res_FP_ACAR_file_root,"design_p",p,"_n",n,"_mod",mod,".csv")
+                res_FP_multireg_file <- paste0(res_FP_multireg_file_root,"design_p",p,"_n",n,"_mod",mod,".csv")
+                res_FP_SRG_file <- paste0(res_FP_SRG_file_root,"design_p",p,"_n",n,"_mod",mod,".csv")
+                
+                res_FP_CAR_fileB <- paste0(res_FP_CAR_fileB_root,"design_p",p,"_n",n,"_mod",mod,".csv")
+                res_FP_ACAR_fileB <- paste0(res_FP_ACAR_fileB_root,"design_p",p,"_n",n,"_mod",mod,".csv")
+                res_FP_multireg_fileB <- paste0(res_FP_multireg_fileB_root,"design_p",p,"_n",n,"_mod",mod,".csv")
+                res_FP_SRG_fileB <- paste0(res_FP_SRG_fileB_root,"design_p",p,"_n",n,"_mod",mod,".csv")
+
+
+
                 graph_tmp <- do.call(paste0("g_model",mod),list(k=k))
                 Omega <- graph_tmp$Omega
                 Sigma <- graph_tmp$Sigma
+
+                graph_evaluator <- Omega
+                graph_evaluator[Omega!=0] <- 1
+                graph_evaluator[Omega==0] <- -1
+                diag(graph_evaluator) <- 0
+
+                B_evaluator <- beta
+                B_evaluator[beta!=0] <- 1
+                B_evaluator[beta==0] <- -1
+
+                graph_FP_CAR <- graph_FP_ACAR <- graph_FP_multireg <- graph_FP_SRG <- 0 * Omega
+                B_FP_CAR <- B_FP_ACAR <- B_FP_multireg <- B_FP_SRG <- 0 * beta
                 
                 for(i in 1:nrep){
                     cat("k =",k,",p =",p,",s =",s,",mod =",mod,",rep =",i,"\n")
@@ -102,9 +147,9 @@ for(k in ks) {
                     for(jj in 1:retry){
                         sample_CAR_A <- tryCatch( CAR_ALASSO_Cpp(Z,  Design, n_iter = 10000, 
                             n_burn_in = 5000, thin_by = 10, 
-                            r_beta = 1+0*beta, delta_beta = .01 + 0 * beta,
-                            r_Omega = rep(1,.5*(k-1)*k),
-                            delta_Omega = rep(.01,.5*(k-1)*k),
+                            r_beta = 1e-2+0*beta, delta_beta = 1e-6 + 0 * beta,
+                            r_Omega = rep(1e-2,.5*(k-1)*k),
+                            delta_Omega = rep(1e-6,.5*(k-1)*k),
                             lambda_diag = rep(0,k), 
                             progress = T),error = function(e){return(list())} )
                         if(length(sample_CAR_A)>0) break
@@ -171,6 +216,12 @@ for(k in ks) {
                     write.csv(res_graph_Omega,res_graph_Omega_file)
                     i_res_graph_Omega <- i_res_graph_Omega + 1
 
+
+                    graph_A <- abs(Omega_CAR_A/sample_multireg$Omega)>.5
+                    graph_FP_ACAR <- graph_FP_ACAR + graph_A * graph_evaluator
+                    write.csv(graph_FP_ACAR,res_FP_ACAR_file)
+
+
                     ## CAR
                     res_graph_Omega[i_res_graph_Omega,1:6] <- c(k,p,n,s,mod,i)
                     res_graph_Omega$algo[i_res_graph_Omega] <- "CAR-LASSO"
@@ -182,6 +233,12 @@ for(k in ks) {
                         get_counts_Omega(abs(Omega_CAR)>thr[2],Omega!=0)
                     write.csv(res_graph_Omega,res_graph_Omega_file)
                     i_res_graph_Omega <- i_res_graph_Omega + 1
+
+
+                    graph_CAR <- abs(Omega_CAR/sample_multireg$Omega)>.5
+                    graph_FP_CAR <- graph_FP_CAR + graph_CAR * graph_evaluator
+                    write.csv(graph_FP_CAR,res_FP_CAR_file)
+
 
                     ## SRG
                     res_graph_Omega[i_res_graph_Omega,1:6] <- c(k,p,n,s,mod,i)
@@ -195,6 +252,10 @@ for(k in ks) {
                     write.csv(res_graph_Omega,res_graph_Omega_file)
                     i_res_graph_Omega <- i_res_graph_Omega + 1
 
+                    graph_SRG <- abs(Omega_SRG/sample_multireg$Omega)>.5
+                    graph_FP_SRG <- graph_FP_SRG + graph_SRG * graph_evaluator
+                    write.csv(graph_FP_SRG,res_FP_SRG_file)
+
                     ## multireg
                     res_graph_Omega[i_res_graph_Omega,1:6] <- c(k,p,n,s,mod,i)
                     res_graph_Omega$algo[i_res_graph_Omega] <- "multireg"
@@ -205,6 +266,9 @@ for(k in ks) {
                     write.csv(res_graph_Omega,res_graph_Omega_file)
                     i_res_graph_Omega <- i_res_graph_Omega + 1
 
+                    graph_multireg <- abs(sample_multireg$Omega)>thr[2]
+                    graph_FP_multireg <- graph_FP_multireg + graph_multireg * graph_evaluator
+                    write.csv(graph_FP_multireg,res_FP_multireg_file)
 
                     # graph beta
                     ## CAR-A
@@ -219,6 +283,10 @@ for(k in ks) {
                     write.csv(res_graph_beta,res_graph_beta_file)
                     i_res_graph_beta <- i_res_graph_beta + 1
 
+                    B_A <- abs(beta_CAR_A/sample_multireg$beta)>.5
+                    B_FP_ACAR <- B_FP_ACAR + B_A * B_evaluator
+                    write.csv(B_FP_ACAR,res_FP_ACAR_fileB)
+
                     ## CAR
                     res_graph_beta[i_res_graph_beta,1:6] <- c(k,p,n,s,mod,i)
                     res_graph_beta$algo[i_res_graph_beta] <- "CAR-LASSO"
@@ -230,6 +298,10 @@ for(k in ks) {
                         get_counts_beta(abs(beta_CAR)>thr[2],beta!=0)
                     write.csv(res_graph_beta,res_graph_beta_file)
                     i_res_graph_beta <- i_res_graph_beta + 1
+
+                    B_CAR <- abs(beta_CAR/sample_multireg$beta)>.5
+                    B_FP_CAR <- B_FP_CAR + B_CAR * B_evaluator
+                    write.csv(B_FP_CAR,res_FP_CAR_fileB)
 
                     ## SRG
                     res_graph_beta[i_res_graph_beta,1:6] <- c(k,p,n,s,mod,i)
@@ -243,6 +315,10 @@ for(k in ks) {
                     write.csv(res_graph_beta,res_graph_beta_file)
                     i_res_graph_beta <- i_res_graph_beta + 1
 
+                    B_SRG <- abs(beta_SRG/sample_multireg$beta)>.5
+                    B_FP_SRG <- B_FP_SRG + B_SRG * B_evaluator
+                    write.csv(B_FP_SRG,res_FP_SRG_fileB)
+
                     ## multireg
                     res_graph_beta[i_res_graph_beta,1:6] <- c(k,p,n,s,mod,i)
                     res_graph_beta$algo[i_res_graph_beta] <- "multireg"
@@ -252,6 +328,10 @@ for(k in ks) {
                         get_counts_beta(abs(sample_multireg$beta)>thr[2],beta!=0)
                     write.csv(res_graph_beta,res_graph_beta_file)
                     i_res_graph_beta <- i_res_graph_beta + 1
+
+                    B_multireg <- abs(sample_multireg$beta)>thr[2]
+                    B_FP_multireg <- B_FP_multireg + B_multireg * B_evaluator
+                    write.csv(B_FP_multireg,res_FP_multireg_fileB)
 
                 }
             }   
