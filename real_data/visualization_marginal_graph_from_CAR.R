@@ -14,7 +14,7 @@ Graph_binary <- abs(A_Graph/multireg_Graph) > .5
 diag(Graph_binary) <- 1
 
 B_marginal <- (A_beta*B_binary) %*% solve(A_Graph*Graph_binary)
-
+Graph_marginal <- solve(A_Graph*Graph_binary)
 #B_binary <- abs(B_marginal) > 1e-3
 #Graph_binary <- abs(multireg_Graph) > 1e-3
 #diag(Graph_binary) <- 1

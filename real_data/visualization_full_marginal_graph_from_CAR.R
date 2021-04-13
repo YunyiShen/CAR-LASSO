@@ -9,18 +9,22 @@ load("./real_data/Human/res/CAR_full_design_genus_.005_50_without_unclass_long_c
 # for soil
 load("./real_data/Soil/res/CAR_full_design_genus_.01_50_without_unclass_lambda_prior_1e-2_1e-6_long_chain.RData")
 
-
-
 B_binary <- abs(A_beta/multireg_beta) > .5
 Graph_binary <- abs(A_Graph/multireg_Graph) > .5
 diag(Graph_binary) <- 1
 
-diag(Graph_binary) <- 1
-CAR <- get_CAR_MB(A_beta*B_binary,Graph_binary*A_Graph)
+B_marginal <- (A_beta*B_binary) %*% solve(A_Graph*Graph_binary)
+Graph_marginal <- solve(A_Graph*Graph_binary)
+diag(Graph_marginal) <- 0
+#B_binary <- abs(B_marginal) > 1e-3
+#Graph_binary <- abs(multireg_Graph) > 1e-3
+#diag(Graph_binary) <- 1
 
-among_spp <- graph_from_adjacency_matrix(CAR$C,mode = "directed",weighted = T,diag = F)
+CAR <- get_CAR_MB(B_marginal*B_binary,Graph_binary*A_Graph)
+
+among_spp <- graph_from_adjacency_matrix(Graph_marginal,mode = "directed",weighted = T,diag = F)
 abs_graph <- graph_from_adjacency_matrix(abs(Graph_binary*A_Graph),mode = "undirected",weighted = T,diag = F)
-linear_reg_graph <- graph_from_adjacency_matrix(t(CAR$C),weighted = T, mode = "directed")
+linear_reg_graph <- graph_from_adjacency_matrix(t(Graph_marginal),weighted = T, mode = "directed")
 
 col_pn <- c("lightblue","pink")
 l <-layout_with_fr(among_spp)#, repulserad=vcount(among_spp)^3,area=vcount(among_spp)^2.4)
@@ -39,12 +43,12 @@ ind_mat_micro <- expand.grid(from = 1:(ncol(comp_mat)-1),to = 1:(ncol(comp_mat)-
 ind_mat_micro <- ind_mat_micro[ind_mat_micro$from!=ind_mat_micro$to,]
 ind_mat_micro$weight <- sapply(1:nrow(ind_mat_micro),function(i,indmat,mat){
   mat[indmat$from[i],indmat$to[i]]
-},ind_mat_micro,CAR$C)
+},ind_mat_micro,Graph_marginal)
 
 ind_mat_env <- expand.grid(from = 1:ncol(Design_dummy),to = 1:(ncol(comp_mat)-1))
 ind_mat_env$weight <- sapply(1:nrow(ind_mat_env),function(i,indmat,mat){
   mat[indmat$from[i],indmat$to[i]]
-},ind_mat_env,CAR$B)
+},ind_mat_env,B_marginal )
 
 ind_mat_env$from <- paste0("E",ind_mat_env$from)
 ind_mat_env$to <- paste0("M",ind_mat_env$to)
@@ -136,20 +140,7 @@ p2 <- p  + geom_node_text(aes(label = name),nudge_x = p$data$x * .38, nudge_y = 
 
 p2
 #ggsave("./real_data/humangut.pdf",width = 8,height = 6)
-ggsave("./real_data/humangut2.pdf",p2,width = 8,height = 7)
+ggsave("./real_data/humangut2_fullmargin.pdf",p2,width = 8,height = 7)
 
-ggsave("./real_data/soil2.pdf",p2,width = 8,height = 7)
+ggsave("./real_data/soil2_fullmargin.pdf",p2,width = 8,height = 7)
 
-
-#IF human
-alpha_cent <- alpha_centrality(full_graph)[1:14]
-#IF soil
-alpha_cent <- alpha_centrality(full_graph)[1:17]
-
-mu <- colMeans(test$mu)
-
-plot_data <- data.frame(mu,alpha_cent)
-
-write.csv(plot_data, "./real_data/human_alpha_cent.csv")
-
-my.lm <- lm(alpha_cent~mu)
