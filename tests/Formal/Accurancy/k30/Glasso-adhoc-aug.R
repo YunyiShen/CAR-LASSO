@@ -10,16 +10,11 @@ sourceCpp("./src/graphical-ALASSO.cpp")
 source("./tests/Formal/Accurancy/misc.R")
 source("./tests/Formal/Accurancy/Graph_generator.R")
 settings_link <- "./tests/Formal/Accurancy/settings/"
-res_loss_file <- "./tests/Formal/Accurancy/k10/results/loss_Glasso_aug.csv"
-res_graph_Omega_file <- "./tests/Formal/Accurancy/k10/results/graph_Omega_Glasso_aug.csv"
-
-res_FP_Glasso_file_root <- "./tests/Formal/Accurancy/k10/results/graph_visual/Omega/FP_GlassoaugO"
-res_FP_AGlasso_file_root <- "./tests/Formal/Accurancy/k10/results/graph_visual/Omega/FP_AGlassoaugO"
-res_FP_multireg_mu0_file_root <- "./tests/Formal/Accurancy/k10/results/graph_visual/Omega/FP_multireg_mu0augO"
-res_FP_ad_hoc_file_root <- "./tests/Formal/Accurancy/k10/results/graph_visual/Omega/FP_ad_hocaugO"
+res_loss_file <- "./tests/Formal/Accurancy/k30/results/loss_Glasso_aug.csv"
+res_graph_Omega_file <- "./tests/Formal/Accurancy/k30/results/graph_Omega_Glasso_aug.csv"
 
 
-ks <- c(10)
+ks <- c(30)
 #ks <- c(30)
 ss <- c(.2,.5)
 #ss <- c(.2)
@@ -53,14 +48,14 @@ i_res_graph_Omega <- 1
 i_res_graph_beta <- 1
 
 for(k in ks) {
-    n <- 50 
+    n <- 50 * (k==30) + 200 * (k==100)
     for(p in ps){
         for(s in ss){
 
             beta <- read.csv(paste0(
-                settings_link, "beta_k", 30, "_p", p , "_s",s, ".csv"
+                settings_link, "beta_k", k, "_p", p , "_s",s, ".csv"
             ))
-            beta <- as.matrix(beta[,1:k])
+            beta <- as.matrix(beta)
             Design <- read.csv(paste0(
                 settings_link, "design_p",p,"_n",n,".csv"
             ))
@@ -70,28 +65,6 @@ for(k in ks) {
                 graph_tmp <- do.call(paste0("g_model",mod),list(k=k))
                 Omega <- graph_tmp$Omega
                 Sigma <- graph_tmp$Sigma
-
-                res_FP_Glasso_file <- paste0(res_FP_Glasso_file_root,"_beta_s",s,"_design_p",p,"_n",n,"_mod",mod,".csv")
-                res_FP_AGlasso_file <- paste0(res_FP_AGlasso_file_root,"_beta_s",s,"_design_p",p,"_n",n,"_mod",mod,".csv")
-                res_FP_multireg_mu0_file <- paste0(res_FP_multireg_mu0_file_root,"_beta_s",s,"_design_p",p,"_n",n,"_mod",mod,".csv")
-                res_FP_ad_hoc_file <- paste0(res_FP_ad_hoc_file_root,"_beta_s",s,"_design_p",p,"_n",n,"_mod",mod,".csv")
-                
-
-
-                graph_tmp <- do.call(paste0("g_model",mod),list(k=k))
-                Omega <- graph_tmp$Omega
-                Sigma <- graph_tmp$Sigma
-
-                graph_evaluator <- Omega
-                graph_evaluator[Omega!=0] <- 1
-                graph_evaluator[Omega==0] <- -1
-                diag(graph_evaluator) <- 0
-
-                B_evaluator <- beta
-                B_evaluator[beta!=0] <- 1
-                B_evaluator[beta==0] <- -1
-
-                graph_FP_Glasso <- graph_FP_AGlasso <- graph_FP_multireg_mu0 <- graph_FP_ad_hoc <- 0 * Omega
                 
                 for(i in 1:nrep){
                     cat("k =",k,",p =",p,",s =",s,",mod =",mod,",rep =",i,"\n")
@@ -120,8 +93,8 @@ for(k in ks) {
                     for(jj in 1:retry){
                         sample_GL_A <- tryCatch( Graphical_ALASSO_Cpp(cbind(Z,Design),  n_iter = 10000, 
                           n_burn_in = 5000, thin_by = 10, 
-                          lambda_a = rep(1e-2,.5*(k+p-1)*(k+p)),
-                          lambda_b = rep(1e-6,.5*(k+p-1)*(k+p)),
+                          lambda_a = rep(1,.5*(k+p-1)*(k+p)),
+                          lambda_b = rep(.01,.5*(k+p-1)*(k+p)),
                           progress = T),
                           error = function(e){return(list())} )
                         if(length(sample_GL_A)>0) break
@@ -146,7 +119,7 @@ for(k in ks) {
                         else cat("retry ",jj,"\n")
                     }
                     if(length(sample_adhoc)>0){
-                        Omega_adhoc <- as.matrix(sample_adhoc[1:k,1:k])
+                        Omega_adhoc <- as.matrix(sample_adhoc)[1:k,1:k]
                         
 
                         res_loss[i_res_loss,1:6] <- c(k,p,n,s,mod,i)
@@ -185,10 +158,6 @@ for(k in ks) {
                     write.csv(res_graph_Omega,res_graph_Omega_file)
                     i_res_graph_Omega <- i_res_graph_Omega + 1
 
-                    graph_A <- abs(Omega_GL_A/sample_multireg$Omega[1:k,1:k])>.5
-                    graph_FP_AGlasso <- graph_FP_AGlasso + graph_A * graph_evaluator
-                    write.csv(graph_FP_AGlasso,res_FP_AGlasso_file)
-
                     ## GLASSO
                     res_graph_Omega[i_res_graph_Omega,1:6] <- c(k,p,n,s,mod,i)
                     res_graph_Omega$algo[i_res_graph_Omega] <- "GLASSO-aug"
@@ -201,10 +170,6 @@ for(k in ks) {
                     write.csv(res_graph_Omega,res_graph_Omega_file)
                     i_res_graph_Omega <- i_res_graph_Omega + 1
 
-                    graph_Glasso <- abs(Omega_GL/sample_multireg$Omega[1:k,1:k])>.5
-                    graph_FP_Glasso <- graph_FP_Glasso + graph_Glasso * graph_evaluator
-                    write.csv(graph_FP_Glasso,res_FP_Glasso_file)
-
                     ## ad hoc
                     res_graph_Omega[i_res_graph_Omega,1:6] <- c(k,p,n,s,mod,i)
                     res_graph_Omega$algo[i_res_graph_Omega] <- "adhoc-aug"
@@ -216,10 +181,6 @@ for(k in ks) {
                     write.csv(res_graph_Omega,res_graph_Omega_file)
                     i_res_graph_Omega <- i_res_graph_Omega + 1
 
-                    graph_adhoc <- abs(Omega_adhoc)>thr[2]
-                    graph_FP_ad_hoc <- graph_FP_ad_hoc + graph_adhoc * graph_evaluator
-                    write.csv(graph_FP_ad_hoc,res_FP_ad_hoc_file)
-
                     ## multireg
                     res_graph_Omega[i_res_graph_Omega,1:6] <- c(k,p,n,s,mod,i)
                     res_graph_Omega$algo[i_res_graph_Omega] <- "multireg-aug"
@@ -229,11 +190,6 @@ for(k in ks) {
                         get_counts_Omega(abs(sample_multireg$Omega[1:k,1:k])>thr[2],Omega!=0)
                     write.csv(res_graph_Omega,res_graph_Omega_file)
                     i_res_graph_Omega <- i_res_graph_Omega + 1
-
-                    graph_multireg <- abs(sample_multireg$Omega[1:k,1:k])>thr[1]
-                    graph_FP_multireg_mu0 <- graph_FP_multireg_mu0 + graph_multireg * graph_evaluator
-                    write.csv(graph_FP_multireg_mu0,res_FP_multireg_mu0_file)
-
 
                 }
             }   
