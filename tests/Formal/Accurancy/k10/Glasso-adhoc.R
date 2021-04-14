@@ -77,10 +77,10 @@ for(k in ks) {
                 Omega <- graph_tmp$Omega
                 Sigma <- graph_tmp$Sigma
 
-                res_FP_Glasso_file <- paste0(res_FP_Glasso_file_root,"design_p",p,"_n",n,"_mod",mod,".csv")
-                res_FP_AGlasso_file <- paste0(res_FP_AGlasso_file_root,"design_p",p,"_n",n,"_mod",mod,".csv")
-                res_FP_multireg_mu0_file <- paste0(res_FP_multireg_mu0_file_root,"design_p",p,"_n",n,"_mod",mod,".csv")
-                res_FP_ad_hoc_file <- paste0(res_FP_ad_hoc_file_root,"design_p",p,"_n",n,"_mod",mod,".csv")
+                res_FP_Glasso_file <- paste0(res_FP_Glasso_file_root,"_beta_s",s,"_design_p",p,"_n",n,"_mod",mod,".csv")
+                res_FP_AGlasso_file <- paste0(res_FP_AGlasso_file_root,"_beta_s",s,"_design_p",p,"_n",n,"_mod",mod,".csv")
+                res_FP_multireg_mu0_file <- paste0(res_FP_multireg_mu0_file_root,"_beta_s",s,"_design_p",p,"_n",n,"_mod",mod,".csv")
+                res_FP_ad_hoc_file <- paste0(res_FP_ad_hoc_file_root,"_beta_s",s,"_design_p",p,"_n",n,"_mod",mod,".csv")
                 
 
 
@@ -237,7 +237,7 @@ for(k in ks) {
                     write.csv(res_graph_Omega,res_graph_Omega_file)
                     i_res_graph_Omega <- i_res_graph_Omega + 1
 
-                    graph_multireg <- abs(sample_multireg$Omega)>thr[2]
+                    graph_multireg <- abs(sample_multireg$Omega)>thr[1]
                     graph_FP_multireg_mu0 <- graph_FP_multireg_mu0 + graph_multireg * graph_evaluator
                     write.csv(graph_FP_multireg_mu0,res_FP_multireg_mu0_file)
 
