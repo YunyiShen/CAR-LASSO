@@ -1,5 +1,5 @@
 library(ggplot2)
-all_res <- list.files("./tests/Formal/Accurancy/k10/results",full.names = T)
+all_res <- list.files("./tests/Formal/Accurancy/k30/results",full.names = T)
 ##all_res <- list.files("results",full.names = T)
 
 all_loss_files <- all_res[grep("loss",all_res)]
@@ -7,7 +7,7 @@ all_loss <- lapply(all_loss_files,read.csv,row.names=1)
 all_loss <- Reduce(rbind,all_loss)
 
 all_loss_k30 <- all_loss[!is.na(all_loss$steinOmega),]
-all_loss_k30 <- all_loss_k30[all_loss_k30$k==10,]
+all_loss_k30 <- all_loss_k30[all_loss_k30$k==30,]
 
 all_loss_k30$beta.sparsity <- factor( 1-all_loss_k30$s,levels = c(0.8,0.5))
 #all_loss_k30$p <- paste0("#.predictors:",all_loss_k30$p)
@@ -42,7 +42,7 @@ Stein_k30 <- ggplot(data = all_loss_k30,aes(x=algo,y=log(steinOmega))) +
         plot.margin = margin(.15, .15, .15, .15, "cm"))
 
 Stein_k30
-ggsave("./tests/Formal/Accurancy/Figs/Stein_k10_Asmallprior2.pdf",Stein_k30,width = 12,height = 8,unit = "in")
+ggsave("./tests/Formal/Accurancy/Figs/Stein_k30_Asmallprior2.pdf",Stein_k30,width = 12,height = 8,unit = "in")
 ggsave("Figs/Stein_k10_Asmallprior2.jpg",Stein_k30,width = 10,height = 8,unit = "in")
 
 Stein_k30_aggregate_mean <- aggregate(steinOmega~p+mod+algo+beta.sparsity,data = all_loss_k30,FUN = mean)
