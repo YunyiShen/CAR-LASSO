@@ -9,16 +9,18 @@ human$genus <- factor(human$X, levels = (as.character(human$X)))
 gsoil <- ggplot(data = soil,aes(x=genus,y=alpha_cent)) + 
   geom_bar( stat = "identity") + 
   ylab("alpha centrality") +
+  xlab("soil")+
   coord_flip()
 
 ghuman <- ggplot(data = human,aes(x=genus,y=alpha_cent)) + 
   geom_bar( stat = "identity") + 
   ylab("alpha centrality") +
+  xlab("gut") +
   coord_flip() 
 
 
 ggpubr::ggarrange(ghuman,gsoil,
-          labels = c("gut", "soil"),
+          #labels = c("gut", "soil"),
           ncol = 2, nrow = 1)
 
 
