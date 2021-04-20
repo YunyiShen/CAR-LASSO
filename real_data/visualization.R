@@ -140,3 +140,16 @@ ggsave("./real_data/humangut2.pdf",p2,width = 8,height = 7)
 
 ggsave("./real_data/soil2.pdf",p2,width = 8,height = 7)
 
+
+#IF human
+alpha_cent <- alpha_centrality(full_graph)[1:14]
+#IF soil
+alpha_cent <- alpha_centrality(full_graph)[1:17]
+
+mu <- colMeans(test$mu)
+
+plot_data <- data.frame(mu,alpha_cent)
+
+write.csv(plot_data, "./real_data/human_alpha_cent.csv")
+
+my.lm <- lm(alpha_cent~mu)

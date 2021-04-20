@@ -1,6 +1,6 @@
 get_graph <- function(CAR_sample,k){
   Omega <- matrix(0,k,k)
-  Omega[upper.tri(Omega,T)] = apply(CAR_sample$Omega,2,mean)
+  Omega[upper.tri(Omega,T)] = apply(CAR_sample$Omega,2,mean, na.rm=T)
   Omega <- Omega+t(Omega)
   diag(Omega) <- 0.5 * diag(Omega)
   return(Omega)

@@ -4,7 +4,7 @@ all_beta <- lapply(all_beta_files,read.csv,row.names=1)
 all_beta <- Reduce(rbind,all_beta)
 
 all_beta_k30 <- all_beta[!is.na(all_beta$k),]
-all_beta_k30 <- all_beta_k30[all_beta_k30$k==30,]
+all_beta_k30 <- all_beta_k30[all_beta_k30$k==10,]
 
 all_beta_k30$beta.sparsity <- factor( 1-all_beta_k30$s,levels = c(0.8,0.5))
 all_beta_k30$p <- paste0(all_beta_k30$p, " predictors")
@@ -57,7 +57,7 @@ beta_MCC <- ggplot(data = beta_learning_k30,aes(x=algo,y = MCC)) +
         plot.margin = margin(.15, .15, .15, .15, "cm"))
 
 beta_MCC
-ggsave("Figs/MCC_k30_Asmallprior_beta2.pdf",beta_MCC,width = 10,height = 8,unit = "in")
+ggsave("./tests/Formal/Accurancy/Figs/MCC_k10_Asmallprior_beta2.pdf",beta_MCC,width = 10,height = 8,unit = "in")
 
 
 beta_Sensitivity <- ggplot(data = beta_learning_k30,aes(x=algo,y = Sensitivity)) + 
