@@ -56,7 +56,7 @@ void rCARAlasso_(const arma::mat &Z_curr,
     // flaged
     // update Omega
     
-    update_car_Omega_adp_helper2(Omega_curr, Z_curr, design, 
+    update_car_Omega_adp_helper(Omega_curr, Z_curr, design, 
                                      mu_curr, beta_curr,
                                      lambda_Omega,
                                      lambda_diag,
