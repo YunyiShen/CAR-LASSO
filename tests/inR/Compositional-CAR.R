@@ -11,6 +11,7 @@ p = 5
 
 sourceCpp("./src/Multinomial-CAR-ALASSO.cpp")
 sourceCpp("./src/CAR-ALASSO-hir.cpp")
+sourceCpp("./src/graphical-intercept-ALASSO.cpp")
 sourceCpp("./src/CAR-LASSO-hir.cpp")
 source("./tests/Formal/Accurancy/Graph_generator.R")
 
@@ -36,7 +37,7 @@ Y <- matrix(NA,n,k+1)
 N = 5000
 
 for( i in 1:n ){
-  Z[i,] <- MASS::mvrnorm(1,Sigma %*% (Xbeta[i,]+mu),Sigma)
+  Z[i,] <- MASS::mvrnorm(1,0*Sigma %*% (Xbeta[i,]+mu),Sigma)
   p_temp <- c(exp(Z[i,]) , 1)
   Y[i,] <- rmultinom(1, N, p_temp/sum(p_temp))
 }
@@ -58,6 +59,15 @@ test <- CAR_ALASSO_hir_Cpp(Y,  Design, link = 2,n_iter = 5000,
                             r_beta = .01+0*beta, delta_beta = 1e-6 + 0 * beta,
                             r_Omega = rep(.01,.5*(k-1)*k),
                             delta_Omega = rep(1e-6,.5*(k-1)*k),
+                            lambda_diag = rep(0,k),
+                            ns = 100,m = 10, emax = 64,
+                            progress = T)
+
+test <- Intercept_Graphical_ALASSO_hir_Cpp(Y, link = 2,n_iter = 5000, 
+                            n_burn_in = 1000, thin_by = 10, 
+                            
+                            lambda_a = rep(.01,.5*(k-1)*k),
+                            lambda_b = rep(1e-6,.5*(k-1)*k),
                             lambda_diag = rep(0,k),
                             ns = 100,m = 10, emax = 64,
                             progress = T)
