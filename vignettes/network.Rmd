@@ -2,7 +2,7 @@
 title: "Get started with CAR-LASSO models"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{network}
+  %\VignetteIndexEntry{Get started with CAR-LASSO models}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

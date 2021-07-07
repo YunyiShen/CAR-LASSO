@@ -1,18 +1,24 @@
 Package: CARlasso
 Title: Conditional AutoRegressive LASSO
 Version: 0.1
-Authors@R: person("Yunyi", "Shen", email = "yshen99@wisc.edu", role = c("aut", "cre"))
+Authors@R: c(person("Yunyi", "Shen", email = "yshen99@wisc.edu", role = c("aut", "cre")),person("Claudia","Solis-Lemus", role = "aut"))
 Description: Bayesian Conditional Auto Regressive LASSO with automatic and adaptive shrinkage 
 Depends: R (>= 3.4.0)
-License: GPL-3.0
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
 ByteCompile: TRUE
-Suggests: testthat
+Suggests: 
+    testthat,
+    knitr,
+    rmarkdown
 RoxygenNote: 7.1.1
 Roxygen: list(markdown = TRUE)
 LinkingTo: 
     Rcpp, RcppArmadillo, RcppProgress, coda, Matrix, igraph, ggraph, ggplot2, MASS
-Imports:  
+Imports: 
     Rcpp, RcppArmadillo, RcppProgress, coda, Matrix, igraph, ggraph, ggplot2, MASS
 SystemRequirements: C++11
+VignetteBuilder: knitr
+URL: https://github.com/YunyiShen/CAR-LASSO
+BugReports: https://github.com/YunyiShen/CAR-LASSO/issues

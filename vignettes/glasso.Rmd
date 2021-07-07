@@ -2,7 +2,7 @@
 title: "Graphical LASSO support"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{glasso}
+  %\VignetteIndexEntry{Graphical LASSO support}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
