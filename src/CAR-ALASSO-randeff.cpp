@@ -164,6 +164,7 @@ List CAR_ALASSO_randeff_Cpp(const arma::mat &data,       // col composition data
                                         design_r, nu_curr,
                                         mu_curr, beta_curr,
                                         lambda_Omega,
+                                        lambda_diag,
                                         k, p, n);
 
     //center before mu after beta and Omega

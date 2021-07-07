@@ -23,6 +23,7 @@ void update_car_randeff_Omega_adp_helper(arma::mat & Omega,
                              const arma::vec & mu,
                              const arma::mat & beta,
                              const arma::vec & lambda_curr,// different lambda for different entries
+                             const arma::vec & lambda_diag, 
                              int k, int p,int n){
   //arma::mat Omega;
   //arma::mat Y_tilde;
@@ -132,7 +133,7 @@ void update_car_randeff_Omega_adp_helper(arma::mat & Omega,
     // update gamma, follow GIG 
     lambda_gamma = n/2+1;
     //psi_gamma = lambda_temp(j,j) + S(j,j);
-    psi_gamma = S(j,j);
+    psi_gamma = S(j,j) + lambda_diag(j);;
     chi_gamma = U(j,j) - 
       2*as_scalar(U12.t()*inv_Omega_11*omega_12)+
       as_scalar(omega_12.t()*inv_Omega_11*U11*inv_Omega_11*omega_12);

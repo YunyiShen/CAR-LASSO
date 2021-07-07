@@ -25,6 +25,7 @@ void update_car_randeff_Omega_adp_helper(arma::mat & Omega,
                              const arma::vec & mu,
                              const arma::mat & beta,
                              const arma::vec & lambda_curr,// different lambda for different entries
+                             const arma::vec & lambda_diag, 
                              int k, int p,int n);
 
 
