@@ -15,9 +15,9 @@ Suggests:
 RoxygenNote: 7.1.1
 Roxygen: list(markdown = TRUE)
 LinkingTo: 
-    Rcpp, RcppArmadillo, RcppProgress, coda, Matrix, igraph, ggraph, ggplot2, MASS
+    Rcpp, RcppArmadillo, RcppProgress
 Imports: 
-    Rcpp, RcppArmadillo, RcppProgress, coda, Matrix, igraph, ggraph, ggplot2, MASS
+    Rcpp, RcppProgress, coda, Matrix, igraph, ggraph, ggplot2, MASS, methods
 SystemRequirements: C++11
 VignetteBuilder: knitr
 URL: https://github.com/YunyiShen/CAR-LASSO

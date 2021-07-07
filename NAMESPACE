@@ -3,6 +3,7 @@ import(coda, Matrix, MASS)
 import(igraph, ggraph, ggplot2)
 importFrom("stats", "as.formula", "formula", "model.matrix", "na.omit",
                 "rnorm", "sd", "terms")
+importFrom("methods","is")
 useDynLib("CARlasso", .registration = TRUE)
 export(CARlasso)
 export(bGlasso)
