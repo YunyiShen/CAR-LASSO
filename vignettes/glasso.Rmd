@@ -54,7 +54,7 @@ dt <- mgp154[,c("Alistipes","Bacteroides",
 
 To run the composition model, we need to set `link="logit"`
 
-```{r compositional1}
+```{r compositional1, eval = FALSE}
 gut_res <- bGlasso( data = dt,link = "logit", 
                     n_iter = 2000, 
                     n_burn_in = 1000, thin_by = 2)
@@ -69,7 +69,7 @@ This is common in a lot of ecological applications. For instance number of seedl
 
 To run the composition model, we need to set `link="log"`
 
-```{r counting}
+```{r counting, eval = FALSE}
 gut_res <- gut_res <- bGlasso( data = dt[,1:4],link = "log", 
                     n_iter = 2000, 
                     n_burn_in = 1000, thin_by = 2)
