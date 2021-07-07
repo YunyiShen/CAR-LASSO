@@ -267,7 +267,7 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
         y, design, link = 1,
         n_iter, n_burn_in,
         thin_by, r_beta, delta_beta,
-        r_Omega, delta_Omega, lambda_diag,
+        r_Omega, delta_Omega,
         ns, m, emax, 
         progress
       )
@@ -293,7 +293,7 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
         y, design, link = 2,
         n_iter, n_burn_in,
         thin_by, r_beta, delta_beta,
-        r_Omega, delta_Omega, lambda_diag,
+        r_Omega, delta_Omega,
         ns, m, emax, 
         progress
       )
@@ -324,7 +324,7 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
         y, design, link = 3,
         n_iter, n_burn_in,
         thin_by, r_beta, delta_beta,
-        r_Omega, delta_Omega, lambda_diag,
+        r_Omega, delta_Omega,
         ns, m, emax, 
         progress
       )
@@ -355,3 +355,191 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
 
   return(res)
 }
+
+#' Gibbs sampler for Bayesian Graphical LASSO and extensions
+#' 
+#' @description Main sampling algorithm of Glasso model, note that the mean is in CAR parameterization
+#'
+#' @param data A data.frame with all response, row as observations
+#' @param link String name of link function? Currently can be "identity" for normal response, "probit" for binary, "log" for counting, "logit" for compositional. Note that when use "logit", the last response will be used as reference. 
+#' @param r_Omega Hyper-parameter for precision matrix, shape parameter of Gamma. Should be a scalar 
+#' @param delta_Omega Hyper-parameter for precision matrix, rate parameter of Gamma. Shoule be a scalar
+#' @param n_iter Number of sampling iterations (i.e. after burn in) for the Gibbs sampler
+#' @param n_burn_in Number of burn in iterations for the Gibbs sampler
+#' @param thin_by Final sample was thin by this number
+#' @param ns parameter for ARS, maximum number of hulls, only used when link is "log" and "logit"
+#' @param m parameter for ARS, initial number of hulls, only used when link is "log" and "logit"
+#' @param emax parameter for ARS, tolerance for small values being 0, larger meaning we tolerate smaller values, only used when link is "log" and "logit"
+#' @param progress Bool, whether report progress from C++
+#' @param verbos Bool, whether show warnings and messages.
+#' 
+#' @return A `bglasso_out` object with elements: 
+#' \itemize{
+#'    \item{`$point_est`}{
+#'        \itemize{
+#'          \item{`$Omega`}{: Posterior mean of precision matrix}
+#'        }
+#'    }
+#'    \item{`$nodes`}{
+#'        \itemize{
+#'            \item{`$responses`}{: node name of responses}
+#'        }
+#'    }
+#' 
+#'    \item{`$data`}{
+#'        \itemize{
+#'            \item{`$response`}{: response matrix}
+#'        }
+#'    }
+#' 
+#'    \item{`$settings`}{: all settings sent to the algorithm, exclude data}
+#'    \item{`$MCMC_output`}{
+#'        \itemize{
+#'            \item{`$mu`}{: A coda::mcmc object, each row was an MCMC sample of the mean vector}
+#'            \item{`$Omega`}{: A coda::mcmc object, each row was an MCMC sample of the upper triangular part (with diagonal) of precision matrix Omega}
+#'            \item{`$lambda`}{:  A coda::mcmc object, first column was the shrinkage parameter lambda for regression coefficient and the second column was shrinkage parameter lambda for precision matrix}
+#'        }
+#'    }
+#' }
+#' 
+#' 
+#' 
+#' @examples
+#' set.seed(42)
+#' dt <- simu_AR1()
+#' glassores <- bGlasso(data = dt[,1:5])
+#' plot(glassores) 
+#' 
+
+
+bGlasso <- function(data, link = "identity",
+                     r_Omega = 1, 
+                     delta_Omega = 0.01,
+                     n_iter = 2000,
+                     n_burn_in = 1000, thin_by = 10,
+                     ns = 1000, m=20, emax=64, 
+                     progress = TRUE, verbos = TRUE) {
+
+  # check links
+  if (!(link %in% c("identity", "probit", "log", "logit"))) {
+    stop("Currently only implemented identity (normal), 
+       log (Poisson) logit (multi-nomial) and probit (bernoulli)")
+  }
+
+  # omit NAs
+  if (!all(!is.na(data)) & verbos) {
+    warning("NAs in data are omitted")
+    data <- na.omit(data)
+  }
+
+
+
+
+  
+
+  y <- as.matrix(data)
+  # get dimensions
+  n <- nrow(y)
+  k <- ncol(y) - (link == "logit") # careful for multinomial response
+
+
+  
+    if (is.null(r_Omega)) r_Omega <- 1
+    if (is.null(delta_Omega)) delta_Omega <- 0.01
+    if (verbos & (length(r_Omega) > 1 | length(delta_Omega) > 1)) {
+      cat("Multiple hyper parameters supplied, will take the first entry of hyper prior for Omega shrinkage\n\n")
+    }
+    r_Omega <- r_Omega[1]
+    delta_Omega <- delta_Omega[1]
+  
+  ## end checking Omega hyper parameters
+
+  
+  ## Main algorithms
+
+  if (link == "identity") {
+    if (verbos) cat("Algorithm start...\n\n")
+    if (verbos & progress) cat("progress:\n\n")
+    
+      res <- Intercept_Graphical_LASSO_Cpp(
+        y,n_iter, n_burn_in,
+        thin_by,
+        r_Omega, delta_Omega,
+        progress
+      )
+  }
+
+  if (link == "log") {
+    if (verbos) cat("Algorithm start...\n\n")
+    if (verbos & progress) cat("progress:\n\n")
+    
+    res <- Intercept_Graphical_LASSO_hir_Cpp(
+        y, link = 1,
+        n_iter, n_burn_in,
+        thin_by,
+        r_Omega, delta_Omega,
+        ns, m, emax, 
+        progress
+    )
+  }
+
+  if (link == "logit") {
+    if (verbos) cat("Last response will be used as reference group\n\n")
+    if (verbos) cat("Algorithm start...\n\n")
+    if (verbos & progress) cat("progress:\n\n")
+    res <- CAR_LASSO_hir_Cpp(
+        y, link = 2,
+        n_iter, n_burn_in,
+        thin_by,
+        r_Omega, delta_Omega,
+        ns, m, emax, 
+        progress
+    )
+    
+  }
+  if (link == "probit") {
+    unique_values <- apply(y, 2, function(w) {
+      length(unique(w))
+    })
+    if (!all(unique_values == 2)) {
+      stop("Response has multiple unique values, cannot use probit link, do you mean logit?\n")
+    }
+
+    if (verbos) cat("Algorithm start...\n\n")
+    if (verbos & progress) cat("progress:\n\n")
+    
+    
+    res <- CAR_LASSO_hir_Cpp(
+        y, link = 3,
+        n_iter, n_burn_in,
+        thin_by,
+        r_Omega, delta_Omega,
+        ns, m, emax, 
+        progress
+    )
+  }
+
+  omega_post <- get_graph(res,k)
+
+  point_est <- list(Omega = omega_post)
+
+  res <- lapply(res, coda::mcmc)
+
+  settings <- list(link = link,
+                    r_Omega = r_Omega, 
+                     delta_Omega = delta_Omega, n_iter = n_iter,
+                     n_burn_in = n_burn_in, thin_by = thin_by, ns=ns,m=m,emax=emax,progress = progress, verbos = verbos)
+
+  nodes <- list(response = colnames(y))
+  res <- list(point_est = point_est, nodes = nodes,  
+              data = list(response = y),
+              settings = settings, MCMC_output = res)
+
+  class(res) <- "bglasso_out"
+
+  if(verbos) cat("\ndone\n\n")
+
+  return(res)
+}
+
+
