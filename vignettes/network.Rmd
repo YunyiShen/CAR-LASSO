@@ -33,14 +33,14 @@ head(dt)
 
 To use the Normal version, we should set `link="identity"` which is the default. 
 
-```{r ar1example_first}
+```{r ar1example_first, eval = FALSE}
 car_res <- CARlasso(y1+y2+y3+y4+y5~x1+x2+x3+x4+x5, data = dt, adaptive = TRUE)
 plot(car_res,tol = 0.05)
 ```
 
 We can have a more formal horseshoe inference on the structure of the network, this will update the `car_res`:
 
-```{r horseshoe_1}
+```{r horseshoe_1,eval = FALSE}
 # with horseshoe inference
 car_res <- horseshoe(car_res)
 plot(car_res)
@@ -59,7 +59,7 @@ mgp154[1:5,1:7]
 
 To run the composition model, we need to set `link="logit"`
 
-```{r compositional1}
+```{r compositional1, eval = FALSE}
 gut_res <- CARlasso(Alistipes+Bacteroides+
                         Eubacterium+Parabacteroides+all_others~
                         BMI+Age+Gender+Stratum,
@@ -70,7 +70,7 @@ gut_res <- CARlasso(Alistipes+Bacteroides+
 
 Note that in this case `all_others`, i.e. the last one in the left hand side of the formula will be the reference level.
 
-```{r horseshoe_comp}
+```{r horseshoe_comp, eval = FALSE}
 # horseshoe will take a while, as it needs to sample the latent normal too
 gut_res <- horseshoe(gut_res)
 plot(gut_res)
@@ -82,7 +82,7 @@ This is common in a lot of ecological applications. For instance number of seedl
 
 To run the composition model, we need to set `link="log"`
 
-```{r counting}
+```{r counting, eval = FALSE}
 gut_res <- CARlasso(Alistipes+Bacteroides+
                         Eubacterium+Parabacteroides+all_others~
                         BMI+Age+Gender+Stratum,
