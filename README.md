@@ -11,7 +11,11 @@ The package is not yet on CRAN, to install it, use:
 devtools::install_github("YunyiShen/CAR-LASSO")
 ```
 
-Example run, we generated data from a 5-node AR1 model with each node has a specific treatment then use CAR-ALASSO to reconstruct such network and plot the result. 
+To get started, checkout [this page](https://yunyishen.ml/CAR-LASSO/dev/articles/network.html)
+
+
+
+Here are some example runs, we generated data from a 5-node AR1 model with each node has a specific treatment then use CAR-ALASSO to reconstruct such network and plot the result. 
 
 ```r
 set.seed(42)
@@ -59,3 +63,6 @@ gut_res <- horseshoe(gut_res)
 plot(gut_res)
 ```
 ![The Result](http://YunyiShen.github.io/files/Research_figs/CARLASSO/gut_count.png)
+
+
+The package also have graphical lasso support, see [this page](https://yunyishen.ml/CAR-LASSO/dev/articles/glasso.html). If you would like lower level interface of car lasso, see [this page](https://yunyishen.ml/CAR-LASSO/dev/articles/buildown.html).
