@@ -5,20 +5,12 @@ CAR_ALASSO_hir_Cpp <- function(data, design, link, n_iter, n_burn_in, thin_by, r
     .Call(`_CARlasso_CAR_ALASSO_hir_Cpp`, data, design, link, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, lambda_diag, ns, m, emax, progress)
 }
 
-CAR_ALASSO_randeff_Cpp <- function(data, design, design_r, membership, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, alpha, beta, lambda_diag, progress) {
-    .Call(`_CARlasso_CAR_ALASSO_randeff_Cpp`, data, design, design_r, membership, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, alpha, beta, lambda_diag, progress)
-}
-
 CAR_ALASSO_Cpp <- function(data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, lambda_diag, progress) {
     .Call(`_CARlasso_CAR_ALASSO_Cpp`, data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, lambda_diag, progress)
 }
 
 CAR_LASSO_hir_Cpp <- function(data, design, link, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, ns, m, emax, progress) {
     .Call(`_CARlasso_CAR_LASSO_hir_Cpp`, data, design, link, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, ns, m, emax, progress)
-}
-
-CAR_LASSO_randeff_Cpp <- function(data, design, design_r, membership, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, alpha, beta, progress) {
-    .Call(`_CARlasso_CAR_LASSO_randeff_Cpp`, data, design, design_r, membership, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, alpha, beta, progress)
 }
 
 CAR_LASSO_Cpp <- function(data, design, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, progress) {
@@ -55,14 +47,6 @@ sample_Omega_prior_cpp <- function(k, n_iter, n_burn_in, thin_by, lambda_a, lamb
 
 rgig <- function(lambda, chi, psi) {
     .Call(`_CARlasso_rgig`, lambda, chi, psi)
-}
-
-Multinomial_CAR_ALASSO_randeff_Cpp <- function(data, design, design_r, membership, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, lambda_diag, alpha, beta, ns, m, emax, progress) {
-    .Call(`_CARlasso_Multinomial_CAR_ALASSO_randeff_Cpp`, data, design, design_r, membership, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, lambda_diag, alpha, beta, ns, m, emax, progress)
-}
-
-Pois_CAR_ALASSO_randeff_Cpp <- function(data, design, design_r, membership, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, lambda_diag, alpha, beta, ns, m, emax, progress) {
-    .Call(`_CARlasso_Pois_CAR_ALASSO_randeff_Cpp`, data, design, design_r, membership, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, lambda_diag, alpha, beta, ns, m, emax, progress)
 }
 
 update_Z_helper_CAR <- function(Z_curr, data, design, mu_curr, beta_curr, Omega_curr, k, p, n) {
@@ -107,10 +91,6 @@ rinvGau <- function(mu, lambda) {
 
 stein_loss_cpp <- function(Omega, Omega_hat) {
     .Call(`_CARlasso_stein_loss_cpp`, Omega, Omega_hat)
-}
-
-CAR_multireg_randeff_cpp <- function(data, design, design_r, membership, n_burn_in, n_iter, thin_by, Bbar, A, nu, V, alpha, beta) {
-    .Call(`_CARlasso_CAR_multireg_randeff_cpp`, data, design, design_r, membership, n_burn_in, n_iter, thin_by, Bbar, A, nu, V, alpha, beta)
 }
 
 CAR_multireg_cpp <- function(data, design, n_sample, Bbar, A, nu, V) {

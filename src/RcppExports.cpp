@@ -31,31 +31,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// CAR_ALASSO_randeff_Cpp
-List CAR_ALASSO_randeff_Cpp(const arma::mat& data, const arma::mat& design, const arma::mat& design_r, const arma::mat& membership, const int n_iter, const int n_burn_in, const int thin_by, const arma::mat r_beta, const arma::mat delta_beta, const arma::vec r_Omega, const arma::vec delta_Omega, const double alpha, const double beta, const arma::vec& lambda_diag, bool progress);
-RcppExport SEXP _CARlasso_CAR_ALASSO_randeff_Cpp(SEXP dataSEXP, SEXP designSEXP, SEXP design_rSEXP, SEXP membershipSEXP, SEXP n_iterSEXP, SEXP n_burn_inSEXP, SEXP thin_bySEXP, SEXP r_betaSEXP, SEXP delta_betaSEXP, SEXP r_OmegaSEXP, SEXP delta_OmegaSEXP, SEXP alphaSEXP, SEXP betaSEXP, SEXP lambda_diagSEXP, SEXP progressSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::mat& >::type data(dataSEXP);
-    Rcpp::traits::input_parameter< const arma::mat& >::type design(designSEXP);
-    Rcpp::traits::input_parameter< const arma::mat& >::type design_r(design_rSEXP);
-    Rcpp::traits::input_parameter< const arma::mat& >::type membership(membershipSEXP);
-    Rcpp::traits::input_parameter< const int >::type n_iter(n_iterSEXP);
-    Rcpp::traits::input_parameter< const int >::type n_burn_in(n_burn_inSEXP);
-    Rcpp::traits::input_parameter< const int >::type thin_by(thin_bySEXP);
-    Rcpp::traits::input_parameter< const arma::mat >::type r_beta(r_betaSEXP);
-    Rcpp::traits::input_parameter< const arma::mat >::type delta_beta(delta_betaSEXP);
-    Rcpp::traits::input_parameter< const arma::vec >::type r_Omega(r_OmegaSEXP);
-    Rcpp::traits::input_parameter< const arma::vec >::type delta_Omega(delta_OmegaSEXP);
-    Rcpp::traits::input_parameter< const double >::type alpha(alphaSEXP);
-    Rcpp::traits::input_parameter< const double >::type beta(betaSEXP);
-    Rcpp::traits::input_parameter< const arma::vec& >::type lambda_diag(lambda_diagSEXP);
-    Rcpp::traits::input_parameter< bool >::type progress(progressSEXP);
-    rcpp_result_gen = Rcpp::wrap(CAR_ALASSO_randeff_Cpp(data, design, design_r, membership, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, alpha, beta, lambda_diag, progress));
-    return rcpp_result_gen;
-END_RCPP
-}
 // CAR_ALASSO_Cpp
 List CAR_ALASSO_Cpp(const arma::mat& data, const arma::mat& design, const int n_iter, const int n_burn_in, const int thin_by, const arma::mat r_beta, const arma::mat delta_beta, const arma::vec r_Omega, const arma::vec delta_Omega, const arma::vec& lambda_diag, bool progress);
 RcppExport SEXP _CARlasso_CAR_ALASSO_Cpp(SEXP dataSEXP, SEXP designSEXP, SEXP n_iterSEXP, SEXP n_burn_inSEXP, SEXP thin_bySEXP, SEXP r_betaSEXP, SEXP delta_betaSEXP, SEXP r_OmegaSEXP, SEXP delta_OmegaSEXP, SEXP lambda_diagSEXP, SEXP progressSEXP) {
@@ -98,30 +73,6 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type emax(emaxSEXP);
     Rcpp::traits::input_parameter< bool >::type progress(progressSEXP);
     rcpp_result_gen = Rcpp::wrap(CAR_LASSO_hir_Cpp(data, design, link, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, ns, m, emax, progress));
-    return rcpp_result_gen;
-END_RCPP
-}
-// CAR_LASSO_randeff_Cpp
-List CAR_LASSO_randeff_Cpp(const arma::mat& data, const arma::mat& design, const arma::mat& design_r, const arma::mat& membership, const int n_iter, const int n_burn_in, const int thin_by, const double r_beta, const double delta_beta, const double r_Omega, const double delta_Omega, const double alpha, const double beta, bool progress);
-RcppExport SEXP _CARlasso_CAR_LASSO_randeff_Cpp(SEXP dataSEXP, SEXP designSEXP, SEXP design_rSEXP, SEXP membershipSEXP, SEXP n_iterSEXP, SEXP n_burn_inSEXP, SEXP thin_bySEXP, SEXP r_betaSEXP, SEXP delta_betaSEXP, SEXP r_OmegaSEXP, SEXP delta_OmegaSEXP, SEXP alphaSEXP, SEXP betaSEXP, SEXP progressSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::mat& >::type data(dataSEXP);
-    Rcpp::traits::input_parameter< const arma::mat& >::type design(designSEXP);
-    Rcpp::traits::input_parameter< const arma::mat& >::type design_r(design_rSEXP);
-    Rcpp::traits::input_parameter< const arma::mat& >::type membership(membershipSEXP);
-    Rcpp::traits::input_parameter< const int >::type n_iter(n_iterSEXP);
-    Rcpp::traits::input_parameter< const int >::type n_burn_in(n_burn_inSEXP);
-    Rcpp::traits::input_parameter< const int >::type thin_by(thin_bySEXP);
-    Rcpp::traits::input_parameter< const double >::type r_beta(r_betaSEXP);
-    Rcpp::traits::input_parameter< const double >::type delta_beta(delta_betaSEXP);
-    Rcpp::traits::input_parameter< const double >::type r_Omega(r_OmegaSEXP);
-    Rcpp::traits::input_parameter< const double >::type delta_Omega(delta_OmegaSEXP);
-    Rcpp::traits::input_parameter< const double >::type alpha(alphaSEXP);
-    Rcpp::traits::input_parameter< const double >::type beta(betaSEXP);
-    Rcpp::traits::input_parameter< bool >::type progress(progressSEXP);
-    rcpp_result_gen = Rcpp::wrap(CAR_LASSO_randeff_Cpp(data, design, design_r, membership, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, alpha, beta, progress));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -270,62 +221,6 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type chi(chiSEXP);
     Rcpp::traits::input_parameter< double >::type psi(psiSEXP);
     rcpp_result_gen = Rcpp::wrap(rgig(lambda, chi, psi));
-    return rcpp_result_gen;
-END_RCPP
-}
-// Multinomial_CAR_ALASSO_randeff_Cpp
-List Multinomial_CAR_ALASSO_randeff_Cpp(const arma::mat& data, const arma::mat& design, const arma::mat& design_r, const arma::mat& membership, const int n_iter, const int n_burn_in, const int thin_by, const arma::mat r_beta, const arma::mat delta_beta, const arma::vec r_Omega, const arma::vec delta_Omega, const arma::vec& lambda_diag, const double alpha, const double beta, const int ns, const int m, const double emax, bool progress);
-RcppExport SEXP _CARlasso_Multinomial_CAR_ALASSO_randeff_Cpp(SEXP dataSEXP, SEXP designSEXP, SEXP design_rSEXP, SEXP membershipSEXP, SEXP n_iterSEXP, SEXP n_burn_inSEXP, SEXP thin_bySEXP, SEXP r_betaSEXP, SEXP delta_betaSEXP, SEXP r_OmegaSEXP, SEXP delta_OmegaSEXP, SEXP lambda_diagSEXP, SEXP alphaSEXP, SEXP betaSEXP, SEXP nsSEXP, SEXP mSEXP, SEXP emaxSEXP, SEXP progressSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::mat& >::type data(dataSEXP);
-    Rcpp::traits::input_parameter< const arma::mat& >::type design(designSEXP);
-    Rcpp::traits::input_parameter< const arma::mat& >::type design_r(design_rSEXP);
-    Rcpp::traits::input_parameter< const arma::mat& >::type membership(membershipSEXP);
-    Rcpp::traits::input_parameter< const int >::type n_iter(n_iterSEXP);
-    Rcpp::traits::input_parameter< const int >::type n_burn_in(n_burn_inSEXP);
-    Rcpp::traits::input_parameter< const int >::type thin_by(thin_bySEXP);
-    Rcpp::traits::input_parameter< const arma::mat >::type r_beta(r_betaSEXP);
-    Rcpp::traits::input_parameter< const arma::mat >::type delta_beta(delta_betaSEXP);
-    Rcpp::traits::input_parameter< const arma::vec >::type r_Omega(r_OmegaSEXP);
-    Rcpp::traits::input_parameter< const arma::vec >::type delta_Omega(delta_OmegaSEXP);
-    Rcpp::traits::input_parameter< const arma::vec& >::type lambda_diag(lambda_diagSEXP);
-    Rcpp::traits::input_parameter< const double >::type alpha(alphaSEXP);
-    Rcpp::traits::input_parameter< const double >::type beta(betaSEXP);
-    Rcpp::traits::input_parameter< const int >::type ns(nsSEXP);
-    Rcpp::traits::input_parameter< const int >::type m(mSEXP);
-    Rcpp::traits::input_parameter< const double >::type emax(emaxSEXP);
-    Rcpp::traits::input_parameter< bool >::type progress(progressSEXP);
-    rcpp_result_gen = Rcpp::wrap(Multinomial_CAR_ALASSO_randeff_Cpp(data, design, design_r, membership, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, lambda_diag, alpha, beta, ns, m, emax, progress));
-    return rcpp_result_gen;
-END_RCPP
-}
-// Pois_CAR_ALASSO_randeff_Cpp
-List Pois_CAR_ALASSO_randeff_Cpp(const arma::mat& data, const arma::mat& design, const arma::mat& design_r, const arma::mat& membership, const int n_iter, const int n_burn_in, const int thin_by, const arma::mat r_beta, const arma::mat delta_beta, const arma::vec r_Omega, const arma::vec delta_Omega, const arma::vec& lambda_diag, const double alpha, const double beta, const int ns, const int m, const double emax, bool progress);
-RcppExport SEXP _CARlasso_Pois_CAR_ALASSO_randeff_Cpp(SEXP dataSEXP, SEXP designSEXP, SEXP design_rSEXP, SEXP membershipSEXP, SEXP n_iterSEXP, SEXP n_burn_inSEXP, SEXP thin_bySEXP, SEXP r_betaSEXP, SEXP delta_betaSEXP, SEXP r_OmegaSEXP, SEXP delta_OmegaSEXP, SEXP lambda_diagSEXP, SEXP alphaSEXP, SEXP betaSEXP, SEXP nsSEXP, SEXP mSEXP, SEXP emaxSEXP, SEXP progressSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::mat& >::type data(dataSEXP);
-    Rcpp::traits::input_parameter< const arma::mat& >::type design(designSEXP);
-    Rcpp::traits::input_parameter< const arma::mat& >::type design_r(design_rSEXP);
-    Rcpp::traits::input_parameter< const arma::mat& >::type membership(membershipSEXP);
-    Rcpp::traits::input_parameter< const int >::type n_iter(n_iterSEXP);
-    Rcpp::traits::input_parameter< const int >::type n_burn_in(n_burn_inSEXP);
-    Rcpp::traits::input_parameter< const int >::type thin_by(thin_bySEXP);
-    Rcpp::traits::input_parameter< const arma::mat >::type r_beta(r_betaSEXP);
-    Rcpp::traits::input_parameter< const arma::mat >::type delta_beta(delta_betaSEXP);
-    Rcpp::traits::input_parameter< const arma::vec >::type r_Omega(r_OmegaSEXP);
-    Rcpp::traits::input_parameter< const arma::vec >::type delta_Omega(delta_OmegaSEXP);
-    Rcpp::traits::input_parameter< const arma::vec& >::type lambda_diag(lambda_diagSEXP);
-    Rcpp::traits::input_parameter< const double >::type alpha(alphaSEXP);
-    Rcpp::traits::input_parameter< const double >::type beta(betaSEXP);
-    Rcpp::traits::input_parameter< const int >::type ns(nsSEXP);
-    Rcpp::traits::input_parameter< const int >::type m(mSEXP);
-    Rcpp::traits::input_parameter< const double >::type emax(emaxSEXP);
-    Rcpp::traits::input_parameter< bool >::type progress(progressSEXP);
-    rcpp_result_gen = Rcpp::wrap(Pois_CAR_ALASSO_randeff_Cpp(data, design, design_r, membership, n_iter, n_burn_in, thin_by, r_beta, delta_beta, r_Omega, delta_Omega, lambda_diag, alpha, beta, ns, m, emax, progress));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -522,29 +417,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// CAR_multireg_randeff_cpp
-List CAR_multireg_randeff_cpp(const arma::mat& data, const arma::mat& design, const arma::mat& design_r, const arma::mat& membership, int n_burn_in, int n_iter, int thin_by, const arma::mat& Bbar, const arma::mat& A, double nu, const arma::mat& V, const double alpha, const double beta);
-RcppExport SEXP _CARlasso_CAR_multireg_randeff_cpp(SEXP dataSEXP, SEXP designSEXP, SEXP design_rSEXP, SEXP membershipSEXP, SEXP n_burn_inSEXP, SEXP n_iterSEXP, SEXP thin_bySEXP, SEXP BbarSEXP, SEXP ASEXP, SEXP nuSEXP, SEXP VSEXP, SEXP alphaSEXP, SEXP betaSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::mat& >::type data(dataSEXP);
-    Rcpp::traits::input_parameter< const arma::mat& >::type design(designSEXP);
-    Rcpp::traits::input_parameter< const arma::mat& >::type design_r(design_rSEXP);
-    Rcpp::traits::input_parameter< const arma::mat& >::type membership(membershipSEXP);
-    Rcpp::traits::input_parameter< int >::type n_burn_in(n_burn_inSEXP);
-    Rcpp::traits::input_parameter< int >::type n_iter(n_iterSEXP);
-    Rcpp::traits::input_parameter< int >::type thin_by(thin_bySEXP);
-    Rcpp::traits::input_parameter< const arma::mat& >::type Bbar(BbarSEXP);
-    Rcpp::traits::input_parameter< const arma::mat& >::type A(ASEXP);
-    Rcpp::traits::input_parameter< double >::type nu(nuSEXP);
-    Rcpp::traits::input_parameter< const arma::mat& >::type V(VSEXP);
-    Rcpp::traits::input_parameter< const double >::type alpha(alphaSEXP);
-    Rcpp::traits::input_parameter< const double >::type beta(betaSEXP);
-    rcpp_result_gen = Rcpp::wrap(CAR_multireg_randeff_cpp(data, design, design_r, membership, n_burn_in, n_iter, thin_by, Bbar, A, nu, V, alpha, beta));
-    return rcpp_result_gen;
-END_RCPP
-}
 // CAR_multireg_cpp
 List CAR_multireg_cpp(const arma::mat& data, const arma::mat& design, int n_sample, const arma::mat& Bbar, const arma::mat& A, double nu, const arma::mat& V);
 RcppExport SEXP _CARlasso_CAR_multireg_cpp(SEXP dataSEXP, SEXP designSEXP, SEXP n_sampleSEXP, SEXP BbarSEXP, SEXP ASEXP, SEXP nuSEXP, SEXP VSEXP) {
@@ -677,10 +549,8 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_CARlasso_CAR_ALASSO_hir_Cpp", (DL_FUNC) &_CARlasso_CAR_ALASSO_hir_Cpp, 15},
-    {"_CARlasso_CAR_ALASSO_randeff_Cpp", (DL_FUNC) &_CARlasso_CAR_ALASSO_randeff_Cpp, 15},
     {"_CARlasso_CAR_ALASSO_Cpp", (DL_FUNC) &_CARlasso_CAR_ALASSO_Cpp, 11},
     {"_CARlasso_CAR_LASSO_hir_Cpp", (DL_FUNC) &_CARlasso_CAR_LASSO_hir_Cpp, 14},
-    {"_CARlasso_CAR_LASSO_randeff_Cpp", (DL_FUNC) &_CARlasso_CAR_LASSO_randeff_Cpp, 14},
     {"_CARlasso_CAR_LASSO_Cpp", (DL_FUNC) &_CARlasso_CAR_LASSO_Cpp, 10},
     {"_CARlasso_update_car_tau2_adp_helper", (DL_FUNC) &_CARlasso_update_car_tau2_adp_helper, 6},
     {"_CARlasso_update_car_lambda_Omega_adp_helper", (DL_FUNC) &_CARlasso_update_car_lambda_Omega_adp_helper, 4},
@@ -690,8 +560,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_CARlasso_update_car_tau2_helper", (DL_FUNC) &_CARlasso_update_car_tau2_helper, 6},
     {"_CARlasso_sample_Omega_prior_cpp", (DL_FUNC) &_CARlasso_sample_Omega_prior_cpp, 7},
     {"_CARlasso_rgig", (DL_FUNC) &_CARlasso_rgig, 3},
-    {"_CARlasso_Multinomial_CAR_ALASSO_randeff_Cpp", (DL_FUNC) &_CARlasso_Multinomial_CAR_ALASSO_randeff_Cpp, 18},
-    {"_CARlasso_Pois_CAR_ALASSO_randeff_Cpp", (DL_FUNC) &_CARlasso_Pois_CAR_ALASSO_randeff_Cpp, 18},
     {"_CARlasso_update_Z_helper_CAR", (DL_FUNC) &_CARlasso_update_Z_helper_CAR, 9},
     {"_CARlasso_rtn1", (DL_FUNC) &_CARlasso_rtn1, 4},
     {"_CARlasso_update_Z_helper_multinomial", (DL_FUNC) &_CARlasso_update_Z_helper_multinomial, 10},
@@ -703,7 +571,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_CARlasso_Intercept_Graphical_LASSO_hir_Cpp", (DL_FUNC) &_CARlasso_Intercept_Graphical_LASSO_hir_Cpp, 11},
     {"_CARlasso_rinvGau", (DL_FUNC) &_CARlasso_rinvGau, 2},
     {"_CARlasso_stein_loss_cpp", (DL_FUNC) &_CARlasso_stein_loss_cpp, 2},
-    {"_CARlasso_CAR_multireg_randeff_cpp", (DL_FUNC) &_CARlasso_CAR_multireg_randeff_cpp, 13},
     {"_CARlasso_CAR_multireg_cpp", (DL_FUNC) &_CARlasso_CAR_multireg_cpp, 7},
     {"_CARlasso_Multinomial_CAR_multireg_cpp", (DL_FUNC) &_CARlasso_Multinomial_CAR_multireg_cpp, 12},
     {"_CARlasso_Pois_CAR_multireg_cpp", (DL_FUNC) &_CARlasso_Pois_CAR_multireg_cpp, 12},
