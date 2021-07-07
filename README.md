@@ -11,6 +11,9 @@ The package is not yet on CRAN, to install it, use:
 devtools::install_github("YunyiShen/CAR-LASSO")
 ```
 
+Several packages necessary: `Rcpp`, `RcppArmadillo`, `RcppProgress`, `coda`, `Matrix`, `igraph`, `ggraph`, and `ggplot2`. 
+
+
 To get started, checkout [this page](https://yunyishen.ml/CAR-LASSO/dev/articles/network.html)
 
 

@@ -1,3 +1,5 @@
+utils::globalVariables(c("abs_weight", "direction.", "name"))
+
 #' plot the chain graph estimated by CAR-LASSO with threshold or horseshoe method using ggraph
 #'
 #' @param x The carlasso_out xect
