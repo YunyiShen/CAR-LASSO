@@ -1,4 +1,4 @@
-import(Rcpp, RcppArmadillo, RcppProgress)
+import(Rcpp)
 import(coda, Matrix, MASS)
 import(igraph, ggraph, ggplot2)
 importFrom("stats", "as.formula", "formula", "model.matrix", "na.omit",
