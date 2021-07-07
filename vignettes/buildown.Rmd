@@ -1,0 +1,18 @@
+---
+title: "Build your own hierarchical"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{build_own}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+We also offer two low level one-step sampling functions `rCARAlasso_` and `rCARlasso_` for adaptive and non-adaptive version of the CARlasso, see [reference](https://yunyishen.ml/CAR-LASSO/dev/reference/rCARAlasso_.html) for the detail.
+
+The typical usage would be one write ones own sampler to sample the Normal latent variable and feed it to the one-step sampling. Note that these two functions will **update** the current states in **memory** directly.
