@@ -23,6 +23,9 @@ car_res <- horseshoe(car_res)
 plot(car_res)
 ```
 
+![The Result](http://YunyiShen.github.io/files/Research_figs/CARLASSO/package_eg.png)
+
+
 To run a reduced version of the analysis on human gut microbiome (with less predictors and responses), try:
 
 ```r
@@ -37,6 +40,8 @@ gut_res <- horseshoe(gut_res)
 plot(gut_res)
 ```
 It might take a little while due to the sampling process of the latent normal variable 
+
+![The Result](http://YunyiShen.github.io/files/Research_figs/CARLASSO/human_gut_reduce.png)
 
 Though we don't recommend treating compositional data as counts, as a illustration, we can run the counting model:
 
@@ -53,3 +58,4 @@ gut_res <- CARlasso(Alistipes+Bacteroides+
 gut_res <- horseshoe(gut_res)
 plot(gut_res)
 ```
+![The Result](http://YunyiShen.github.io/files/Research_figs/CARLASSO/gut_count.png)

@@ -9,3 +9,5 @@ tests/*
 real_data/*
 .vscode/*
 *.DS_Store
+#docs
+inst/doc

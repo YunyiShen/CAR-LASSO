@@ -1,0 +1,13 @@
+authors:
+  Yunyi Shen:
+    href: https://yunyishen.ml
+  Claudia Solis-Lemus:
+    href: https://solislemuslab.github.io/
+
+navbar:
+  structure:
+    left:  [home, intro, reference, articles, tutorials, news]
+    right: [github]
+
+development:
+  mode: devel
