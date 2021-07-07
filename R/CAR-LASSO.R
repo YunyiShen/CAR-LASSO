@@ -89,13 +89,13 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
                      ns = 1000, m=20, emax=64, 
                      progress = TRUE, verbos = TRUE) {
   # some warning messages
-  err_no_predictor <- "No predictor supplied.\n\n"
+  err_no_predictor <- "No predictor supplied, do you want to try bGlasso?.\n\n"
   warr_centering <- "Predictors will be centered.\n\n"
 
   # check links
   if (!(link %in% c("identity", "probit", "log", "logit"))) {
     stop("Currently only implemented identity (normal), 
-      probit (bernoulli) log (Poisson) and logit (multi-nomial)")
+       log (Poisson) logit (multi-nomial) and probit (bernoulli)")
   }
 
   # omit NAs
@@ -212,7 +212,7 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
       }
     }
     if ((length(lambda_diag) == 1 )) {
-      if (verbos) cat("Algorithm set to be adapive. Assuming priors are all the same for Omega's diagonals \n\n")
+      if (verbos) cat("Algorithm set to be adaptive. Assuming priors are all the same for Omega's diagonals \n\n")
       lambda_diag <- rep(lambda_diag, k)
     }
     else {
@@ -226,35 +226,6 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
 
   
   ## Main algorithms
-
-  if (link == "probit") {
-    unique_values <- apply(y, 2, function(w) {
-      length(unique(w))
-    })
-    if (!all(unique_values == 2)) {
-      stop("Response has multiple unique values, cannot use probit link, do you mean logit?\n")
-    }
-
-    if (verbos) cat("Algorithm start...\n\n")
-    if (verbos & progress) cat("progress:\n\n")
-    if (adaptive) {
-      res <- Probit_CAR_ALASSO_Cpp(
-        y, design,
-        n_iter, n_burn_in,
-        thin_by, r_beta, delta_beta,
-        r_Omega, delta_Omega, lambda_diag,
-        progress
-      )
-    }
-    else {
-      res <- Probit_CAR_LASSO_Cpp(
-        y, design,
-        n_iter, n_burn_in,
-        thin_by, r_beta, delta_beta,
-        r_Omega, delta_Omega, progress
-      )
-    }
-  }
 
   if (link == "identity") {
     if (verbos) cat("Algorithm start...\n\n")
@@ -282,8 +253,8 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
     if (verbos) cat("Algorithm start...\n\n")
     if (verbos & progress) cat("progress:\n\n")
     if (adaptive) {
-      res <- Pois_CAR_ALASSO_Cpp(
-        y, design,
+      res <- CAR_ALASSO_hir_Cpp(
+        y, design, link = 1,
         n_iter, n_burn_in,
         thin_by, r_beta, delta_beta,
         r_Omega, delta_Omega, lambda_diag,
@@ -292,11 +263,11 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
       )
     }
     else {
-      res <- Pois_CAR_LASSO_Cpp(
-        y, design,
+      res <- CAR_LASSO_hir_Cpp(
+        y, design, link = 1,
         n_iter, n_burn_in,
         thin_by, r_beta, delta_beta,
-        r_Omega, delta_Omega, 
+        r_Omega, delta_Omega, lambda_diag,
         ns, m, emax, 
         progress
       )
@@ -308,8 +279,8 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
     if (verbos) cat("Algorithm start...\n\n")
     if (verbos & progress) cat("progress:\n\n")
     if (adaptive) {
-      res <- Multinomial_CAR_ALASSO_Cpp(
-        y, design,
+      res <- CAR_ALASSO_hir_Cpp(
+        y, design, link = 2,
         n_iter, n_burn_in,
         thin_by, r_beta, delta_beta,
         r_Omega, delta_Omega, lambda_diag,
@@ -318,17 +289,47 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
       )
     }
     else {
-      res <- Multinomial_CAR_LASSO_Cpp(
-        y, design,
+      res <- CAR_LASSO_hir_Cpp(
+        y, design, link = 2,
         n_iter, n_burn_in,
         thin_by, r_beta, delta_beta,
-        r_Omega, delta_Omega, 
+        r_Omega, delta_Omega, lambda_diag,
         ns, m, emax, 
         progress
       )
     }
   }
+  if (link == "probit") {
+    unique_values <- apply(y, 2, function(w) {
+      length(unique(w))
+    })
+    if (!all(unique_values == 2)) {
+      stop("Response has multiple unique values, cannot use probit link, do you mean logit?\n")
+    }
 
+    if (verbos) cat("Algorithm start...\n\n")
+    if (verbos & progress) cat("progress:\n\n")
+    if (adaptive) {
+      res <- CAR_ALASSO_hir_Cpp(
+        y, design, link = 3,
+        n_iter, n_burn_in,
+        thin_by, r_beta, delta_beta,
+        r_Omega, delta_Omega, lambda_diag,
+        ns, m, emax, 
+        progress
+      )
+    }
+    else {
+      res <- CAR_LASSO_hir_Cpp(
+        y, design, link = 3,
+        n_iter, n_burn_in,
+        thin_by, r_beta, delta_beta,
+        r_Omega, delta_Omega, lambda_diag,
+        ns, m, emax, 
+        progress
+      )
+    }
+  }
 
   omega_post <- get_graph(res,k)
   b_post <- matrix(colMeans(res$beta),p,k)
