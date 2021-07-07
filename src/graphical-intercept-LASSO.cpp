@@ -290,7 +290,7 @@ Rcpp::List Intercept_Graphical_LASSO_hir_Cpp(const arma::mat & data,
   }
 
   if(link==3){
-    Z = 0 * data;
+    Z = data;
     flag = false;
   }
 
