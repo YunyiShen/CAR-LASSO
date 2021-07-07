@@ -5,13 +5,13 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Get started • CARlasso</title>
+<title>Get started with CAR-LASSO models • CARlasso</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="Get started">
+<script src="../pkgdown.js"></script><meta property="og:title" content="Get started with CAR-LASSO models">
 <meta property="og:description" content="CARlasso">
 <meta name="robots" content="noindex">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -55,7 +55,13 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/network.html">Get started</a>
+      <a href="../articles/buildown.html">Build your own hierarchical</a>
+    </li>
+    <li>
+      <a href="../articles/glasso.html">Graphical LASSO support</a>
+    </li>
+    <li>
+      <a href="../articles/network.html">Get started with CAR-LASSO models</a>
     </li>
   </ul>
 </li>
@@ -73,7 +79,7 @@
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1 data-toc-skip>Get started</h1>
+      <h1 data-toc-skip>Get started with CAR-LASSO models</h1>
             
       
       
@@ -85,6 +91,7 @@
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">CARlasso</span><span class="op">)</span></code></pre></div>
+<p><code>CARlasso</code> is the main interface to work with the model, for detailed see <a href="https://yunyishen.ml/CAR-LASSO/dev/reference/CARlasso.html">reference</a>.</p>
 <div id="network-for-gaussian-data" class="section level2">
 <h2 class="hasAnchor">
 <a href="#network-for-gaussian-data" class="anchor"></a>Network for Gaussian data</h2>
@@ -107,6 +114,7 @@
 <span class="co">#&gt; 4  2.0595392  0.735072142  0.04906691</span>
 <span class="co">#&gt; 5 -1.3768616 -0.146472627 -0.57835573</span>
 <span class="co">#&gt; 6 -1.1508556 -0.057887335 -0.99873866</span></code></pre></div>
+<p>To use the Normal version, we should set <code>link="identity"</code> which is the default.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">car_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/CARlasso.html">CARlasso</a></span><span class="op">(</span><span class="va">y1</span><span class="op">+</span><span class="va">y2</span><span class="op">+</span><span class="va">y3</span><span class="op">+</span><span class="va">y4</span><span class="op">+</span><span class="va">y5</span><span class="op">~</span><span class="va">x1</span><span class="op">+</span><span class="va">x2</span><span class="op">+</span><span class="va">x3</span><span class="op">+</span><span class="va">x4</span><span class="op">+</span><span class="va">x5</span>, data <span class="op">=</span> <span class="va">dt</span>, adaptive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 <span class="co">#&gt; Predictors will be centered.</span>
@@ -179,7 +187,7 @@
 <div id="network-for-counting-data" class="section level2">
 <h2 class="hasAnchor">
 <a href="#network-for-counting-data" class="anchor"></a>Network for counting data</h2>
-<p>This is common in a lot of ecological applications. For instance number of seedlings within a site. The responses were count rather than continuous. In <code>CARlasso</code> it is modelled as Poisson with rate follow log-Normal. We will give the example using the data above since the responses are indeed count, but keep in mind we need to be careful whether a couting data is real counting or compositional. To distinguish them, ask the question: <strong>Is the sum know/decided by us/not free</strong>?</p>
+<p>This is common in a lot of ecological applications. For instance number of seedlings within a site. The responses were count rather than continuous. In <code>CARlasso</code> it is modelled as Poisson with rate follow log-Normal. We will give the example using the data above since the responses are indeed count, but keep in mind we need to be careful whether a couting data is real counting or compositional. To distinguish them, ask the question: <strong>Is the sum know/decided by us/not free</strong>? If yes, we want to use compositional models.</p>
 <p>To run the composition model, we need to set <code>link="log"</code></p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">gut_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/CARlasso.html">CARlasso</a></span><span class="op">(</span><span class="va">Alistipes</span><span class="op">+</span><span class="va">Bacteroides</span><span class="op">+</span>
