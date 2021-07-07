@@ -4,7 +4,7 @@ Conditional Auto-Regressive LASSO in R
 
 R implementation of 
 
-Shen, Yunyi, and Claudia Solis-Lemus. "Bayesian Conditional Auto-Regressive LASSO Models to Learn Sparse Networks with Predictors." arXiv preprint arXiv:2012.08397 (2020).
+Shen, Yunyi, and Claudia Solis-Lemus. "Bayesian Conditional Auto-Regressive LASSO Models to Learn Sparse Networks with Predictors." arXiv preprint [arXiv:2012.08397](https://arxiv.org/abs/2012.08397) (2020).
 
 The package is not yet on CRAN, to install it, use:
 ```r

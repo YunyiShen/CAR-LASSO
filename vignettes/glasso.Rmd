@@ -1,8 +1,8 @@
 ---
-title: "Get started with CAR-LASSO models"
+title: "Graphical LASSO support"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{network}
+  %\VignetteIndexEntry{glasso}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -18,34 +18,28 @@ knitr::opts_chunk$set(
 library(CARlasso)
 ```
 
-`CARlasso` is the main interface to work with the model, for detailed see [reference](https://yunyishen.ml/CAR-LASSO/dev/reference/CARlasso.html). 
+We also have Graphical LASSO support for study with no predictors, the main interface is `bGlasso`, please also see the [reference](https://yunyishen.ml/CAR-LASSO/dev/reference/bGlasso.html).
 
 ## Network for Gaussian data
 
-This is the case when data is Gaussian or can be transformed to Gaussian, for instance (log) biomass of trees, we will give a simuated example. The use of the `Carlasso` is similar to `lm`, we could supply a formula and a dataframe with both responses and predictors:
+This is the case when data is Gaussian or can be transformed to Gaussian. We only need responses in this case
 
 ```{r ar1data}
 set.seed(42)
 dt <- simu_AR1(n=100,k=5, rho=0.7)
+dt <- dt[,1:5]
 head(dt)
 
 ```
+Different from `CARlasso` we do not really need to have a formula. To use the Normal version, we should set `link="identity"` which is the default. 
 
-To use the Normal version, we should set `link="identity"` which is the default. 
 
 ```{r ar1example_first}
-car_res <- CARlasso(y1+y2+y3+y4+y5~x1+x2+x3+x4+x5, data = dt, adaptive = TRUE)
-plot(car_res,tol = 0.05)
+glassores <- bGlasso(data = dt)
+plot(glassores)
 ```
 
-We can have a more formal horseshoe inference on the structure of the network, this will update the `car_res`:
-
-```{r horseshoe_1}
-# with horseshoe inference
-car_res <- horseshoe(car_res)
-plot(car_res)
-
-```
+We could see the false link due to the common input.
 
 ## Network for compositional data
 
@@ -54,27 +48,20 @@ This is common in microbe related studies and some ecological applications with 
 Have a look of the data, still a dataframe with all predictors and responses
 
 ```{r comp_data}
-mgp154[1:5,1:7]
+dt <- mgp154[,c("Alistipes","Bacteroides",
+                        "Eubacterium","Parabacteroides","all_others")]
 ```
 
 To run the composition model, we need to set `link="logit"`
 
 ```{r compositional1}
-gut_res <- CARlasso(Alistipes+Bacteroides+
-                        Eubacterium+Parabacteroides+all_others~
-                        BMI+Age+Gender+Stratum,
-                    data = mgp154,link = "logit", 
-                    adaptive = TRUE, n_iter = 2000, 
+gut_res <- bGlasso( data = dt,link = "logit", 
+                    n_iter = 2000, 
                     n_burn_in = 1000, thin_by = 2)
-```
-
-Note that in this case `all_others`, i.e. the last one in the left hand side of the formula will be the reference level.
-
-```{r horseshoe_comp}
-# horseshoe will take a while, as it needs to sample the latent normal too
-gut_res <- horseshoe(gut_res)
 plot(gut_res)
 ```
+
+Note that in this case the last one in the dataframe will be the reference level 
 
 ## Network for counting data
 
@@ -83,16 +70,11 @@ This is common in a lot of ecological applications. For instance number of seedl
 To run the composition model, we need to set `link="log"`
 
 ```{r counting}
-gut_res <- CARlasso(Alistipes+Bacteroides+
-                        Eubacterium+Parabacteroides+all_others~
-                        BMI+Age+Gender+Stratum,
-                    data = mgp154,link = "log", 
-                    adaptive = TRUE, 
-                    r_beta = 0.1, # default sometimes cause singularity in Poisson model due to exponential transformation, slightly change can fix it.
+gut_res <- gut_res <- bGlasso( data = dt[,1:4],link = "log", 
                     n_iter = 2000, 
                     n_burn_in = 1000, thin_by = 2)
-# horseshoe will take a while, as it's currently implemented in R rather than C++
-gut_res <- horseshoe(gut_res)
 plot(gut_res)
 ```
+
+
 
