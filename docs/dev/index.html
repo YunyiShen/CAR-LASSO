@@ -89,7 +89,8 @@
 <p>The package is not yet on CRAN, to install it, use:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org//reference/remote-reexports.html">install_github</a></span><span class="op">(</span><span class="st">"YunyiShen/CAR-LASSO"</span><span class="op">)</span></code></pre></div>
-<p>Example run, we generated data from a 5-node AR1 model with each node has a specific treatment then use CAR-ALASSO to reconstruct such network and plot the result.</p>
+<p>To get started, checkout <a href="https://yunyishen.ml/CAR-LASSO/dev/articles/network.html">this page</a></p>
+<p>Here are some example runs, we generated data from a 5-node AR1 model with each node has a specific treatment then use CAR-ALASSO to reconstruct such network and plot the result.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span>
 <span class="va">dt</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/simu_AR1.html">simu_AR1</a></span><span class="op">(</span>n<span class="op">=</span><span class="fl">100</span>,k<span class="op">=</span><span class="fl">5</span>, rho<span class="op">=</span><span class="fl">0.7</span><span class="op">)</span>
@@ -126,6 +127,7 @@
 <span class="va">gut_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/horseshoe.html">horseshoe</a></span><span class="op">(</span><span class="va">gut_res</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span><span class="op">(</span><span class="va">gut_res</span><span class="op">)</span></code></pre></div>
 <p><img src="http://YunyiShen.github.io/files/Research_figs/CARLASSO/gut_count.png" alt="The Result"></p>
+<p>The package also have graphical lasso support, see <a href="https://yunyishen.ml/CAR-LASSO/dev/articles/glasso.html">this page</a>. If you would like lower level interface of car lasso, see <a href="https://yunyishen.ml/CAR-LASSO/dev/articles/buildown.html">this page</a>.</p>
 </div>
 
   </div>
