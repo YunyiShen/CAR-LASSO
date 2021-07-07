@@ -2,7 +2,7 @@
 title: "Build your own hierarchical"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{glasso}
+  %\VignetteIndexEntry{build_own}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
