@@ -474,7 +474,7 @@ bGlasso <- function(data, link = "identity",
     if (verbos & progress) cat("progress:\n\n")
     
     res <- Intercept_Graphical_LASSO_hir_Cpp(
-        y, link = 1,
+        y, 1,
         n_iter, n_burn_in,
         thin_by,
         r_Omega, delta_Omega,
@@ -487,8 +487,8 @@ bGlasso <- function(data, link = "identity",
     if (verbos) cat("Last response will be used as reference group\n\n")
     if (verbos) cat("Algorithm start...\n\n")
     if (verbos & progress) cat("progress:\n\n")
-    res <- CAR_LASSO_hir_Cpp(
-        y, link = 2,
+    res <- Intercept_Graphical_LASSO_hir_Cpp(
+        y, 2,
         n_iter, n_burn_in,
         thin_by,
         r_Omega, delta_Omega,
@@ -509,8 +509,8 @@ bGlasso <- function(data, link = "identity",
     if (verbos & progress) cat("progress:\n\n")
     
     
-    res <- CAR_LASSO_hir_Cpp(
-        y, link = 3,
+    res <- Intercept_Graphical_LASSO_hir_Cpp(
+        y, 3,
         n_iter, n_burn_in,
         thin_by,
         r_Omega, delta_Omega,
