@@ -1,6 +1,6 @@
 #' Horseshoe method for graphical structure inference
 #' 
-#' @details This method fits a linear regression with less prior on any parameters and compare the posterior mean with the LASSO result. If LASSO is comparablely less than result without sparsity prior, we argue that the edge should be absent
+#' @details This method fits a linear regression with less informative prior on any parameters and compare the posterior mean with the LASSO result. If LASSO is comparably less than result without sparsity prior, we argue that the edge should be absent
 #' @param obj The carlasso_out object from CARlasso
 #' @param Bbar Prior mean of regression coefficients, default all 0s
 #' @param A Prior precision of regression coefficients, default 1e-8
@@ -29,7 +29,7 @@ horseshoe <- function(obj, Bbar=NULL, A = NULL, nu=3, V=NULL, thr = 0.5 ){
     }
 
     if(obj$settings$link == "probit"){
-        multireg_res <- Pobit_CAR_multireg(y,design,obj$settings$n_burn_in,obj$settings$n_iter,
+        multireg_res <- Probit_CAR_multireg(y,design,obj$settings$n_burn_in,obj$settings$n_iter,
                                      obj$settings$thin_by, 
                                      Bbar, A, nu, V)
     }

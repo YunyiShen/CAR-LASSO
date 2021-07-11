@@ -149,7 +149,7 @@ void spl1_multi_(const int *ns, int *n, int *ilow, int *ihigh, int *ipt,
   } /** end of while (! sampld) **/
   //Necesario al terminar de utilizar los generadores de numeros aleatorios del R
   PutRNGstate();
-  if (attempts >= max_attempt)
+  //if (attempts >= max_attempt)
     //Rcout << "Trap in ARS: Maximum number of attempts reached by routine spl1_\n"
     //      << endl;
   Z_curr(l, w) = *beta;
@@ -463,7 +463,7 @@ void update_Z_helper_multinomial(arma::mat &Z_curr,
 //   return;
 // }
 
-// [[Rcpp::export]]
+
 void update_Z_helper_multinomial_SRG(arma::mat &Z_curr, // persumably large, thus will not copy
                                      const arma::mat &data,
                                      const arma::mat &design,
@@ -476,7 +476,7 @@ void update_Z_helper_multinomial_SRG(arma::mat &Z_curr, // persumably large, thu
 {
   arma::mat mu_Zmat = design * beta_curr;
   mu_Zmat.each_row() += mu_curr.t(); // calculate the expectation of latent
-  arma::mat Sigma_Z = inv_sympd(Omega_curr);
+  arma::mat Sigma_Z = arma::inv_sympd(Omega_curr);
   //Rcout << "muZ:\n" << mu_Zmat <<endl;
   //Rcout << "SigmaZ:\n" << Sigma_Z <<endl;
   update_Z_helper_multinomial(Z_curr, mu_Zmat, Sigma_Z, data,
@@ -497,12 +497,13 @@ void update_Z_helper_multinomial_gra(arma::mat &Z_curr, // persumably large, thu
   arma::mat mu_Zmat = 0 * Z_curr;
   mu_Zmat.each_row() += mu_curr.t(); // calculate the expectation of latent
   arma::mat Sigma_Z = inv_sympd(Omega_curr);
+  mu_Zmat = mu_Zmat * Sigma_Z;
   update_Z_helper_multinomial(Z_curr, mu_Zmat, Sigma_Z, data,
                               k, p, n, ns, m, emax);
   return;
 }
 
-// [[Rcpp::export]]
+
 void update_Z_helper_multinomial_CAR(arma::mat &Z_curr, // persumably large, thus will not copy
                                      const arma::mat &data,
                                      const arma::mat &design,
@@ -515,14 +516,14 @@ void update_Z_helper_multinomial_CAR(arma::mat &Z_curr, // persumably large, thu
 {
   arma::mat mu_Zmat = design * beta_curr;
   mu_Zmat.each_row() += mu_curr.t(); // calculate the expectation of latent
-  arma::mat Sigma_Z = inv_sympd(Omega_curr);
+  arma::mat Sigma_Z = arma::inv_sympd(Omega_curr);
   mu_Zmat = mu_Zmat * Sigma_Z; // slightly different from regression, CAR need to times Sigma to mu
   update_Z_helper_multinomial(Z_curr, mu_Zmat, Sigma_Z, data,
                               k, p, n, ns, m, emax);
   return;
 }
 
-// [[Rcpp::export]]
+
 void update_Z_helper_multinomial_CAR_randeff(arma::mat &Z_curr, // persumably large, thus will not copy
                                      const arma::mat &data,
                                      const arma::mat &design,
@@ -537,7 +538,7 @@ void update_Z_helper_multinomial_CAR_randeff(arma::mat &Z_curr, // persumably la
 {
   arma::mat mu_Zmat = design * beta_curr + design_r * nu_curr;
   mu_Zmat.each_row() += mu_curr.t(); // calculate the expectation of latent
-  arma::mat Sigma_Z = inv_sympd(Omega_curr);
+  arma::mat Sigma_Z = arma::inv_sympd(Omega_curr);
   mu_Zmat = mu_Zmat * Sigma_Z; // slightly different from regression, CAR need to times Sigma to mu
   update_Z_helper_multinomial(Z_curr, mu_Zmat, Sigma_Z, data,
                               k, p, n, ns, m, emax);

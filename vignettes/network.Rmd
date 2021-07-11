@@ -1,0 +1,98 @@
+---
+title: "Get started with CAR-LASSO models"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Get started with CAR-LASSO models}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(CARlasso)
+```
+
+`CARlasso` is the main interface to work with the model, for detailed see [reference](https://yunyishen.ml/CAR-LASSO/dev/reference/CARlasso.html). 
+
+## Network for Gaussian data
+
+This is the case when data is Gaussian or can be transformed to Gaussian, for instance (log) biomass of trees, we will give a simuated example. The use of the `Carlasso` is similar to `lm`, we could supply a formula and a dataframe with both responses and predictors:
+
+```{r ar1data}
+set.seed(42)
+dt <- simu_AR1(n=100,k=5, rho=0.7)
+head(dt)
+
+```
+
+To use the Normal version, we should set `link="identity"` which is the default. 
+
+```{r ar1example_first, eval = FALSE}
+car_res <- CARlasso(y1+y2+y3+y4+y5~x1+x2+x3+x4+x5, data = dt, adaptive = TRUE)
+plot(car_res,tol = 0.05)
+```
+
+We can have a more formal horseshoe inference on the structure of the network, this will update the `car_res`:
+
+```{r horseshoe_1,eval = FALSE}
+# with horseshoe inference
+car_res <- horseshoe(car_res)
+plot(car_res)
+
+```
+
+## Network for compositional data
+
+This is common in microbe related studies and some ecological applications with relative abundance only. For instance, microbe relative abundance came from sequencing and in this case we will have the sum of "abundance" decided by the sequence depth rather than the real total abundance. The data is usually described as "compositional". In `CARlasso` this type of data were modelled as Logit-Normal-multinomial. In this case, we have less relative abundance need to have a "reference level" taxa and all others are "relative" to this taxa, we will give a reduced version:
+
+Have a look of the data, still a dataframe with all predictors and responses
+
+```{r comp_data}
+mgp154[1:5,1:7]
+```
+
+To run the composition model, we need to set `link="logit"`
+
+```{r compositional1, eval = FALSE}
+gut_res <- CARlasso(Alistipes+Bacteroides+
+                        Eubacterium+Parabacteroides+all_others~
+                        BMI+Age+Gender+Stratum,
+                    data = mgp154,link = "logit", 
+                    adaptive = TRUE, n_iter = 2000, 
+                    n_burn_in = 1000, thin_by = 2)
+```
+
+Note that in this case `all_others`, i.e. the last one in the left hand side of the formula will be the reference level.
+
+```{r horseshoe_comp, eval = FALSE}
+# horseshoe will take a while, as it needs to sample the latent normal too
+gut_res <- horseshoe(gut_res)
+plot(gut_res)
+```
+
+## Network for counting data
+
+This is common in a lot of ecological applications. For instance number of seedlings within a site. The responses were count rather than continuous. In `CARlasso` it is modelled as Poisson with rate follow log-Normal. We will give the example using the data above since the responses are indeed count, but keep in mind we need to be careful whether a couting data is real counting or compositional. To distinguish them, ask the question: **Is the sum know/decided by us/not free**? If yes, we want to use compositional models. 
+
+To run the composition model, we need to set `link="log"`
+
+```{r counting, eval = FALSE}
+gut_res <- CARlasso(Alistipes+Bacteroides+
+                        Eubacterium+Parabacteroides+all_others~
+                        BMI+Age+Gender+Stratum,
+                    data = mgp154,link = "log", 
+                    adaptive = TRUE, 
+                    r_beta = 0.1, # default sometimes cause singularity in Poisson model due to exponential transformation, slightly change can fix it.
+                    n_iter = 2000, 
+                    n_burn_in = 1000, thin_by = 2)
+# horseshoe will take a while, as it's currently implemented in R rather than C++
+gut_res <- horseshoe(gut_res)
+plot(gut_res)
+```
+

@@ -12,6 +12,10 @@ using namespace arma;
 //#include "helper.h"
 #include "CAR_LASSO_helper.h"
 #include "CAR_ALASSO_helper.h"
+#include "ars_pois_helper.h"
+#include "ars_multinomial_helper.h"
+#include "Probit_helper.h"
+
 /*
  * Main sampling functions for Conditional Auto Regression adaptive LASSO, 
  * Basic idea was to embed adaptive Graphical LASSO into a normal adaptive 
@@ -20,19 +24,22 @@ using namespace arma;
  * In CAR model average structure offer some extra information of partial correlation
  * 
  * A CAR can be reparameterize into a model s.t.: 
- * Y~N(Sigma (Xbeta+mu),Sigma)
+ * Z~N(Sigma (Xbeta+mu),Sigma)
+ * Y~Pois, Multinomial, or Probit
  */
 
 /* 
 Input:
   @ data: a matrix with column as nodes and row as samples
   @ design: a design matrix of common input to the network, should have same # of rows as data
+  @ link: link function, 0: identity, 1: log for pois, 2: logit for multinomial, 3: probit for binary
   @ n_iter: number of saved sampling iterations in the Gibbs sampler
   @ n_burn_in: number of burn in before sampling
   @ thin_by: subsampling steps, integer
   @ r_beta, r_Omega: shape parameter for shrinkage parameter lambda of beta and Omega, 
     for Omega it should be a vector sise as upper.tri, for beta, a matrix as size of beta
   @ delta_beta, delta_Omega: RATE parameter for lambda prior
+  @ int ns,int m,int emax: parameters for ars
   @ progress: whether to show a progress bar from C++
 
 Output:
@@ -53,8 +60,9 @@ Output:
 
 
 // [[Rcpp::export]]
-List CAR_ALASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sample
+List CAR_ALASSO_hir_Cpp(const arma::mat & data, // col composition data, ROW as a sample
                    const arma::mat & design, // design matrix, each ROW as a sample
+                   const int link,
                    const int n_iter, // how many iterations?
                    const int n_burn_in, // burn in
                    const int thin_by, // thinning?
@@ -63,11 +71,43 @@ List CAR_ALASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sa
                    const arma::vec r_Omega, // prior on lambda of Omega
                    const arma::vec delta_Omega,
                    const arma::vec & lambda_diag,// penalty for diagonals 
+                   int ns,int m,int emax,
                    bool progress) {// whether to report progress
   int k = data.n_cols; // number of nodes
   int p = design.n_cols; //number of predictors
   int n = data.n_rows; // number of samples
   
+  bool flag = true;
+  arma::mat Z;
+  if(link==0){
+    Z = data;
+    flag = false;
+  }
+
+  if(link==1){
+    Z = log(data + .1);
+    flag = false;
+  }
+  
+  if(link==2){
+    Z = data; // latent normal variable
+    Z.each_col() /= (Z.col(k-1)+.1);
+    Z.shed_col(k-1);
+    Z = log(Z+.1);
+    k = k-1;// composition has less df
+    flag = false; 
+  }
+  
+  if(link==3){
+    Z = data;
+    flag = false;
+  }
+
+  if(flag){
+    Rcerr << "Unknown link code, this should not happen in R interface, if you see it, please file an issue.\n" << endl;
+  }
+
+
   int n_save = floor(n_iter/thin_by); //
   int i_save = 0;  
   
@@ -89,19 +129,20 @@ List CAR_ALASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sa
   
   arma::vec tau2_curr = randg<arma::vec> (k*p,distr_param(1.0,.01)); // current latent variable tau^2, for prior of beta
 
-  arma::vec mu_curr = trans( mean(data) ); // current value of mean
-  arma::mat centered_data = data;
-  centered_data.each_row() -= mu_curr.t();
+  arma::vec mu_curr = trans( mean(Z) ); // current value of mean
+  arma::mat centered_Z = Z;
+  centered_Z.each_row() -= mu_curr.t();
   arma::mat Omega_curr(k,k); // current value of Omega
-  Omega_curr = inv(cov(data));
-  arma::mat beta_curr = solve( design.t()*design,design.t()*(centered_data*Omega_curr)); // current value of beta
+  
+  Omega_curr = inv(cov(Z));
+  
+  arma::mat beta_curr = solve( design.t()*design,design.t()*(centered_Z*Omega_curr)); // current value of beta
   
   
   arma::vec lambda2_beta = randg<arma::vec> (k*p,distr_param(r_beta(0),delta_beta(0))); // current lambda, for prior of beta
   arma::vec lambda_Omega = randg<arma::vec> (.5*k*(k-1),distr_param(r_Omega(0),delta_Omega(0)));
   
   Progress prog((n_iter+n_burn_in), progress); // progress bar
-  
   // main loop
   for(int i = 0 ; i<(n_iter+n_burn_in) ; ++i){
     
@@ -118,6 +159,21 @@ List CAR_ALASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sa
         )
       );
     }
+
+    if(link == 1){
+      update_Z_helper_Pois_CAR(Z,data,design,mu_curr, beta_curr,Omega_curr, k,p,n,ns,m,emax);
+    }
+
+    if(link == 2){
+      update_Z_helper_multinomial_CAR(Z,data,design,mu_curr, beta_curr,Omega_curr, k,p,n,ns,m,emax);
+    }
+
+    if(link == 3){
+      update_Z_helper_CAR(Z, data,design,mu_curr,beta_curr,
+                             Omega_curr,k,p,n);
+    }
+
+
     // block update start:
 	// flaged
 	// Update lambda_Omega
@@ -127,14 +183,14 @@ List CAR_ALASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sa
                                        delta_Omega);
     
     //Update betas:
-    beta_curr = update_car_beta_helper(data, design, mu_curr,
+    beta_curr = update_car_beta_helper(Z, design, mu_curr,
                                    tau2_curr, Omega_curr, 
                                    k, p, n);
     
     // flaged
     // update Omega
     
-    update_car_Omega_adp_helper(Omega_curr, data, design, 
+    update_car_Omega_adp_helper(Omega_curr, Z, design, 
                                      mu_curr, beta_curr,
                                      lambda_Omega,
                                      lambda_diag,
@@ -144,7 +200,7 @@ List CAR_ALASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sa
     
     // Update mu
     
-    mu_curr = update_car_mu_helper(data,design,beta_curr,
+    mu_curr = update_car_mu_helper(Z,design,beta_curr,
                                Omega_curr, 
                                k, p, n);
     
@@ -185,4 +241,6 @@ List CAR_ALASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sa
     )
   );
 }
+
+
 

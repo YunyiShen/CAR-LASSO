@@ -1,18 +1,25 @@
 Package: CARlasso
 Title: Conditional AutoRegressive LASSO
 Version: 0.1
-Authors@R: person("Yunyi", "Shen", email = "yshen99@wisc.edu", role = c("aut", "cre"))
-Description: Bayesian Conditional Auto Regressive LASSO with automatic and adaptive shrinkage 
-Depends: R (>= 3.4.0)
-License: GPL-3.0
+Authors@R: c(person("Yunyi", "Shen", email = "yshen99@wisc.edu", role = c("aut", "cre"),comment = c(ORCID = "0000-0003-2779-6507")),person("Claudia","Solis-Lemus", role = "aut", comment = c(ORCID = "0000-0002-9789-8915")))
+Maintainer: Yunyi Shen <yshen99@wisc.edu>
+Description: Algorithms to fit Bayesian Conditional Auto Regressive LASSO with automatic and adaptive shrinkage by Shen and Solis-Lemus 2020 <arXiv:2012.08397>.
+Depends: R (>= 3.5.0)
+License: GPL-3 + file LICENSE
 Encoding: UTF-8
 LazyData: true
 ByteCompile: TRUE
-Suggests: testthat
+Suggests: 
+    testthat,
+    knitr,
+    rmarkdown
 RoxygenNote: 7.1.1
 Roxygen: list(markdown = TRUE)
 LinkingTo: 
-    Rcpp, RcppArmadillo, RcppProgress, coda, Matrix, igraph, ggraph, ggplot2, MASS
-Imports:  
-    Rcpp, RcppArmadillo, RcppProgress, coda, Matrix, igraph, ggraph, ggplot2, MASS
+    Rcpp, RcppArmadillo, RcppProgress
+Imports: 
+    Rcpp, coda, Matrix, igraph, ggraph, ggplot2, MASS, methods
 SystemRequirements: C++11
+VignetteBuilder: knitr
+URL: https://github.com/YunyiShen/CAR-LASSO
+BugReports: https://github.com/YunyiShen/CAR-LASSO/issues
