@@ -2,19 +2,29 @@
 # CAR-LASSO
 Conditional Auto-Regressive LASSO in R
 
-R implementation of 
+R implementation of Shen, Yunyi, and Claudia Solis-Lemus. "Bayesian Conditional Auto-Regressive LASSO Models to Learn Sparse Networks with Predictors." arXiv preprint [arXiv:2012.08397](https://arxiv.org/abs/2012.08397) (2020).
 
-Shen, Yunyi, and Claudia Solis-Lemus. "Bayesian Conditional Auto-Regressive LASSO Models to Learn Sparse Networks with Predictors." arXiv preprint [arXiv:2012.08397](https://arxiv.org/abs/2012.08397) (2020).
+With this package, users can infer a graph with two types of nodes: 1) for correlated responses (for example, microbial abundances) and 2) for predictors affecting the responses (for example, environmental or experimental conditions).
 
-The package is not yet on CRAN, to install it, use:
+The advantages of our implementation is that:
+
+1. The edges in the graph correspond to conditional dependency (instead of marginal) which agree better with the biological intution behind experiments
+2. The graph is sparse
+3. Because the implementation is Bayesian, users can incorporate prior knowledge into the model
+
+## Installation
+
+The package is not yet on CRAN, so to install it, please use:
 ```r
 devtools::install_github("YunyiShen/CAR-LASSO")
 ```
 
-Several packages necessary: `Rcpp`, `RcppArmadillo`, `RcppProgress`, `coda`, `Matrix`, `igraph`, `ggraph`, and `ggplot2`. 
+**Dependencies:** The CAR-LASSO R package depends on the following R packages: `Rcpp`, `RcppArmadillo`, `RcppProgress`, `coda`, `Matrix`, `igraph`, `ggraph`, and `ggplot2`. 
 
 
-To get started, checkout [this page](https://yunyishen.ml/CAR-LASSO/dev/articles/network.html)
+## Documentation
+
+To get started, please check out [the tutorial](https://yunyishen.ml/CAR-LASSO/dev/articles/network.html).
 
 
 
@@ -22,6 +32,7 @@ Here are some example runs, we generated data from a 5-node AR1 model with each 
 
 ```r
 set.seed(42)
+library(CARlasso)
 dt <- simu_AR1(n=100,k=5, rho=0.7)
 car_res <- CARlasso(y1+y2+y3+y4+y5~x1+x2+x3+x4+x5, data = dt, adaptive = TRUE)
 plot(car_res,tol = 0.05)
@@ -71,15 +82,15 @@ plot(gut_res)
 The package also have graphical lasso support, see [this page](https://yunyishen.ml/CAR-LASSO/dev/articles/glasso.html). If you would like lower level interface of car lasso, see [this page](https://yunyishen.ml/CAR-LASSO/dev/articles/buildown.html).
 
 
-# Contributions
+## Contributions
 
 Users interested in expanding functionalities in CAR-LASSO R package are welcome to do so.
 See details on how to contribute in [CONTRIBUTING.md](https://github.com/YunyiShen/CAR-LASSO/blob/master/CONTRIBUTING.md).
 
-# License
+## License
 CAR-LASSO R package is licensed under the [GNU General Public License v3.0](https://github.com/YunyiShen/CAR-LASSO/blob/master/LICENSE) license.
 
-# Citation
+## Citation
 
 If you use the CAR-LASSO R package in your work, we kindly ask that you cite the following paper:
 
