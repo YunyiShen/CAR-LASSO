@@ -1,6 +1,6 @@
 ![](https://github.com/YunyiShen/CAR-LASSO/workflows/R-CMD-check/badge.svg)
 
-# CARlasso <a href='https://yunyishen.github.io/dev/CAR-LASSO'><img src='https://github.com/YunyiShen/CAR-LASSO/raw/dev/CARlasso.png' align="right" height="110" /></a> 
+# CARlasso <a href='https://yunyishen.github.io/CAR-LASSO/dev'><img src='https://github.com/YunyiShen/CAR-LASSO/raw/dev/CARlasso.png' align="right" height="110" /></a> 
 
 # CARlasso: Conditional Auto-Regressive LASSO in R
 
