@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Function reference • CARlasso</title>
+<title>Contributing to CAR-LASSO R package • CARlasso</title>
 
 
 <!-- jquery -->
@@ -18,8 +18,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
 
 <!-- bootstrap-toc -->
-<link rel="stylesheet" href="../bootstrap-toc.css">
-<script src="../bootstrap-toc.js"></script>
+<link rel="stylesheet" href="bootstrap-toc.css">
+<script src="bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
@@ -33,13 +33,13 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
-<link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script>
+<link href="pkgdown.css" rel="stylesheet">
+<script src="pkgdown.js"></script>
 
 
 
 
-<meta property="og:title" content="Function reference" />
+<meta property="og:title" content="Contributing to CAR-LASSO R package" />
 
 
 <meta name="robots" content="noindex">
@@ -58,7 +58,7 @@
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    <div class="container template-reference-index">
+    <div class="container template-title-body">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -70,7 +70,7 @@
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="../index.html">CARlasso</a>
+        <a class="navbar-link" href="index.html">CARlasso</a>
         <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">0.1</span>
       </span>
     </div>
@@ -78,13 +78,13 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
+  <a href="index.html">
     <span class="fas fa fas fa-home fa-lg"></span>
      
   </a>
 </li>
 <li>
-  <a href="../reference/index.html">Reference</a>
+  <a href="reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -94,13 +94,13 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/buildown.html">Build your own hierarchical model</a>
+      <a href="articles/buildown.html">Build your own hierarchical model</a>
     </li>
     <li>
-      <a href="../articles/glasso.html">Graphical LASSO support</a>
+      <a href="articles/glasso.html">Graphical LASSO support</a>
     </li>
     <li>
-      <a href="../articles/network.html">Get started with CAR-LASSO models</a>
+      <a href="articles/network.html">Get started with CAR-LASSO models</a>
     </li>
   </ul>
 </li>
@@ -125,92 +125,48 @@
 <div class="row">
   <div class="contents col-md-9">
     <div class="page-header">
-      <h1>Reference</h1>
+      <h1>Contributing to CAR-LASSO R package</h1>
     </div>
 
-    <table class="ref-index">
+<div id="contributing-to-car-lasso-r-package" class="section level1">
 
-    <colgroup>
-      
-      <col class="alias" />
-      <col class="title" />
-    </colgroup>
+<p>The following guidelines are designed for contributors to the CAR-LASSO R package.</p>
+<div id="reporting-issues" class="section level2">
+<h2 class="hasAnchor">
+<a href="#reporting-issues" class="anchor"></a>Reporting Issues</h2>
+<p>For reporting a bug or a failed function or requesting a new feature, you can simply open an issue in the <a href="https://github.com/YunyiShen/CAR-LASSO/issues">issue tracker</a>. If you are reporting a bug, please also include a minimal code example or all relevant information for us to replicate the issue.</p>
+</div>
+<div id="contributing-code" class="section level2">
+<h2 class="hasAnchor">
+<a href="#contributing-code" class="anchor"></a>Contributing Code</h2>
+<p>To make contributions to CAR-LASSO R package, you need to set up your <a href="https://github.com">GitHub</a> account if you do not have and sign in, and request your change(s) or contribution(s) via a pull request against the <code>dev</code> branch of the <a href="https://github.com/YunyiShen/CAR-LASSO">CAR-LASSO repository</a>.</p>
+<p>Please use the following steps:</p>
+<ol>
+<li>Open a new issue for new feature or failed function in the <a href="https://github.com/solislemuslab/bioklustering/issues">Issue tracker</a>
+</li>
+<li>Fork the <a href="https://github.com/YunyiShen/CAR-LASSO">CAR-LASSO repository</a> to your GitHub account</li>
+<li>Clone your fork locally:</li>
+</ol>
+<pre><code>$ git clone https://github.com/your-username/CAR-LASSO.git</code></pre>
+<ol>
+<li>Make your change(s) in the <code>master</code> (or <code>development</code>) branch of your cloned fork</li>
+<li>Make sure that all tests pass without any errors</li>
+<li>Push your change(s) to your fork in your GitHub account</li>
+<li>
+<a href="https://github.com/YunyiShen/CAR-LASSO/pulls">Submit a pull request</a> describing what problem has been solved and linking to the issue you had opened in step 1</li>
+</ol>
+<p>Your contribution will be checked and merged into the original repository. You will be contacted if there is any problem in your contribution.</p>
+<p>Make sure to include the following information in your pull request:</p>
+<ul>
+<li><p><strong>Code</strong> which you are contributing to this package</p></li>
+<li><p><strong>Documentation</strong> of this code if it provides new functionality. This should be a description of new functionality added to the <code>vignettes</code> folder and documentations directly in the <code>R</code> folder written in <code>Roxygen</code>.</p></li>
+<li><p><strong>Tests</strong> of this code to make sure that the previously failed function or the new functionality now works properly</p></li>
+</ul>
+<hr>
+<p><em>These Contributing Guidelines have been adapted from the <a href="https://github.com/atomneb/AtomNeb-py/blob/master/CONTRIBUTING.md">Contributing Guidelines</a> of <a href="https://github.com/atomneb/AtomNeb-py">The Turing Way</a>! (License: MIT)</em></p>
+</div>
+</div>
 
-    <tbody>
-      <tr>
-        <th colspan="2">
-          <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
-          <p class="section-desc"></p>
-        </th>
-      </tr>
-      
-      
-    </tbody><tbody>
-      
-      
-      <tr>
-        
-        <td>
-          <p><code><a href="CARlasso.html">CARlasso()</a></code> </p>
-        </td>
-        <td><p>Gibbs sampler for Conditional Auto Regressive LASSO and extensions</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="bGlasso.html">bGlasso()</a></code> </p>
-        </td>
-        <td><p>Gibbs sampler for Bayesian Graphical LASSO and extensions</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="horseshoe.html">horseshoe()</a></code> </p>
-        </td>
-        <td><p>Horseshoe method for graphical structure inference</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="mgp154.html">mgp154</a></code> </p>
-        </td>
-        <td><p>Gut microbiota in the Irish Elderly</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="mgp2592.html">mgp2592</a></code> </p>
-        </td>
-        <td><p>Hofmockel Soil Aggregate COB KBASE</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="plot.bglasso_out.html">plot(<i>&lt;bglasso_out&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>plot the graph estimated by graphical lasso with threshold method using ggraph</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="plot.carlasso_out.html">plot(<i>&lt;carlasso_out&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>plot the chain graph estimated by CAR-LASSO with threshold or horseshoe method using ggraph</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="rCARAlasso_.html">rCARAlasso_()</a></code> </p>
-        </td>
-        <td><p>Block Gibbs sampler for adaptive CAR-LASSO</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="rCARlasso_.html">rCARlasso_()</a></code> </p>
-        </td>
-        <td><p>Block Gibbs sampler for CAR-LASSO</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="simu_AR1.html">simu_AR1()</a></code> </p>
-        </td>
-        <td><p>Simulate a simple AR1 model with specific predictor</p></td>
-      </tr>
-    </tbody>
-    </table>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -218,7 +174,9 @@
       <h2 data-toc-skip>Contents</h2>
     </nav>
   </div>
+
 </div>
+
 
 
       <footer>

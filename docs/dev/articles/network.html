@@ -55,7 +55,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/buildown.html">Build your own hierarchical</a>
+      <a href="../articles/buildown.html">Build your own hierarchical model</a>
     </li>
     <li>
       <a href="../articles/glasso.html">Graphical LASSO support</a>
@@ -66,7 +66,14 @@
   </ul>
 </li>
       </ul>
-<ul class="nav navbar-nav navbar-right"></ul>
+<ul class="nav navbar-nav navbar-right">
+<li>
+  <a href="https://github.com/YunyiShen/CAR-LASSO/">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
 </div>
 <!--/.nav-collapse -->
   </div>
@@ -82,7 +89,7 @@
       <h1 data-toc-skip>Get started with CAR-LASSO models</h1>
             
       
-      
+      <small class="dont-index">Source: <a href="https://github.com/YunyiShen/CAR-LASSO/blob/master/vignettes/network.Rmd"><code>vignettes/network.Rmd</code></a></small>
       <div class="hidden name"><code>network.Rmd</code></div>
 
     </div>
@@ -90,12 +97,13 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">CARlasso</span><span class="op">)</span></code></pre></div>
-<p><code>CARlasso</code> is the main interface to work with the model, for detailed see <a href="https://yunyishen.ml/CAR-LASSO/dev/reference/CARlasso.html">reference</a>.</p>
-<div id="network-for-gaussian-data" class="section level2">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/YunyiShen/CAR-LASSO">CARlasso</a></span><span class="op">)</span></code></pre></div>
+<p><code>CARlasso</code> is the main interface to work with the model, for details see the <a href="https://yunyishen.ml/CAR-LASSO/dev/reference/CARlasso.html">reference</a>.</p>
+<div id="car-lasso-network-for-gaussian-data" class="section level2">
 <h2 class="hasAnchor">
-<a href="#network-for-gaussian-data" class="anchor"></a>Network for Gaussian data</h2>
-<p>This is the case when data is Gaussian or can be transformed to Gaussian, for instance (log) biomass of trees, we will give a simuated example. The use of the <code>Carlasso</code> is similar to <code>lm</code>, we could supply a formula and a dataframe with both responses and predictors:</p>
+<a href="#car-lasso-network-for-gaussian-data" class="anchor"></a>CAR-LASSO Network for Gaussian data</h2>
+<p>This is the case when data is Gaussian or can be transformed to Gaussian, for example, (log) biomass of trees. We will provide an example with simulated data. The use of the <code>Carlasso</code> is similar to <code>lm</code>, we could supply a formula and a dataframe with both responses and predictors.</p>
+<p>First, we simulate data under a 5-node AR1 model:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span>
 <span class="va">dt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simu_AR1.html">simu_AR1</a></span><span class="op">(</span>n<span class="op">=</span><span class="fl">100</span>,k<span class="op">=</span><span class="fl">5</span>, rho<span class="op">=</span><span class="fl">0.7</span><span class="op">)</span>
@@ -114,7 +122,7 @@
 <span class="co">#&gt; 4  2.0595392  0.735072142  0.04906691</span>
 <span class="co">#&gt; 5 -1.3768616 -0.146472627 -0.57835573</span>
 <span class="co">#&gt; 6 -1.1508556 -0.057887335 -0.99873866</span></code></pre></div>
-<p>To use the Normal version, we should set <code>link="identity"</code> which is the default.</p>
+<p>To use the Normal version, we should set <code>link="identity"</code> which is the default. In this case, we are setting <code>adaptive=TRUE</code> to use the adaptive version of CAR-LASSO (for more details, see <a href="https://arxiv.org/abs/2012.08397">the paper</a>):</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">car_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/CARlasso.html">CARlasso</a></span><span class="op">(</span><span class="va">y1</span><span class="op">+</span><span class="va">y2</span><span class="op">+</span><span class="va">y3</span><span class="op">+</span><span class="va">y4</span><span class="op">+</span><span class="va">y5</span><span class="op">~</span><span class="va">x1</span><span class="op">+</span><span class="va">x2</span><span class="op">+</span><span class="va">x3</span><span class="op">+</span><span class="va">x4</span><span class="op">+</span><span class="va">x5</span>, data <span class="op">=</span> <span class="va">dt</span>, adaptive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 <span class="co">#&gt; Predictors will be centered.</span>
@@ -133,18 +141,19 @@
 <span class="co">#&gt; done</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span><span class="op">(</span><span class="va">car_res</span>,tol <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span></code></pre></div>
 <p><img src="network_files/figure-html/ar1example_first-1.png" width="700"></p>
-<p>We can have a more formal horseshoe inference on the structure of the network, this will update the <code>car_res</code>:</p>
+<p>The color of the edge represents the type of correlation (negative=blue, positive=red) and the width of the edge corresponds to the effect size. Response nodes are represented by circles and predictor nodes are represented by triangles.</p>
+<p>We can have a more formal horseshoe inference on the structure of the network which will update the <code>car_res</code> object:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># with horseshoe inference</span>
 <span class="va">car_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/horseshoe.html">horseshoe</a></span><span class="op">(</span><span class="va">car_res</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span><span class="op">(</span><span class="va">car_res</span><span class="op">)</span></code></pre></div>
 <p><img src="network_files/figure-html/horseshoe_1-1.png" width="700"></p>
 </div>
-<div id="network-for-compositional-data" class="section level2">
+<div id="car-lasso-network-for-compositional-data" class="section level2">
 <h2 class="hasAnchor">
-<a href="#network-for-compositional-data" class="anchor"></a>Network for compositional data</h2>
-<p>This is common in microbe related studies and some ecological applications with relative abundance only. For instance, microbe relative abundance came from sequencing and in this case we will have the sum of “abundance” decided by the sequence depth rather than the real total abundance. The data is usually described as “compositional”. In <code>CARlasso</code> this type of data were modelled as Logit-Normal-multinomial. In this case, we have less relative abundance need to have a “reference level” taxa and all others are “relative” to this taxa, we will give a reduced version:</p>
-<p>Have a look of the data, still a dataframe with all predictors and responses</p>
+<a href="#car-lasso-network-for-compositional-data" class="anchor"></a>CAR-LASSO Network for compositional data</h2>
+<p>This is common in the case of microbe-related studies and some ecological applications with relative abundances. For instance, microbe relative abundance come from sequencing and in this case, the sum of “abundance” is determined by the sequence depth rather than the real total abundance. The data is usually described as “compositional”. In <code>CARlasso</code>, this type of data are modeled as Logit-Normal-multinomial. In this case, we need to have a “reference level” taxa and all others are “relative” to this taxa.</p>
+<p>First, we take a look at the data which is still a dataframe with all predictors and responses</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">mgp154</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">7</span><span class="op">]</span>
 <span class="co">#&gt;      id Alistipes Bacteroides Barnesiella Blautia Butyrivibrio Caloramator</span>
@@ -177,18 +186,20 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; done</span></code></pre></div>
-<p>Note that in this case <code>all_others</code>, i.e. the last one in the left hand side of the formula will be the reference level.</p>
+<p>Note that in this case <code>all_others</code> (an existing column in our data), i.e. the last one in the left hand side of the formula will be the reference level.</p>
+<p>We can update the network inference by a horseshoe method to determine when edges will be considered non-existent. More details can be found in <a href="https://arxiv.org/abs/2012.08397">the paper</a>.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># horseshoe will take a while, as it needs to sample the latent normal too</span>
 <span class="va">gut_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/horseshoe.html">horseshoe</a></span><span class="op">(</span><span class="va">gut_res</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span><span class="op">(</span><span class="va">gut_res</span><span class="op">)</span></code></pre></div>
 <p><img src="network_files/figure-html/horseshoe_comp-1.png" width="700"></p>
 </div>
-<div id="network-for-counting-data" class="section level2">
+<div id="car-lasso-network-for-counting-data" class="section level2">
 <h2 class="hasAnchor">
-<a href="#network-for-counting-data" class="anchor"></a>Network for counting data</h2>
-<p>This is common in a lot of ecological applications. For instance number of seedlings within a site. The responses were count rather than continuous. In <code>CARlasso</code> it is modelled as Poisson with rate follow log-Normal. We will give the example using the data above since the responses are indeed count, but keep in mind we need to be careful whether a couting data is real counting or compositional. To distinguish them, ask the question: <strong>Is the sum know/decided by us/not free</strong>? If yes, we want to use compositional models.</p>
-<p>To run the composition model, we need to set <code>link="log"</code></p>
+<a href="#car-lasso-network-for-counting-data" class="anchor"></a>CAR-LASSO Network for counting data</h2>
+<p>This is common in a lot of ecological applications. For instance, number of seedlings within a site. The responses are counts rather than continuous. In <code>CARlasso</code>, it is modeled as Poisson with log-Normal rate.</p>
+<p>We will use the same compositional data as before to illustrate the counts model. However, it is important to note that relative abundances should not be considered as counts. To distinguish between compositional and count data, one can ask the question: <strong>is the sum decided by us?</strong> If yes, we want to use compositional models.</p>
+<p>To run the count model, we need to set <code>link="log"</code>:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">gut_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/CARlasso.html">CARlasso</a></span><span class="op">(</span><span class="va">Alistipes</span><span class="op">+</span><span class="va">Bacteroides</span><span class="op">+</span>
                         <span class="va">Eubacterium</span><span class="op">+</span><span class="va">Parabacteroides</span><span class="op">+</span><span class="va">all_others</span><span class="op">~</span>
@@ -230,7 +241,7 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by <a href="https://yunyishen.ml">Yunyi Shen</a>.</p>
+  <p>Developed by <a href="https://yunyishen.ml">Yunyi Shen</a>, <a href="https://solislemuslab.github.io/">Claudia Solis-Lemus</a>.</p>
 </div>
 
 <div class="pkgdown">

@@ -55,7 +55,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/buildown.html">Build your own hierarchical</a>
+      <a href="../articles/buildown.html">Build your own hierarchical model</a>
     </li>
     <li>
       <a href="../articles/glasso.html">Graphical LASSO support</a>
@@ -66,7 +66,14 @@
   </ul>
 </li>
       </ul>
-<ul class="nav navbar-nav navbar-right"></ul>
+<ul class="nav navbar-nav navbar-right">
+<li>
+  <a href="https://github.com/YunyiShen/CAR-LASSO/">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
 </div>
 <!--/.nav-collapse -->
   </div>
@@ -82,7 +89,7 @@
       <h1 data-toc-skip>Graphical LASSO support</h1>
             
       
-      
+      <small class="dont-index">Source: <a href="https://github.com/YunyiShen/CAR-LASSO/blob/master/vignettes/glasso.Rmd"><code>vignettes/glasso.Rmd</code></a></small>
       <div class="hidden name"><code>glasso.Rmd</code></div>
 
     </div>
@@ -90,12 +97,12 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">CARlasso</span><span class="op">)</span></code></pre></div>
-<p>We also have Graphical LASSO support for study with no predictors, the main interface is <code>bGlasso</code>, please also see the <a href="https://yunyishen.ml/CAR-LASSO/dev/reference/bGlasso.html">reference</a>.</p>
-<div id="network-for-gaussian-data" class="section level2">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/YunyiShen/CAR-LASSO">CARlasso</a></span><span class="op">)</span></code></pre></div>
+<p>We also implemented the standard Graphical LASSO to infer a graph without predictors. The main interface is <code>bGlasso</code>. For more details, please see the <a href="https://yunyishen.ml/CAR-LASSO/dev/reference/bGlasso.html">reference</a>.</p>
+<div id="glasso-network-for-gaussian-data" class="section level2">
 <h2 class="hasAnchor">
-<a href="#network-for-gaussian-data" class="anchor"></a>Network for Gaussian data</h2>
-<p>This is the case when data is Gaussian or can be transformed to Gaussian. We only need responses in this case</p>
+<a href="#glasso-network-for-gaussian-data" class="anchor"></a>GLASSO Network for Gaussian data</h2>
+<p>This is the case when data is Gaussian or can be transformed to Gaussian. We only need responses in this case. We use a 5-node AR1 model to simulate data:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span>
 <span class="va">dt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simu_AR1.html">simu_AR1</a></span><span class="op">(</span>n<span class="op">=</span><span class="fl">100</span>,k<span class="op">=</span><span class="fl">5</span>, rho<span class="op">=</span><span class="fl">0.7</span><span class="op">)</span>
@@ -108,7 +115,7 @@
 <span class="co">#&gt; 4  0.5912523  2.13482891  2.2626483  1.8791249  2.3825324</span>
 <span class="co">#&gt; 5 -2.1837420 -3.68267385 -2.3069358 -3.6243897 -2.2644276</span>
 <span class="co">#&gt; 6 -2.2367855 -1.92498967 -3.2242525 -1.5495283 -1.4191343</span></code></pre></div>
-<p>Different from <code>CARlasso</code> we do not really need to have a formula. To use the Normal version, we should set <code>link="identity"</code> which is the default.</p>
+<p>Unlike <code>CARlasso</code>, we do not really need to have a formula (because we do not have predictors, only responses). To use the Normal version, we should set <code>link="identity"</code> which is the default.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">glassores</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bGlasso.html">bGlasso</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">dt</span><span class="op">)</span>
 <span class="co">#&gt; Algorithm start...</span>
@@ -119,17 +126,17 @@
 <span class="co">#&gt; done</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span><span class="op">(</span><span class="va">glassores</span><span class="op">)</span></code></pre></div>
 <p><img src="glasso_files/figure-html/ar1example_first-1.png" width="700"></p>
-<p>We could see the false link due to the common input.</p>
+<p>Some of the connections are actually due to predictors.</p>
 </div>
-<div id="network-for-compositional-data" class="section level2">
+<div id="glasso-network-for-compositional-data" class="section level2">
 <h2 class="hasAnchor">
-<a href="#network-for-compositional-data" class="anchor"></a>Network for compositional data</h2>
-<p>This is common in microbe related studies and some ecological applications with relative abundance only. For instance, microbe relative abundance came from sequencing and in this case we will have the sum of “abundance” decided by the sequence depth rather than the real total abundance. The data is usually described as “compositional”. In <code>CARlasso</code> this type of data were modelled as Logit-Normal-multinomial. In this case, we have less relative abundance need to have a “reference level” taxa and all others are “relative” to this taxa, we will give a reduced version:</p>
-<p>Have a look of the data, still a dataframe with all predictors and responses</p>
+<a href="#glasso-network-for-compositional-data" class="anchor"></a>GLASSO Network for compositional data</h2>
+<p>This is common in the case of microbe-related studies and some ecological applications with relative abundances. For instance, microbe relative abundance come from sequencing and in this case, the sum of “abundance” is determined by the sequence depth rather than the real total abundance. The data is usually described as “compositional”.</p>
+<p>We first extract only the responses that we want to include in the model:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">dt</span> <span class="op">&lt;-</span> <span class="va">mgp154</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Alistipes"</span>,<span class="st">"Bacteroides"</span>,
                         <span class="st">"Eubacterium"</span>,<span class="st">"Parabacteroides"</span>,<span class="st">"all_others"</span><span class="op">)</span><span class="op">]</span></code></pre></div>
-<p>To run the composition model, we need to set <code>link="logit"</code></p>
+<p>To run the composition model in <code>bGlasso</code>, we need to set <code>link="logit"</code></p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">gut_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bGlasso.html">bGlasso</a></span><span class="op">(</span> data <span class="op">=</span> <span class="va">dt</span>,link <span class="op">=</span> <span class="st">"logit"</span>, 
                     n_iter <span class="op">=</span> <span class="fl">2000</span>, 
@@ -144,13 +151,13 @@
 <span class="co">#&gt; done</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span><span class="op">(</span><span class="va">gut_res</span><span class="op">)</span></code></pre></div>
 <p><img src="glasso_files/figure-html/compositional1-1.png" width="700"></p>
-<p>Note that in this case the last one in the dataframe will be the reference level</p>
+<p>Note that in this case the last one in the dataframe will be the reference level (<code>all_others</code> in this case).</p>
 </div>
-<div id="network-for-counting-data" class="section level2">
+<div id="glasso-network-for-counting-data" class="section level2">
 <h2 class="hasAnchor">
-<a href="#network-for-counting-data" class="anchor"></a>Network for counting data</h2>
-<p>This is common in a lot of ecological applications. For instance number of seedlings within a site. The responses were count rather than continuous. In <code>CARlasso</code> it is modelled as Poisson with rate follow log-Normal. We will give the example using the data above since the responses are indeed count, but keep in mind we need to be careful whether a couting data is real counting or compositional. To distinguish them, ask the question: <strong>Is the sum know/decided by us/not free</strong>? If yes, we want to use compositional models.</p>
-<p>To run the composition model, we need to set <code>link="log"</code></p>
+<a href="#glasso-network-for-counting-data" class="anchor"></a>GLASSO Network for counting data</h2>
+<p>This is common in a lot of ecological applications. For instance, number of seedlings within a site. The responses are counts rather than continuous. We will use the same compositional data as before to illustrate the counts model. However, it is important to note that relative abundances should not be considered as counts. To distinguish between compositional and count data, one can ask the question: <strong>is the sum decided by us?</strong> If yes, we want to use compositional models.</p>
+<p>To run the count model, we need to set <code>link="log"</code>. Note that we only include the first 4 responses:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">gut_res</span> <span class="op">&lt;-</span> <span class="va">gut_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bGlasso.html">bGlasso</a></span><span class="op">(</span> data <span class="op">=</span> <span class="va">dt</span><span class="op">[</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span>,link <span class="op">=</span> <span class="st">"log"</span>, 
                     n_iter <span class="op">=</span> <span class="fl">2000</span>, 
@@ -177,7 +184,7 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by <a href="https://yunyishen.ml">Yunyi Shen</a>.</p>
+  <p>Developed by <a href="https://yunyishen.ml">Yunyi Shen</a>, <a href="https://solislemuslab.github.io/">Claudia Solis-Lemus</a>.</p>
 </div>
 
 <div class="pkgdown">

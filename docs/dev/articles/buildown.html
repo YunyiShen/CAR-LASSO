@@ -5,13 +5,13 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Build your own hierarchical • CARlasso</title>
+<title>Build your own hierarchical model • CARlasso</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="Build your own hierarchical">
+<script src="../pkgdown.js"></script><meta property="og:title" content="Build your own hierarchical model">
 <meta property="og:description" content="CARlasso">
 <meta name="robots" content="noindex">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -55,7 +55,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/buildown.html">Build your own hierarchical</a>
+      <a href="../articles/buildown.html">Build your own hierarchical model</a>
     </li>
     <li>
       <a href="../articles/glasso.html">Graphical LASSO support</a>
@@ -66,7 +66,14 @@
   </ul>
 </li>
       </ul>
-<ul class="nav navbar-nav navbar-right"></ul>
+<ul class="nav navbar-nav navbar-right">
+<li>
+  <a href="https://github.com/YunyiShen/CAR-LASSO/">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
 </div>
 <!--/.nav-collapse -->
   </div>
@@ -79,18 +86,18 @@
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1 data-toc-skip>Build your own hierarchical</h1>
+      <h1 data-toc-skip>Build your own hierarchical model</h1>
             
       
-      
+      <small class="dont-index">Source: <a href="https://github.com/YunyiShen/CAR-LASSO/blob/master/vignettes/buildown.Rmd"><code>vignettes/buildown.Rmd</code></a></small>
       <div class="hidden name"><code>buildown.Rmd</code></div>
 
     </div>
 
     
     
-<p>We also offer two low level one-step sampling functions <code>rCARAlasso_</code> and <code>rCARlasso_</code> for adaptive and non-adaptive version of the CARlasso, see <a href="https://yunyishen.ml/CAR-LASSO/dev/reference/rCARAlasso_.html">reference</a> for the detail.</p>
-<p>The typical usage would be one write ones own sampler to sample the Normal latent variable and feed it to the one-step sampling. Note that these two functions will <strong>update</strong> the current states in <strong>memory</strong> directly.</p>
+<p>We also offer two low-level one-step sampling functions <code>rCARAlasso_</code> and <code>rCARlasso_</code> for adaptive and non-adaptive version of the CARlasso, see <a href="https://yunyishen.ml/CAR-LASSO/dev/reference/rCARAlasso_.html">reference</a> for details.</p>
+<p>The typical usage would be one writes their own sampler to sample the Normal latent variable and feed it to the one-step sampling. Note that these two functions will <strong>update</strong> the current states in <strong>memory</strong> directly.</p>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -102,7 +109,7 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by <a href="https://yunyishen.ml">Yunyi Shen</a>.</p>
+  <p>Developed by <a href="https://yunyishen.ml">Yunyi Shen</a>, <a href="https://solislemuslab.github.io/">Claudia Solis-Lemus</a>.</p>
 </div>
 
 <div class="pkgdown">
