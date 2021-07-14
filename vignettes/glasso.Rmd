@@ -40,7 +40,7 @@ glassores <- bGlasso(data = dt)
 plot(glassores)
 ```
 
-We could see the false link due to the common input. [???]
+Some of the connections are actually due to predictors. 
 
 ## GLASSO Network for compositional data
 

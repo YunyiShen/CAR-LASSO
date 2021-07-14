@@ -1,5 +1,8 @@
 ![](https://github.com/YunyiShen/CAR-LASSO/workflows/R-CMD-check/badge.svg)
-# CAR-LASSO: Conditional Auto-Regressive LASSO in R
+
+# CARlasso <a href='https://yunyishen.github.io/dev/CAR-LASSO'><img src='https://github.com/YunyiShen/CAR-LASSO/raw/dev/CARlasso.png' align="right" height="110" /></a> 
+
+# CARlasso: Conditional Auto-Regressive LASSO in R
 
 With this package, users can infer a graph with two types of nodes: 1) for correlated responses (for example, microbial abundances) and 2) for predictors affecting the responses (for example, environmental or experimental conditions).
 
