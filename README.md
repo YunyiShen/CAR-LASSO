@@ -1,8 +1,5 @@
 ![](https://github.com/YunyiShen/CAR-LASSO/workflows/R-CMD-check/badge.svg)
-# CAR-LASSO
-Conditional Auto-Regressive LASSO in R
-
-R implementation of Shen, Yunyi, and Claudia Solis-Lemus. "Bayesian Conditional Auto-Regressive LASSO Models to Learn Sparse Networks with Predictors." arXiv preprint [arXiv:2012.08397](https://arxiv.org/abs/2012.08397) (2020).
+# CAR-LASSO: Conditional Auto-Regressive LASSO in R
 
 With this package, users can infer a graph with two types of nodes: 1) for correlated responses (for example, microbial abundances) and 2) for predictors affecting the responses (for example, environmental or experimental conditions).
 
@@ -28,9 +25,10 @@ For more information, please check out [the tutorial](https://yunyishen.ml/CAR-L
 
 ### Fitting a CAR-ALASSO network on human gut microbiome data
 
-To run a reduced version of the analysis on human gut microbiome in our paper (with less predictors and responses), you do:
+To run a reduced version of the analysis on human gut microbiome in our paper (with less predictors and responses):
 
 ```r
+library(CARlasso)
 gut_res <- CARlasso(Alistipes+Bacteroides+
                         Eubacterium+Parabacteroides+all_others~
                         BMI+Age+Gender+Stratum,
@@ -42,6 +40,14 @@ gut_res <- horseshoe(gut_res)
 plot(gut_res)
 ```
 It might take a little while due to the sampling process of the latent normal variable.
+
+We are using the sample human gut microbiome data included in the package (`mgp154`).
+If you want to run this model on your own data, check out the structure of `mgp154` to put your data in the same format:
+
+```r
+str(mgp154)
+head(mgp154)
+```
 
 The color of the edge represents the type of correlation (negative=blue, positive=red) and the width of the edge corresponds to the effect size. Response nodes are represented by circles (in this case, microbes) and predictor nodes are represented by triangles (in this case, age, gender, and stratum).
 
@@ -65,12 +71,13 @@ plot(gut_res)
 
 ![The Result](http://YunyiShen.github.io/files/Research_figs/CARLASSO/gut_count.png)
 
+
+
 ### Fitting a CAR-ALASSO network on simulated data
 
 We generate data from a 5-node AR1 model where each node has a specific treatment. Then, we use the adaptive version of CAR-LASSO (CAR-ALASSO) to reconstruct such network and plot the result: 
 
 ```r
-library(CARlasso)
 set.seed(42)
 dt <- simu_AR1(n=100, k=5, rho=0.7)
 car_res <- CARlasso(y1+y2+y3+y4+y5~x1+x2+x3+x4+x5, data = dt, adaptive = TRUE)
