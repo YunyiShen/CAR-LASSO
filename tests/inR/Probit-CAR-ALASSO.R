@@ -11,6 +11,7 @@ p = 1
 
 sourceCpp("./src/Probit-CAR-ALASSO.cpp")
 sourceCpp("./src/Probit-CAR-LASSO.cpp")
+sourceCpp("./src/CAR-ALASSO-hir.cpp")
 #sourceCpp("./src/Probit-SRG-LASSO.cpp")
 source("./tests/Formal/Accurancy/Graph_generator.R")
 
@@ -63,6 +64,16 @@ test <- Probit_CAR_ALASSO_Cpp(Y,  Design, n_iter = 20000,
                             r_Omega = rep(1,.5*(k-1)*k),
                             delta_Omega = rep(1,.5*(k-1)*k),
                             lambda_diag = rep(1,k),
+                            progress = T)
+
+
+test <- CAR_ALASSO_hir_Cpp(Y,  Design, link = 3,n_iter = 20000, 
+                            n_burn_in = 10000, thin_by = 5, 
+                            r_beta = 1+0*beta, delta_beta = 1 + 0 * beta,
+                            r_Omega = rep(1,.5*(k-1)*k),
+                            delta_Omega = rep(1,.5*(k-1)*k),
+                            lambda_diag = rep(1,k),
+                            ns = 100,m = 10, emax = 64,
                             progress = T)
 
 Graph <- 0 * Omega

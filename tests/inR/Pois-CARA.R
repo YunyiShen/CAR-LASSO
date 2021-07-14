@@ -11,6 +11,9 @@ p = 2
 
 sourceCpp("./src/Pois-CAR-ALASSO.cpp")
 sourceCpp("./src/Pois-CAR-LASSO.cpp")
+sourceCpp("./src/graphical-intercept-LASSO.cpp")
+sourceCpp("./src/CAR-ALASSO-hir.cpp")
+sourceCpp("./src/CAR-LASSO-hir.cpp")
 source("./tests/Formal/Accurancy/Graph_generator.R")
 
 set.seed(12345)
@@ -49,6 +52,32 @@ test <- Pois_CAR_ALASSO_Cpp(Y,  Design, n_iter = 5000,
                             delta_Omega = rep(1e-6,.5*(k-1)*k),
                             lambda_diag = rep(0,k), 
                             ns = 300,m = 80, emax = 64,
+                            progress = T)
+
+test <- CAR_ALASSO_hir_Cpp(Y,  Design, link = 1,n_iter = 5000, 
+                            n_burn_in = 1000, thin_by = 10, 
+                            r_beta = .1+0*beta, delta_beta = 1e-6 + 0 * beta,
+                            r_Omega = rep(.01,.5*(k-1)*k),
+                            delta_Omega = rep(1e-6,.5*(k-1)*k),
+                            lambda_diag = rep(0,k), 
+                            ns = 300,m = 80, emax = 64,
+                            progress = T)
+
+test <- CAR_LASSO_hir_Cpp(Y,  Design, link = 1,n_iter = 5000, 
+                            n_burn_in = 1000, thin_by = 10, 
+                            r_beta = 1, .01,
+                            r_Omega = 1,
+                            delta_Omega = .01, 
+                            ns = 300,m = 10, emax = 64,
+                            progress = T)
+
+test <- Intercept_Graphical_ALASSO_hir_Cpp(Y, link = 1,n_iter = 5000, 
+                            n_burn_in = 1000, thin_by = 10, 
+                            
+                            lambda_a = rep(.01,.5*(k-1)*k),
+                            lambda_b = rep(1e-6,.5*(k-1)*k),
+                            lambda_diag = rep(0,k),
+                            ns = 300,m = 10, emax = 64,
                             progress = T)
 
 A_Graph <- 0 * Omega

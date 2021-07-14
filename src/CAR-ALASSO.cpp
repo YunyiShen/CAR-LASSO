@@ -134,7 +134,7 @@ List CAR_ALASSO_Cpp(const arma::mat & data, // col composition data, ROW as a sa
     // flaged
     // update Omega
     
-    update_car_Omega_adp_helper2(Omega_curr, data, design, 
+    update_car_Omega_adp_helper(Omega_curr, data, design, 
                                      mu_curr, beta_curr,
                                      lambda_Omega,
                                      lambda_diag,

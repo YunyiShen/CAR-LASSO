@@ -36,6 +36,7 @@ List Multinomial_CAR_ALASSO_randeff_Cpp(const arma::mat &data,       // col comp
                                         const arma::mat delta_beta,
                                         const arma::vec r_Omega, // prior on lambda of Omega
                                         const arma::vec delta_Omega,
+                                        const arma::vec & lambda_diag,// penalty for diagonals 
                                         const double alpha,                           // prior for random effect
                                         const double beta,                            // prior for random effect
                                         const int ns, const int m, const double emax, // ars parameters
@@ -133,6 +134,7 @@ List Multinomial_CAR_ALASSO_randeff_Cpp(const arma::mat &data,       // col comp
                                             design_r, nu_curr,
                                             mu_curr, beta_curr,
                                             lambda_Omega,
+                                            lambda_diag,
                                             k, p, n);
 
         //center before mu after beta and Omega
