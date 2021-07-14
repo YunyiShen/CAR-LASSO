@@ -18,11 +18,14 @@ knitr::opts_chunk$set(
 library(CARlasso)
 ```
 
-`CARlasso` is the main interface to work with the model, for detailed see [reference](https://yunyishen.ml/CAR-LASSO/dev/reference/CARlasso.html). 
+`CARlasso` is the main interface to work with the model, for details see the [reference](https://yunyishen.ml/CAR-LASSO/dev/reference/CARlasso.html). 
 
-## Network for Gaussian data
+## CAR-LASSO Network for Gaussian data
 
-This is the case when data is Gaussian or can be transformed to Gaussian, for instance (log) biomass of trees, we will give a simuated example. The use of the `Carlasso` is similar to `lm`, we could supply a formula and a dataframe with both responses and predictors:
+This is the case when data is Gaussian or can be transformed to Gaussian, for example, (log) biomass of trees.
+We will provide an example with simulated data. The use of the `Carlasso` is similar to `lm`, we could supply a formula and a dataframe with both responses and predictors.
+
+First, we simulate data under a 5-node AR1 model:
 
 ```{r ar1data}
 set.seed(42)
@@ -31,14 +34,16 @@ head(dt)
 
 ```
 
-To use the Normal version, we should set `link="identity"` which is the default. 
+To use the Normal version, we should set `link="identity"` which is the default. In this case, we are setting `adaptive=TRUE` to use the adaptive version of CAR-LASSO (for more details, see [the paper](https://arxiv.org/abs/2012.08397)):
 
 ```{r ar1example_first}
 car_res <- CARlasso(y1+y2+y3+y4+y5~x1+x2+x3+x4+x5, data = dt, adaptive = TRUE)
 plot(car_res,tol = 0.05)
 ```
 
-We can have a more formal horseshoe inference on the structure of the network, this will update the `car_res`:
+The color of the edge represents the type of correlation (negative=blue, positive=red) and the width of the edge corresponds to the effect size. Response nodes are represented by circles and predictor nodes are represented by triangles.
+
+We can have a more formal horseshoe inference on the structure of the network which will update the `car_res` object:
 
 ```{r horseshoe_1}
 # with horseshoe inference
@@ -47,11 +52,11 @@ plot(car_res)
 
 ```
 
-## Network for compositional data
+## CAR-LASSO Network for compositional data
 
-This is common in microbe related studies and some ecological applications with relative abundance only. For instance, microbe relative abundance came from sequencing and in this case we will have the sum of "abundance" decided by the sequence depth rather than the real total abundance. The data is usually described as "compositional". In `CARlasso` this type of data were modelled as Logit-Normal-multinomial. In this case, we have less relative abundance need to have a "reference level" taxa and all others are "relative" to this taxa, we will give a reduced version:
+This is common in the case of microbe-related studies and some ecological applications with relative abundances. For instance, microbe relative abundance come from sequencing and in this case, the sum of "abundance" is determined by the sequence depth rather than the real total abundance. The data is usually described as "compositional". In `CARlasso`, this type of data are modeled as Logit-Normal-multinomial. In this case, we need to have a "reference level" taxa and all others are "relative" to this taxa.
 
-Have a look of the data, still a dataframe with all predictors and responses
+First, we take a look at the data which is still a dataframe with all predictors and responses
 
 ```{r comp_data}
 mgp154[1:5,1:7]
@@ -68,7 +73,9 @@ gut_res <- CARlasso(Alistipes+Bacteroides+
                     n_burn_in = 1000, thin_by = 2)
 ```
 
-Note that in this case `all_others`, i.e. the last one in the left hand side of the formula will be the reference level.
+Note that in this case `all_others` (an existing column in our data), i.e. the last one in the left hand side of the formula will be the reference level.
+
+We can update the network inference by a horseshoe method to determine when edges will be considered non-existent. More details can be found in [the paper](https://arxiv.org/abs/2012.08397).
 
 ```{r horseshoe_comp}
 # horseshoe will take a while, as it needs to sample the latent normal too
@@ -76,11 +83,13 @@ gut_res <- horseshoe(gut_res)
 plot(gut_res)
 ```
 
-## Network for counting data
+## CAR-LASSO Network for counting data
 
-This is common in a lot of ecological applications. For instance number of seedlings within a site. The responses were count rather than continuous. In `CARlasso` it is modelled as Poisson with rate follow log-Normal. We will give the example using the data above since the responses are indeed count, but keep in mind we need to be careful whether a couting data is real counting or compositional. To distinguish them, ask the question: **Is the sum know/decided by us/not free**? If yes, we want to use compositional models. 
+This is common in a lot of ecological applications. For instance, number of seedlings within a site. The responses are counts rather than continuous. In `CARlasso`, it is modeled as Poisson with log-Normal rate. 
 
-To run the composition model, we need to set `link="log"`
+We will use the same compositional data as before to illustrate the counts model. However, it is important to note that relative abundances should not be considered as counts. To distinguish between compositional and count data, one can ask the question: **is the sum decided by us?** If yes, we want to use compositional models. 
+
+To run the count model, we need to set `link="log"`:
 
 ```{r counting}
 gut_res <- CARlasso(Alistipes+Bacteroides+
