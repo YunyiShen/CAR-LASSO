@@ -24,27 +24,11 @@ devtools::install_github("YunyiShen/CAR-LASSO")
 
 ## Documentation
 
-To get started, please check out [the tutorial](https://yunyishen.ml/CAR-LASSO/dev/articles/network.html).
+For more information, please check out [the tutorial](https://yunyishen.ml/CAR-LASSO/dev/articles/network.html).
 
+### Fitting a CAR-ALASSO network on human gut microbiome data
 
-
-Here are some example runs, we generated data from a 5-node AR1 model with each node has a specific treatment then use CAR-ALASSO to reconstruct such network and plot the result. 
-
-```r
-set.seed(42)
-library(CARlasso)
-dt <- simu_AR1(n=100,k=5, rho=0.7)
-car_res <- CARlasso(y1+y2+y3+y4+y5~x1+x2+x3+x4+x5, data = dt, adaptive = TRUE)
-plot(car_res,tol = 0.05)
-# with horseshoe inference
-car_res <- horseshoe(car_res)
-plot(car_res)
-```
-
-![The Result](http://YunyiShen.github.io/files/Research_figs/CARLASSO/package_eg.png)
-
-
-To run a reduced version of the analysis on human gut microbiome (with less predictors and responses), try:
+To run a reduced version of the analysis on human gut microbiome in our paper (with less predictors and responses), you do:
 
 ```r
 gut_res <- CARlasso(Alistipes+Bacteroides+
@@ -57,11 +41,13 @@ gut_res <- CARlasso(Alistipes+Bacteroides+
 gut_res <- horseshoe(gut_res)
 plot(gut_res)
 ```
-It might take a little while due to the sampling process of the latent normal variable 
+It might take a little while due to the sampling process of the latent normal variable.
+
+The color of the edge represents the type of correlation (negative=blue, positive=red) and the width of the edge corresponds to the effect size. Response nodes are represented by circles (in this case, microbes) and predictor nodes are represented by triangles (in this case, age, gender, and stratum).
 
 ![The Result](http://YunyiShen.github.io/files/Research_figs/CARLASSO/human_gut_reduce.png)
 
-Though we don't recommend treating compositional data as counts, as a illustration, we can run the counting model:
+Though we don't recommend treating compositional data as counts, as a illustration, we can run the counting model (`link = "log"`):
 
 ```r
 gut_res <- CARlasso(Alistipes+Bacteroides+
@@ -76,10 +62,35 @@ gut_res <- CARlasso(Alistipes+Bacteroides+
 gut_res <- horseshoe(gut_res)
 plot(gut_res)
 ```
+
 ![The Result](http://YunyiShen.github.io/files/Research_figs/CARLASSO/gut_count.png)
 
+### Fitting a CAR-ALASSO network on simulated data
 
-The package also have graphical lasso support, see [this page](https://yunyishen.ml/CAR-LASSO/dev/articles/glasso.html). If you would like lower level interface of car lasso, see [this page](https://yunyishen.ml/CAR-LASSO/dev/articles/buildown.html).
+We generate data from a 5-node AR1 model where each node has a specific treatment. Then, we use the adaptive version of CAR-LASSO (CAR-ALASSO) to reconstruct such network and plot the result: 
+
+```r
+library(CARlasso)
+set.seed(42)
+dt <- simu_AR1(n=100, k=5, rho=0.7)
+car_res <- CARlasso(y1+y2+y3+y4+y5~x1+x2+x3+x4+x5, data = dt, adaptive = TRUE)
+plot(car_res,tol = 0.05)
+# with horseshoe inference
+car_res <- horseshoe(car_res)
+plot(car_res)
+```
+
+![The Result](http://YunyiShen.github.io/files/Research_figs/CARLASSO/package_eg.png)
+
+
+### Fitting a standard Graphical LASSO network
+
+Our package also includes functions to fit a standard graphical LASSO, see [this page](https://yunyishen.ml/CAR-LASSO/dev/articles/glasso.html) in the tutorial for more details. 
+
+
+### Fitting your own hierarchical model
+
+If you would like lower level interface of CAR-LASSO, see [this page](https://yunyishen.ml/CAR-LASSO/dev/articles/buildown.html) in the tutorial.
 
 
 ## Contributions
