@@ -69,3 +69,35 @@ plot(gut_res)
 
 
 The package also have graphical lasso support, see [this page](https://yunyishen.ml/CAR-LASSO/dev/articles/glasso.html). If you would like lower level interface of car lasso, see [this page](https://yunyishen.ml/CAR-LASSO/dev/articles/buildown.html).
+
+
+# Contributions
+
+Users interested in expanding functionalities in CAR-LASSO R package are welcome to do so.
+See details on how to contribute in [CONTRIBUTING.md](https://github.com/YunyiShen/CAR-LASSO/blob/master/CONTRIBUTING.md).
+
+# License
+CAR-LASSO R package is licensed under the [GNU General Public License v3.0](https://github.com/YunyiShen/CAR-LASSO/blob/master/LICENSE) license.
+
+# Citation
+
+If you use the CAR-LASSO R package in your work, we kindly ask that you cite the following paper:
+
+Shen, Y., Solís-Lemus, C. (2020). Bayesian Conditional Auto-Regressive LASSO Models to Learn Sparse Networks with Predictors, [arXiv:2012.08397](https://arxiv.org/abs/2012.08397)
+
+```
+@article{Shen2020,
+  title         = "Bayesian Conditional {Auto-Regressive} {LASSO} Models to
+                   Learn Sparse Networks with Predictors",
+  author        = "Shen, Yunyi and Solis-Lemus, Claudia",
+  month         =  dec,
+  year          =  2020,
+  archivePrefix = "arXiv",
+  primaryClass  = "stat.AP",
+  eprint        = "2012.08397"
+}
+```
+
+# Feedback, issues and questions
+
+Feedback, issues and questions are encouraged through the [GitHub issue tracker](https://github.com/YunyiShen/CAR-LASSO/issues).
