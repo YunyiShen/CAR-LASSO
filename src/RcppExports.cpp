@@ -194,23 +194,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// sample_Omega_prior_cpp
-Rcpp::List sample_Omega_prior_cpp(int k, const int n_iter, const int n_burn_in, const int thin_by, const double lambda_a, const double lambda_b, bool progress);
-RcppExport SEXP _CARlasso_sample_Omega_prior_cpp(SEXP kSEXP, SEXP n_iterSEXP, SEXP n_burn_inSEXP, SEXP thin_bySEXP, SEXP lambda_aSEXP, SEXP lambda_bSEXP, SEXP progressSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type k(kSEXP);
-    Rcpp::traits::input_parameter< const int >::type n_iter(n_iterSEXP);
-    Rcpp::traits::input_parameter< const int >::type n_burn_in(n_burn_inSEXP);
-    Rcpp::traits::input_parameter< const int >::type thin_by(thin_bySEXP);
-    Rcpp::traits::input_parameter< const double >::type lambda_a(lambda_aSEXP);
-    Rcpp::traits::input_parameter< const double >::type lambda_b(lambda_bSEXP);
-    Rcpp::traits::input_parameter< bool >::type progress(progressSEXP);
-    rcpp_result_gen = Rcpp::wrap(sample_Omega_prior_cpp(k, n_iter, n_burn_in, thin_by, lambda_a, lambda_b, progress));
-    return rcpp_result_gen;
-END_RCPP
-}
 // rgig
 double rgig(double lambda, double chi, double psi);
 RcppExport SEXP _CARlasso_rgig(SEXP lambdaSEXP, SEXP chiSEXP, SEXP psiSEXP) {
@@ -558,7 +541,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_CARlasso_update_car_mu_helper", (DL_FUNC) &_CARlasso_update_car_mu_helper, 7},
     {"_CARlasso_update_car_Omega_helper", (DL_FUNC) &_CARlasso_update_car_Omega_helper, 9},
     {"_CARlasso_update_car_tau2_helper", (DL_FUNC) &_CARlasso_update_car_tau2_helper, 6},
-    {"_CARlasso_sample_Omega_prior_cpp", (DL_FUNC) &_CARlasso_sample_Omega_prior_cpp, 7},
     {"_CARlasso_rgig", (DL_FUNC) &_CARlasso_rgig, 3},
     {"_CARlasso_update_Z_helper_CAR", (DL_FUNC) &_CARlasso_update_Z_helper_CAR, 9},
     {"_CARlasso_rtn1", (DL_FUNC) &_CARlasso_rtn1, 4},

@@ -41,10 +41,6 @@ update_car_tau2_helper <- function(beta, lambda2, Omega, k, p, n) {
     .Call(`_CARlasso_update_car_tau2_helper`, beta, lambda2, Omega, k, p, n)
 }
 
-sample_Omega_prior_cpp <- function(k, n_iter, n_burn_in, thin_by, lambda_a, lambda_b, progress) {
-    .Call(`_CARlasso_sample_Omega_prior_cpp`, k, n_iter, n_burn_in, thin_by, lambda_a, lambda_b, progress)
-}
-
 rgig <- function(lambda, chi, psi) {
     .Call(`_CARlasso_rgig`, lambda, chi, psi)
 }
