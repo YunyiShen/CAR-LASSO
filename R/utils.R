@@ -114,8 +114,8 @@ plot.carlasso_out <- function(x, ...) {
         guides(
             width = guide_legend(order = 1),
             size = guide_legend(order = 2),
-            shape = FALSE, 
-            edge_color = FALSE 
+            shape = "none", 
+            edge_color = "none" 
         )
 
 
@@ -234,8 +234,8 @@ plot.bglasso_out <- function(x, ...) {
         guides(
             width = guide_legend(order = 1),
             size = guide_legend(order = 2),
-            shape = FALSE, 
-            edge_color = FALSE 
+            shape = "none", 
+            edge_color = "none" 
         )
 
 
