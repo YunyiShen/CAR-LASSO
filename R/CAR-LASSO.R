@@ -1,4 +1,4 @@
-#' Gibbs sampler for Conditional Auto Regressive LASSO and extensions
+#' Gibbs sampler for Conditional Autoregressive LASSO and extensions
 #' 
 #' @description Main sampling algorithm of CAR-LASSO model
 #'
