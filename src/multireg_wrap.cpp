@@ -27,7 +27,7 @@ List CAR_multireg_cpp(const arma::mat &data, const arma::mat &design,
     arma::mat beta_mcmc(n_sample, k * p); // beta mcmc
     beta_mcmc += NA_REAL;
 
-    arma::mat Omega_mcmc(n_sample, floor(k * (k + 1) / 2)); // vectorized column first, but had no diagnol
+    arma::mat Omega_mcmc(n_sample, floor(static_cast<double>(k * (k + 1) / 2))); // vectorized column first, but had no diagnol
     Omega_mcmc += NA_REAL;
 
     arma::mat mu_mcmc(n_sample, k); // mean for node 1 to k
@@ -77,14 +77,14 @@ List Multinomial_CAR_multireg_cpp(const arma::mat &data, const arma::mat &design
     int k = data.n_cols - 1;
     int p = design.n_cols;
 
-    int n_save = floor(n_iter / thin_by); //
+    int n_save = floor(static_cast<double>(n_iter / thin_by)); //
     int i_save = 0;
 
     // mcmc matrices:
     arma::mat beta_mcmc(n_save, k * p); // beta mcmc
     beta_mcmc += NA_REAL;
 
-    arma::mat Omega_mcmc(n_save, floor(k * (k + 1) / 2)); // vectorized column first, but had no diagnol
+    arma::mat Omega_mcmc(n_save, floor(static_cast<double>(k * (k + 1) / 2))); // vectorized column first, but had no diagnol
     Omega_mcmc += NA_REAL;
 
     arma::mat mu_mcmc(n_save, k); // mean for node 1 to k
@@ -153,14 +153,14 @@ List Pois_CAR_multireg_cpp(const arma::mat &data, const arma::mat &design,
     int k = data.n_cols;
     int p = design.n_cols;
 
-    int n_save = floor(n_iter / thin_by); //
+    int n_save = floor(static_cast<double>(n_iter / thin_by)); //
     int i_save = 0;
 
     // mcmc matrices:
     arma::mat beta_mcmc(n_save, k * p); // beta mcmc
     beta_mcmc += NA_REAL;
 
-    arma::mat Omega_mcmc(n_save, floor(k * (k + 1) / 2)); // vectorized column first, but had no diagnol
+    arma::mat Omega_mcmc(n_save, floor(static_cast<double>(k * (k + 1) / 2))); // vectorized column first, but had no diagnol
     Omega_mcmc += NA_REAL;
 
     arma::mat mu_mcmc(n_save, k); // mean for node 1 to k
@@ -229,14 +229,14 @@ List Probit_CAR_multireg_cpp(const arma::mat &data, const arma::mat &design,
     int k = data.n_cols;
     int p = design.n_cols;
 
-    int n_save = floor(n_iter / thin_by); //
+    int n_save = floor(static_cast<double>(n_iter / thin_by)); //
     int i_save = 0;
 
     // mcmc matrices:
     arma::mat beta_mcmc(n_save, k * p); // beta mcmc
     beta_mcmc += NA_REAL;
 
-    arma::mat Omega_mcmc(n_save, floor(k * (k + 1) / 2)); // vectorized column first, but had no diagnol
+    arma::mat Omega_mcmc(n_save, floor(static_cast<double>(k * (k + 1) / 2))); // vectorized column first, but had no diagnol
     Omega_mcmc += NA_REAL;
 
     arma::mat mu_mcmc(n_save, k); // mean for node 1 to k
