@@ -14,7 +14,13 @@ The advantages of our implementation is that:
 
 ## Installation
 
-The package is not yet on CRAN, so to install it, please use:
+The package is on CRAN, so to install it, please use:
+
+```r
+install.packages("CARlasso")
+```
+To install development version from github:
+
 ```r
 devtools::install_github("YunyiShen/CAR-LASSO")
 ```
