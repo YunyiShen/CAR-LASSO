@@ -104,8 +104,11 @@
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
-<p>The package is not yet on CRAN, so to install it, please use:</p>
+<p>The package is on CRAN, so to install it, please use:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"CARlasso"</span><span class="op">)</span></code></pre></div>
+<p>To install development version from github:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org//reference/remote-reexports.html">install_github</a></span><span class="op">(</span><span class="st">"YunyiShen/CAR-LASSO"</span><span class="op">)</span></code></pre></div>
 <p><strong>Dependencies:</strong> The CAR-LASSO R package depends on the following R packages: <code>Rcpp</code>, <code>RcppArmadillo</code>, <code>RcppProgress</code>, <code>coda</code>, <code>Matrix</code>, <code>igraph</code>, <code>ggraph</code>, and <code>ggplot2</code>.</p>
 </div>
@@ -117,7 +120,7 @@
 <h3 class="hasAnchor">
 <a href="#fitting-a-car-alasso-network-on-human-gut-microbiome-data" class="anchor"></a>Fitting a CAR-ALASSO network on human gut microbiome data</h3>
 <p>To run a reduced version of the analysis on human gut microbiome in our paper (with less predictors and responses):</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/YunyiShen/CAR-LASSO">CARlasso</a></span><span class="op">)</span>
 <span class="va">gut_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/CARlasso.html">CARlasso</a></span><span class="op">(</span><span class="va">Alistipes</span><span class="op">+</span><span class="va">Bacteroides</span><span class="op">+</span>
                         <span class="va">Eubacterium</span><span class="op">+</span><span class="va">Parabacteroides</span><span class="op">+</span><span class="va">all_others</span><span class="op">~</span>
@@ -130,13 +133,13 @@
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">gut_res</span><span class="op">)</span></code></pre></div>
 <p>It might take a little while due to the sampling process of the latent normal variable.</p>
 <p>We are using the sample human gut microbiome data included in the package (<code>mgp154</code>). If you want to run this model on your own data, check out the structure of <code>mgp154</code> to put your data in the same format:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span><span class="op">(</span><span class="va">mgp154</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">mgp154</span><span class="op">)</span></code></pre></div>
 <p>The color of the edge represents the type of correlation (negative=blue, positive=red) and the width of the edge corresponds to the effect size. Response nodes are represented by circles (in this case, microbes) and predictor nodes are represented by triangles (in this case, age, gender, and stratum).</p>
 <p><img src="http://YunyiShen.github.io/files/Research_figs/CARLASSO/human_gut_reduce.png" alt="The Result"></p>
 <p>Though we don’t recommend treating compositional data as counts, as a illustration, we can run the counting model (<code>link = "log"</code>):</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">gut_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/CARlasso.html">CARlasso</a></span><span class="op">(</span><span class="va">Alistipes</span><span class="op">+</span><span class="va">Bacteroides</span><span class="op">+</span>
                         <span class="va">Eubacterium</span><span class="op">+</span><span class="va">Parabacteroides</span><span class="op">+</span><span class="va">all_others</span><span class="op">~</span>
                         <span class="va">BMI</span><span class="op">+</span><span class="va">Age</span><span class="op">+</span><span class="va">Gender</span><span class="op">+</span><span class="va">Stratum</span>,
@@ -154,7 +157,7 @@
 <h3 class="hasAnchor">
 <a href="#fitting-a-car-alasso-network-on-simulated-data" class="anchor"></a>Fitting a CAR-ALASSO network on simulated data</h3>
 <p>We generate data from a 5-node AR1 model where each node has a specific treatment. Then, we use the adaptive version of CAR-LASSO (CAR-ALASSO) to reconstruct such network and plot the result:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span>
 <span class="va">dt</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/simu_AR1.html">simu_AR1</a></span><span class="op">(</span>n<span class="op">=</span><span class="fl">100</span>, k<span class="op">=</span><span class="fl">5</span>, rho<span class="op">=</span><span class="fl">0.7</span><span class="op">)</span>
 <span class="va">car_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/CARlasso.html">CARlasso</a></span><span class="op">(</span><span class="va">y1</span><span class="op">+</span><span class="va">y2</span><span class="op">+</span><span class="va">y3</span><span class="op">+</span><span class="va">y4</span><span class="op">+</span><span class="va">y5</span><span class="op">~</span><span class="va">x1</span><span class="op">+</span><span class="va">x2</span><span class="op">+</span><span class="va">x3</span><span class="op">+</span><span class="va">x4</span><span class="op">+</span><span class="va">x5</span>, data <span class="op">=</span> <span class="va">dt</span>, adaptive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
