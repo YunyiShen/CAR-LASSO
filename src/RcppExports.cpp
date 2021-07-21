@@ -6,6 +6,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // CAR_ALASSO_hir_Cpp
 List CAR_ALASSO_hir_Cpp(const arma::mat& data, const arma::mat& design, const int link, const int n_iter, const int n_burn_in, const int thin_by, const arma::mat r_beta, const arma::mat delta_beta, const arma::vec r_Omega, const arma::vec delta_Omega, const arma::vec& lambda_diag, int ns, int m, int emax, bool progress);
 RcppExport SEXP _CARlasso_CAR_ALASSO_hir_Cpp(SEXP dataSEXP, SEXP designSEXP, SEXP linkSEXP, SEXP n_iterSEXP, SEXP n_burn_inSEXP, SEXP thin_bySEXP, SEXP r_betaSEXP, SEXP delta_betaSEXP, SEXP r_OmegaSEXP, SEXP delta_OmegaSEXP, SEXP lambda_diagSEXP, SEXP nsSEXP, SEXP mSEXP, SEXP emaxSEXP, SEXP progressSEXP) {

@@ -68,11 +68,11 @@ Rcpp::List Intercept_Graphical_LASSO_Cpp(const arma::mat & data,
   arma::uvec pertub_vec = linspace<uvec>(0,k-1,k); 
   
   // mcmc storage
-  int n_store = floor(n_iter/thin_by);
+  int n_store = floor(static_cast<double>(n_iter/thin_by));
   //arma::mat Sigma_mcmc(n_store,k*k,fill::zeros);
   //Sigma_mcmc += NA_REAL;
   
-  arma::mat Omega_mcmc(n_store,floor( k * (k+1)/2 ) ,fill::zeros);
+  arma::mat Omega_mcmc(n_store,floor( static_cast<double>(k * (k+1)/2) ) ,fill::zeros);
   Omega_mcmc += NA_REAL;
   
   arma::vec lambda_mcmc(n_store, fill::zeros);
@@ -307,11 +307,11 @@ Rcpp::List Intercept_Graphical_LASSO_hir_Cpp(const arma::mat & data,
   arma::uvec pertub_vec = linspace<uvec>(0,k-1,k); 
   
   // mcmc storage
-  int n_store = floor(n_iter/thin_by);
+  int n_store = floor(static_cast<double>(n_iter/thin_by));
   //arma::mat Sigma_mcmc(n_store,k*k,fill::zeros);
   //Sigma_mcmc += NA_REAL;
   
-  arma::mat Omega_mcmc(n_store,floor( k * (k+1)/2 ) ,fill::zeros);
+  arma::mat Omega_mcmc(n_store,floor( static_cast<double>(k * (k+1)/2) ) ,fill::zeros);
   Omega_mcmc += NA_REAL;
   
   arma::vec lambda_mcmc(n_store, fill::zeros);
