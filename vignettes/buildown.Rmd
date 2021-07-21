@@ -2,7 +2,7 @@
 title: "Build your own hierarchical model"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Build your own hierarchical}
+  %\VignetteIndexEntry{Build your own hierarchical model}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
