@@ -10,4 +10,4 @@ navbar:
     right: [github]
 
 development:
-  mode: devel
+  mode: release
