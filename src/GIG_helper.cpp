@@ -333,7 +333,7 @@ double rgig(double lambda, double chi, double psi){
   
   // allocate array for random sample //
   
-  if (chi < DOUBLE_EPS*10.0) { 
+  if (chi < DBL_EPSILON*10.0) { 
     // special cases which are basically Gamma and Inverse Gamma distribution //
     if (lambda > 0.0) {
       res = R::rgamma(lambda, 2.0/psi); 
@@ -343,7 +343,7 @@ double rgig(double lambda, double chi, double psi){
     }    
   }
   
-  else if (psi < DOUBLE_EPS*10.0) {
+  else if (psi < DBL_EPSILON*10.0) {
     // special cases which are basically Gamma and Inverse Gamma distribution //
     if (lambda > 0.0) {
       res = 1.0/R::rgamma(lambda, 2.0/chi); 
