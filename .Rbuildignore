@@ -1,2 +1,11 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
+
+^\.github
+^\.git
+^\tests
+^\real_data
+*.png
+LICENSE
+README.md
+CONTRIBUTING.md
