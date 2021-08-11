@@ -1,6 +1,6 @@
 Package: CARlasso
 Title: Conditional Autoregressive LASSO
-Version: 0.1.1
+Version: 0.1.2
 Authors@R: c(person("Yunyi", "Shen", email = "yshen99@wisc.edu", role = c("aut", "cre"),comment = c(ORCID = "0000-0003-2779-6507")),person("Claudia","Solis-Lemus", role = "aut", comment = c(ORCID = "0000-0002-9789-8915")))
 Maintainer: Yunyi Shen <yshen99@wisc.edu>
 Description: Algorithms to fit Bayesian Conditional Autoregressive LASSO with automatic and adaptive shrinkage described in Shen and Solis-Lemus (2020) <arXiv:2012.08397>.

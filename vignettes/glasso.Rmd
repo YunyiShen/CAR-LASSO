@@ -35,7 +35,7 @@ head(dt)
 Unlike `CARlasso`, we do not really need to have a formula (because we do not have predictors, only responses). To use the Normal version, we should set `link="identity"` which is the default. 
 
 
-```{r ar1example_first}
+```{r ar1example_first, eval = FALSE}
 glassores <- bGlasso(data = dt)
 plot(glassores)
 ```
