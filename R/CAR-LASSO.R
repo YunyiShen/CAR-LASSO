@@ -147,7 +147,7 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
     if (is.null(r_beta)) r_beta <- 1
     if (is.null(delta_beta)) delta_beta <- 0.01
     if (verbos & (length(r_beta) > 1 | length(delta_beta) > 1)) {
-      cat("Algorithm set to be non-adapive, will take the first entry of hyperprior for beta shrinkage\n\n")
+      cat("Algorithm set to be non-adaptive, will take the first entry of hyperprior for beta shrinkage\n\n")
     }
     r_beta <- r_beta[1]
     delta_beta <- delta_beta[1]
@@ -156,7 +156,7 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
     if (is.null(r_beta)) r_beta <- 0.01
     if (is.null(delta_beta)) delta_beta <- 1e-6
     if ((length(r_beta) == 1 & length(delta_beta) == 1)) {
-      if (verbos) cat("Algorithm set to be adapive. Assuming all hyper parameters are the same for beta \n\n")
+      if (verbos) cat("Algorithm set to be adaptive. Assuming all hyper parameters are the same for beta \n\n")
       r_beta <- matrix(r_beta, p, k)
       delta_beta <- matrix(delta_beta, p, k)
     }
@@ -190,7 +190,7 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
     if (is.null(r_Omega)) r_Omega <- 1
     if (is.null(delta_Omega)) delta_Omega <- 0.01
     if (verbos & (length(r_Omega) > 1 | length(delta_Omega) > 1)) {
-      cat("Algorithm set to be non-adapive, will take the first entry of hyper prior for Omega shrinkage\n\n")
+      cat("Algorithm set to be non-adaptive, will take the first entry of hyper prior for Omega shrinkage\n\n")
     }
     r_Omega <- r_Omega[1]
     delta_Omega <- delta_Omega[1]
@@ -200,7 +200,7 @@ CARlasso <- function(formula, # a double sided formula needed, e.g. x+y~a+b
     if (is.null(delta_Omega)) delta_Omega <- 1e-6
     if (is.null(lambda_diag)) lambda_diag <- 0
     if ((length(r_Omega) == 1 & length(delta_Omega) == 1)) {
-      if (verbos) cat("Algorithm set to be adapive. Assuming all hyper parameters are the same for Omega's off diagonal entries \n\n")
+      if (verbos) cat("Algorithm set to be adaptive. Assuming all hyper parameters are the same for Omega's off diagonal entries \n\n")
       r_Omega <- rep(r_Omega, .5 * (k - 1) * k)
       delta_Omega <- rep(delta_Omega, .5 * (k - 1) * k)
     }
