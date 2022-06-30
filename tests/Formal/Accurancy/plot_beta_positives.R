@@ -12,7 +12,7 @@ generate_raster <- function(f){
 }
 
 generate_plot <- function(thestack,name){
-  names(thestack) <- paste0("model", 1:5)
+  names(thestack) <- c("AR1","AR2","Block","Star","Circle")
   gplot(thestack) +
     geom_tile(aes(fill = value), color="grey65") +
     facet_grid(~ variable) +
@@ -46,7 +46,7 @@ generate_plot <- function(thestack,name){
 
 
 all_resCAR_ACAR <- list.files("./tests/Formal/Accurancy/k10/results/graph_visual/B",
-                      pattern = "CARB_beta_s0.5_design_p5_n50",
+                      pattern = "CARB_beta_s0.2_design_p5_n50",
                       full.names = T)
 all_resCAR <- all_resCAR_ACAR[1:5+6]
 all_resACAR <- all_resCAR_ACAR[1:5]
@@ -57,7 +57,7 @@ mat_ACAR <- lapply(all_resACAR, generate_raster)
 stack_ACAR <- Reduce(stack, mat_ACAR)
 
 all_resSRG <- list.files("./tests/Formal/Accurancy/k10/results/graph_visual/B",
-                              pattern = "SRGB_beta_s0.5_design_p5_n50",
+                              pattern = "SRGB_beta_s0.2_design_p5_n50",
                               full.names = T)[1:5]
 mat_SRG <- lapply(all_resSRG, generate_raster)
 stack_SRG <- Reduce(stack, mat_SRG)
@@ -65,7 +65,7 @@ stack_SRG <- Reduce(stack, mat_SRG)
 
 
 all_resmultireg <- list.files("./tests/Formal/Accurancy/k10/results/graph_visual/B",
-                            pattern = "multiregB_beta_s0.5_design_p5_n50",
+                            pattern = "multiregB_beta_s0.2_design_p5_n50",
                             full.names = T)[1:5]
 mat_multireg <- lapply(all_resmultireg, generate_raster)
 stack_multireg <- Reduce(stack, mat_multireg)
@@ -84,5 +84,5 @@ ggpubr::ggarrange(ACAR_res, CAR_res, SRG_res, multireg_res,
                   legend = "right",align = "hv",
                   common.legend = T)
 
-ggsave("./tests/Formal/Accurancy/Figs/beta_reconstruct.5_5.pdf",width = 10, height = 9)
-ggsave("./tests/Formal/Accurancy/Figs/beta_reconstruct.5_5.jpg",width = 10, height = 9)
+ggsave("./tests/Formal/Accurancy/Figs/beta_reconstruct.2_5.pdf",width = 10, height = 9)
+#ggsave("./tests/Formal/Accurancy/Figs/beta_reconstruct.5_5.jpg",width = 10, height = 9)

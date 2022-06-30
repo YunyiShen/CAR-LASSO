@@ -12,7 +12,7 @@ generate_raster <- function(f){
 }
 
 generate_plot <- function(thestack,name){
-  names(thestack) <- paste0("model", 1:5)
+  names(thestack) <- c("AR1","AR2","Block","Star","Circle")
   gplot(thestack) +
     geom_tile(aes(fill = value), color="grey65") +
     facet_grid(~ variable) +
@@ -46,7 +46,7 @@ generate_plot <- function(thestack,name){
 
 
 all_resCAR_ACAR <- list.files("./tests/Formal/Accurancy/k10/results/graph_visual/Omega",
-                      pattern = "CARO_beta_s0.5_design_p10_n50",
+                      pattern = "CARO_beta_s0.5_design_p5_n50",
                       full.names = T)
 all_resCAR <- all_resCAR_ACAR[1:5+6]
 all_resACAR <- all_resCAR_ACAR[1:5]
@@ -57,26 +57,26 @@ mat_ACAR <- lapply(all_resACAR, generate_raster)
 stack_ACAR <- Reduce(stack, mat_ACAR)
 
 all_resSRG <- list.files("./tests/Formal/Accurancy/k10/results/graph_visual/Omega",
-                              pattern = "SRGO1_beta_s0.5_design_p10_n50",
+                              pattern = "SRGO1_beta_s0.5_design_p5_n50",
                               full.names = T)[1:5]
 mat_SRG <- lapply(all_resSRG, generate_raster)
 stack_SRG <- Reduce(stack, mat_SRG)
 
 
 all_resGlasso <- list.files("./tests/Formal/Accurancy/k10/results/graph_visual/Omega",
-                         pattern = "GlassoaugO_beta_s0.5_design_p10_n50",
+                         pattern = "GlassoaugO_beta_s0.5_design_p5_n50",
                          full.names = T)[1:5+6]
 mat_Glasso <- lapply(all_resGlasso, generate_raster)
 stack_Glasso <- Reduce(stack, mat_Glasso)
 
 all_resAGlasso <- list.files("./tests/Formal/Accurancy/k10/results/graph_visual/Omega",
-                            pattern = "GlassoO_beta_s0.5_design_p10_n50",
+                            pattern = "GlassoO_beta_s0.5_design_p5_n50",
                             full.names = T)[1:5]
 mat_AGlasso <- lapply(all_resAGlasso, generate_raster)
 stack_AGlasso <- Reduce(stack, mat_AGlasso)
 
 all_resmultireg <- list.files("./tests/Formal/Accurancy/k10/results/graph_visual/Omega",
-                            pattern = "multiregO_beta_s0.5_design_p10_n50",
+                            pattern = "multiregO_beta_s0.5_design_p5_n50",
                             full.names = T)[1:5]
 mat_multireg <- lapply(all_resmultireg, generate_raster)
 stack_multireg <- Reduce(stack, mat_multireg)
@@ -96,5 +96,5 @@ ggpubr::ggarrange(ACAR_res, CAR_res, SRG_res, Glasso_res, multireg_res,
                   legend = "right",align = "hv",
                   common.legend = T)
 
-ggsave("./tests/Formal/Accurancy/Figs/graph_reconstruct.5_10.pdf",width = 10, height = 11)
-ggsave("./tests/Formal/Accurancy/Figs/graph_reconstruct.5_10.jpg",width = 10, height = 11)
+ggsave("./tests/Formal/Accurancy/Figs/graph_reconstruct.5_5.pdf",width = 10, height = 11)
+#ggsave("./tests/Formal/Accurancy/Figs/graph_reconstruct.5_10.jpg",width = 10, height = 11)
