@@ -6,6 +6,7 @@ all_res <- list.files("./tests/Formal/Accurancy/k10/results",full.names = T)
 all_Omega_files <- all_res[grep("graph_Omega",all_res)]
 all_Omega <- lapply(all_Omega_files,read.csv,row.names=1)
 all_Omega <- Reduce(rbind,all_Omega)
+all_Omega$algo <- sub("CAR","CG",all_Omega$algo)
 
 all_Omega_k30 <- all_Omega[!is.na(all_Omega$k),]
 all_Omega_k30 <- all_Omega_k30[all_Omega_k30$k==10,]
@@ -13,7 +14,9 @@ all_Omega_k30 <- all_Omega_k30[all_Omega_k30$k==10,]
 all_Omega_k30$beta.sparsity <- factor( 1-all_Omega_k30$s,levels = c(0.8,0.5))
 all_Omega_k30$p <- paste0(all_Omega_k30$p, " predictors")
 all_Omega_k30 <- within(all_Omega_k30, p<-factor(p, levels=c("5 predictors", "10 predictors")))
-all_Omega_k30$mod <- paste0("model ",all_Omega_k30$mod)
+model_list <- c("AR1","AR2","Block","Star","Circle","Dense")
+all_Omega_k30$mod <- model_list[all_Omega_k30$mod]
+all_Omega_k30$mod <- factor(all_Omega_k30$mod, levels = model_list)
 
 all_Omega_bayes <- all_Omega_k30[!is.na(all_Omega_k30$TP_bayes) & all_Omega_k30$mod!="model 6",c(1:11,20)]
 all_Omega_multireg <- all_Omega_k30[(all_Omega_k30$algo=="multireg"|all_Omega_k30$algo=="multireg_mu0"|all_Omega_k30$algo=="multireg_mu0-aug"|
@@ -36,23 +39,11 @@ Omega_learning_k30 <- rbind(all_Omega_bayes,all_Omega_multireg)
 Omega_learning_k30[is.na(Omega_learning_k30)] <- 0
 #Omega_learning_k30$beta.sparsity <- Omega_learning_k30$s
 
-## Original plot:
-Graph_MCC <- ggplot(data = Omega_learning_k30,aes(x=algo,y = MCC)) + 
-  geom_boxplot(aes(fill = beta.sparsity)) + 
-  facet_grid(mod~p) + 
-  ylab("MCC on Omega") + 
-  xlab("") +
-  theme(legend.position="top") + 
-  theme(text = element_text(size=14), 
-        axis.text.x = element_text(angle=45,hjust = 1,vjust=1),
-        plot.margin = margin(.15, .15, .15, .15, "cm"))
-
-Graph_MCC
-ggsave("./tests/Formal/Accurancy/Figs/MCC_k30_Asmallprior_Omega.pdf",Graph_MCC,width = 9,height = 5.5,unit = "in")
 
 ## New plot
-Omega_learning_k30 <- within(Omega_learning_k30, algo<-factor(algo, levels=c("CAR-LASSO", "CAR-ALASSO", "SRG-LASSO","GLASSO-aug", "GALASSO-aug", "ad-hoc-aug" ,"GLASSO", "GALASSO","multireg_mu0-aug" ,"multireg", "multireg_mu0", "ad-hoc")))
-Graph_MCC <- ggplot(data = Omega_learning_k30,aes(x=algo,y = MCC)) + 
+library(ggplot2)
+Omega_learning_k30 <- within(Omega_learning_k30, algo<-factor(algo, levels=c("CG-LASSO", "CG-ALASSO", "SRG-LASSO","GLASSO-aug", "GALASSO-aug", "ad-hoc-aug" ,"GLASSO", "GALASSO","multireg_mu0-aug" ,"multireg", "multireg_mu0", "ad-hoc")))
+Graph_MCC <- ggplot(data = Omega_learning_k30[Omega_learning_k30$mod!="Dense",],aes(x=algo,y = MCC)) + 
   geom_point(aes(color = beta.sparsity), alpha=0.1, size=1)+
   geom_boxplot(aes(fill = beta.sparsity)) + 
   facet_grid(p~mod) + 

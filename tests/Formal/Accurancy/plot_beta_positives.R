@@ -71,8 +71,8 @@ mat_multireg <- lapply(all_resmultireg, generate_raster)
 stack_multireg <- Reduce(stack, mat_multireg)
 
 
-ACAR_res <- generate_plot(stack_ACAR, "CAR-A")
-CAR_res <- generate_plot(stack_CAR, "CAR")
+ACAR_res <- generate_plot(stack_ACAR, "CG-A")
+CAR_res <- generate_plot(stack_CAR, "CG")
 SRG_res <- generate_plot(stack_SRG, "SRG")
 multireg_res <- generate_plot(stack_multireg,"multireg")
 
