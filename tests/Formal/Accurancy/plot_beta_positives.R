@@ -12,7 +12,7 @@ generate_raster <- function(f){
 }
 
 generate_plot <- function(thestack,name){
-  names(thestack) <- c("AR1","AR2","Block","Star","Circle")
+  names(thestack) <- c("AR1","AR2","Block","Star","Circle","Dense")
   gplot(thestack) +
     geom_tile(aes(fill = value), color="grey65") +
     facet_grid(~ variable) +
@@ -44,8 +44,8 @@ generate_plot <- function(thestack,name){
   
 }
 
-s <- 0.2
-p <- 5
+s <- 0.5
+p <- 10
 
 all_resCAR_ACAR <- list.files("./tests/Formal/Accurancy/k10/results/graph_visual/B",
                       pattern = paste0( "CARB_beta_s",s,"_design_p",p,"_n50"),
@@ -86,5 +86,5 @@ ggpubr::ggarrange(ACAR_res, CAR_res, SRG_res, multireg_res,
                   legend = "right",align = "hv",
                   common.legend = T)
 
-ggsave(paste0("./tests/Formal/Accurancy/Figs/beta_reconstruct",sub("0","",s),"_",p,".pdf"),width = 10, height = 9)
+ggsave(paste0("./tests/Formal/Accurancy/Figs/beta_reconstruct",sub("0","",s),"_",p,".pdf"),width = 12, height = 9)
 #ggsave("./tests/Formal/Accurancy/Figs/beta_reconstruct.5_5.jpg",width = 10, height = 9)
