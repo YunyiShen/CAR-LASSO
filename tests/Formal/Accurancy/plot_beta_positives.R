@@ -44,12 +44,14 @@ generate_plot <- function(thestack,name){
   
 }
 
+s <- 0.2
+p <- 5
 
 all_resCAR_ACAR <- list.files("./tests/Formal/Accurancy/k10/results/graph_visual/B",
-                      pattern = "CARB_beta_s0.2_design_p5_n50",
+                      pattern = paste0( "CARB_beta_s",s,"_design_p",p,"_n50"),
                       full.names = T)
-all_resCAR <- all_resCAR_ACAR[1:5+6]
-all_resACAR <- all_resCAR_ACAR[1:5]
+all_resCAR <- all_resCAR_ACAR[1:6+6]
+all_resACAR <- all_resCAR_ACAR[1:6]
 
 mat_CAR <- lapply(all_resCAR, generate_raster)
 stack_CAR <- Reduce(stack, mat_CAR)
@@ -57,16 +59,16 @@ mat_ACAR <- lapply(all_resACAR, generate_raster)
 stack_ACAR <- Reduce(stack, mat_ACAR)
 
 all_resSRG <- list.files("./tests/Formal/Accurancy/k10/results/graph_visual/B",
-                              pattern = "SRGB_beta_s0.2_design_p5_n50",
-                              full.names = T)[1:5]
+                              pattern = paste0("SRGB_beta_s",s,"_design_p",p,"_n50"),
+                              full.names = T)[1:6]
 mat_SRG <- lapply(all_resSRG, generate_raster)
 stack_SRG <- Reduce(stack, mat_SRG)
 
 
 
 all_resmultireg <- list.files("./tests/Formal/Accurancy/k10/results/graph_visual/B",
-                            pattern = "multiregB_beta_s0.2_design_p5_n50",
-                            full.names = T)[1:5]
+                            pattern = paste0("multiregB_beta_s",s,"_design_p",p,"_n50"),
+                            full.names = T)[1:6]
 mat_multireg <- lapply(all_resmultireg, generate_raster)
 stack_multireg <- Reduce(stack, mat_multireg)
 
@@ -84,5 +86,5 @@ ggpubr::ggarrange(ACAR_res, CAR_res, SRG_res, multireg_res,
                   legend = "right",align = "hv",
                   common.legend = T)
 
-ggsave("./tests/Formal/Accurancy/Figs/beta_reconstruct.2_5.pdf",width = 10, height = 9)
+ggsave(paste0("./tests/Formal/Accurancy/Figs/beta_reconstruct",sub("0","",s),"_",p,".pdf"),width = 10, height = 9)
 #ggsave("./tests/Formal/Accurancy/Figs/beta_reconstruct.5_5.jpg",width = 10, height = 9)

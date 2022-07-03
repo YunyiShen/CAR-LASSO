@@ -2,7 +2,7 @@ library(Matrix)
 library(RcppArmadillo)
 library(Rcpp)
 library(RcppProgress)
-library(bayesm)
+#library(bayesm)
 library(ggplot2)
 
 rm(list = ls())
@@ -128,12 +128,14 @@ res = read.csv("scalingres.csv", header=TRUE)
 res$n <- paste0("sample_size:",res$n)
 #res$p <- paste0("predictors:", res$p)
 res$p <- paste0(res$p, " predictors")
+res$algo <- sub("CAR","CG",res$algo)
+
 res <- within(res, p<-factor(p, levels=c("5 predictors", "10 predictors")))
 res <- within(res, n<-factor(n, levels=c("sample_size:500", "sample_size:1000")))
 res <- within(res, algo<-factor(algo))
-res <- within(res, algo<-factor(algo, levels=c("CAR_LASSO", "CAR_ALASSO", "SRG_LASSO", "GLASSO", "multireg")))
-res <- within(res, algo<-factor(algo, labels=c("CAR-LASSO", "CAR-ALASSO", "SRG-LASSO", "GLASSO", "multireg")))
+res <- within(res, algo<-factor(algo, levels=c("CG_LASSO", "CG_ALASSO", "SRG_LASSO", "GLASSO", "multireg")))
 
+res <- within(res, algo<-factor(algo, labels=c("CG-LASSO", "CG-ALASSO", "SRG-LASSO", "GLASSO", "multireg")))
 
 
 cbbPalette <- c(

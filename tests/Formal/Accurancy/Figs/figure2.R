@@ -69,12 +69,12 @@ Sigma1 <- 0.7^(abs(outer(1:q, 1:q, FUN = "-")))
 Omega1 <- solve(Sigma1)
 Omega1[abs(Omega1) < 1e-12] <- 0
 
-png("omega_AR1.png", width = 6, height = 6, units = "in", res = 300)
-par(mar = c(3,1,1,1), mgp = c(1.8, 0.5, 0), cex.main = 2)
-plot_Omega(Omega1, "AR(1)", color = T)
+png("omega_AR1.png", width = 4.5, height = 4.5, units = "in", res = 300)
+par(mar = c(3,1,2,1), mgp = c(1.8, 0.5, 0), cex.main = 3)
+plot_Omega(Omega1, "AR1", color = T)
 dev.off()
 
-png("graph_AR1.png", width = 6, height = 6, units = "in", res = 300)
+png("graph_AR1.png", width = 4.5, height = 4.5, units = "in", res = 300)
 par(mar = c(1,1,1,1), mgp = c(1.8, 0.5, 0))
 plot_graph(Omega1)
 dev.off()
@@ -93,12 +93,12 @@ for(i in 1:q){
 }
 
 
-png("omega_AR2.png", width = 6, height = 6, units = "in", res = 300)
-par(mar = c(3,1,1,1), mgp = c(1.8, 0.5, 0), cex.main = 2)
-plot_Omega(Omega2, "AR(2)")
+png("omega_AR2.png", width = 4.5, height = 4.5, units = "in", res = 300)
+par(mar = c(3,1,2,1), mgp = c(1.8, 0.5, 0), cex.main = 3)
+plot_Omega(Omega2, "AR2")
 dev.off()
 
-png("graph_AR2.png", width = 6, height = 6, units = "in", res = 300)
+png("graph_AR2.png", width = 4.5, height = 4.5, units = "in", res = 300)
 par(mar = c(1,1,1,1), mgp = c(1.8, 0.5, 0))
 plot_graph(Omega2)
 dev.off()
@@ -110,12 +110,12 @@ Omega3[1:(q/2),1:(q/2)] <- 0.5
 Omega3[q/2 + 1:(q/2),1:(q/2) + q/2] <- 0.5
 diag(Omega3) <- 1
 
-png("omega_block.png", width = 6, height = 6, units = "in", res = 300)
-par(mar = c(3,1,1,1), mgp = c(1.8, 0.5, 0), cex.main = 2)
+png("omega_block.png", width = 4.5, height = 4.5, units = "in", res = 300)
+par(mar = c(3,1,2,1), mgp = c(1.8, 0.5, 0), cex.main = 3)
 plot_Omega(Omega3, "Block")
 dev.off()
 
-png("graph_block.png", width = 6, height = 6, units = "in", res = 300)
+png("graph_block.png", width = 4.5, height = 4.5, units = "in", res = 300)
 par(mar = c(1,1,1,1), mgp = c(1.8, 0.5, 0))
 plot_graph(Omega3)
 dev.off()
@@ -127,12 +127,12 @@ Omega4[,1] <- 0.75
 diag(Omega4) <- 1
 
 
-png("omega_star.png", width = 6, height = 6, units = "in", res = 300)
-par(mar = c(3,1,1,1), mgp = c(1.8, 0.5, 0), cex.main = 2)
+png("omega_star.png", width = 4.5, height = 4.5, units = "in", res = 300)
+par(mar = c(3,1,2,1), mgp = c(1.8, 0.5, 0), cex.main = 3)
 plot_Omega(Omega4, "Star")
 dev.off()
 
-png("graph_star.png", width = 6, height = 6, units = "in", res = 300)
+png("graph_star.png", width = 4.5, height = 4.5, units = "in", res = 300)
 par(mar = c(1,1,1,1), mgp = c(1.8, 0.5, 0))
 plot_graph(Omega4, star_layout = TRUE)
 dev.off()
@@ -143,12 +143,12 @@ Omega5 <- Omega1
 Omega5[1,10] <- Omega5[10,1] <- -1.37
 diag(Omega5) <- 1
 
-png("omega_circle.png", width = 6, height = 6, units = "in", res = 300)
-par(mar = c(3,1,1,1), mgp = c(1.8, 0.5, 0), cex.main = 2)
+png("omega_circle.png", width = 4.5, height = 4.5, units = "in", res = 300)
+par(mar = c(3,1,2,1), mgp = c(1.8, 0.5, 0), cex.main = 3)
 plot_Omega(Omega5, "Circle")
 dev.off()
 
-png("graph_circle.png", width = 6, height = 6, units = "in", res = 300)
+png("graph_circle.png", width = 4.5, height = 4.5, units = "in", res = 300)
 par(mar = c(1,1,1,1), mgp = c(1.8, 0.5, 0))
 plot_graph(Omega5)
 dev.off()
@@ -158,12 +158,12 @@ dev.off()
 Omega6 <- matrix(0.75, nrow = q, ncol = q)
 diag(Omega6) <- 1
 
-png("omega_full.png", width = 6, height = 6, units = "in", res = 300)
-par(mar = c(3,1,1,1), mgp = c(1.8, 0.5, 0), cex.main = 2)
-plot_Omega(Omega6, "Full")
+png("omega_full.png", width = 4.5, height = 4.5, units = "in", res = 300)
+par(mar = c(3,1,2,1), mgp = c(3, 0.5, 0), cex.main = 3)
+plot_Omega(Omega6, "Dense")
 dev.off()
 
-png("graph_full.png", width = 6, height = 6, units = "in", res = 300)
+png("graph_full.png", width = 4.5, height = 4.5, units = "in", res = 300)
 par(mar = c(1,1,1,1), mgp = c(1.8, 0.5, 0))
 plot_graph(Omega6)
 dev.off()
