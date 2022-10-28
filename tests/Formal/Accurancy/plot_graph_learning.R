@@ -42,7 +42,7 @@ Omega_learning_k30[is.na(Omega_learning_k30)] <- 0
 
 ## New plot
 library(ggplot2)
-Omega_learning_k30 <- within(Omega_learning_k30, algo<-factor(algo, levels=c("CG-LASSO", "CG-ALASSO", "SRG-LASSO","GLASSO-aug", "GALASSO-aug", "ad-hoc-aug" ,"GLASSO", "GALASSO","multireg_mu0-aug" ,"multireg", "multireg_mu0", "ad-hoc")))
+Omega_learning_k30 <- within(Omega_learning_k30, algo<-factor(algo, levels=c("CG-ALASSO","CG-LASSO",  "SRG-LASSO","GLASSO-aug", "GALASSO-aug", "ad-hoc-aug" ,"GLASSO", "GALASSO","multireg_mu0-aug" ,"multireg", "multireg_mu0", "ad-hoc")))
 Graph_MCC <- ggplot(data = Omega_learning_k30[Omega_learning_k30$mod!="Dense",],aes(x=algo,y = MCC)) + 
   geom_point(aes(color = beta.sparsity), alpha=0.1, size=1)+
   geom_boxplot(aes(fill = beta.sparsity)) + 

@@ -1,12 +1,12 @@
 
-all_res <- list.files("./tests/Formal/Accurancy/k30/results",full.names = T)
+all_res <- list.files("./tests/Formal/Accurancy/k10/results",full.names = T)
 all_beta_files <- all_res[grep("graph_beta",all_res)]
 all_beta <- lapply(all_beta_files,read.csv,row.names=1)
 all_beta <- Reduce(rbind,all_beta)
 all_beta$algo <- sub("CAR","CG",all_beta$algo)
 
 all_beta_k30 <- all_beta[!is.na(all_beta$k),]
-all_beta_k30 <- all_beta_k30[all_beta_k30$k==30,]
+all_beta_k30 <- all_beta_k30[all_beta_k30$k==10,]
 
 all_beta_k30$beta.sparsity <- factor( 1-all_beta_k30$s,levels = c(0.8,0.5))
 all_beta_k30$p <- paste0(all_beta_k30$p, " predictors")
@@ -36,7 +36,7 @@ beta_learning_k30 <- rbind(all_beta_bayes,all_beta_multireg)
 
 ## New plot:
 library(ggplot2)
-beta_learning_k30 <- within(beta_learning_k30, algo<-factor(algo, levels=c("CG-LASSO", "CG-ALASSO", "SRG-LASSO", "multireg")))
+beta_learning_k30 <- within(beta_learning_k30, algo<-factor(algo, levels=c("CG-ALASSO", "CG-LASSO",  "SRG-LASSO", "multireg")))
 beta_MCC <- ggplot(data = beta_learning_k30,aes(x=algo,y = MCC)) + 
   geom_point(aes(color = beta.sparsity), alpha=0.1, size=1)+
   geom_boxplot(aes(fill = beta.sparsity)) + 
@@ -49,7 +49,7 @@ beta_MCC <- ggplot(data = beta_learning_k30,aes(x=algo,y = MCC)) +
         plot.margin = margin(.15, .15, .15, .15, "cm"))
 
 beta_MCC
-ggsave("./tests/Formal/Accurancy/Figs/MCC_k30_Asmallprior_beta2.pdf",beta_MCC,width = 10,height = 8,unit = "in")
+ggsave("./tests/Formal/Accurancy/Figs/MCC_k10_Asmallprior_beta2.pdf",beta_MCC,width = 10,height = 8,unit = "in")
 
 
 beta_Sensitivity <- ggplot(data = beta_learning_k30,aes(x=algo,y = Sensitivity)) + 

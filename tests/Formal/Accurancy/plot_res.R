@@ -21,7 +21,7 @@ all_loss_k30 <- within(all_loss_k30, p<-factor(p, levels=c("5 predictors", "10 p
 
 
 ## New plot:
-all_loss_k30 <- within(all_loss_k30, algo<-factor(algo, levels=c("CG-LASSO", "CG-ALASSO", "SRG-LASSO","GLASSO-aug", "GALASSO-aug", "ad-hoc-aug" ,"GLASSO", "GALASSO","multireg_mu0-aug" ,"multireg", "multireg_mu0", "ad-hoc")))
+all_loss_k30 <- within(all_loss_k30, algo<-factor(algo, levels=c("CG-ALASSO","CG-LASSO",  "SRG-LASSO","GLASSO-aug", "GALASSO-aug", "ad-hoc-aug" ,"GLASSO", "GALASSO","multireg_mu0-aug" ,"multireg", "multireg_mu0", "ad-hoc")))
 Stein_k30 <- ggplot(data = all_loss_k30,aes(x=algo,y=log(steinOmega))) + 
   geom_point(aes(color = beta.sparsity), alpha=0.1, size=1)+
   geom_boxplot(aes(fill = beta.sparsity)) + 
@@ -34,7 +34,7 @@ Stein_k30 <- ggplot(data = all_loss_k30,aes(x=algo,y=log(steinOmega))) +
         plot.margin = margin(.15, .15, .15, .15, "cm"))
 
 Stein_k30
-ggsave("./tests/Formal/Accurancy/Figs/Stein_k10_Asmallprior2.pdf",Stein_k30,width = 12,height = 8,unit = "in")
+ggsave("./tests/Formal/Accurancy/Figs/Stein_k30_Asmallprior2.pdf",Stein_k30,width = 12,height = 8,unit = "in")
 ggsave("Figs/Stein_k10_Asmallprior2.jpg",Stein_k30,width = 10,height = 8,unit = "in")
 
 Stein_k30_aggregate_mean <- aggregate(steinOmega~p+mod+algo+beta.sparsity,data = all_loss_k30,FUN = mean)
