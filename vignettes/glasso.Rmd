@@ -18,11 +18,11 @@ knitr::opts_chunk$set(
 library(CARlasso)
 ```
 
-We also have Graphical LASSO support for study with no predictors, the main interface is `bGlasso`, please also see the [reference](https://yunyishen.ml/CAR-LASSO/dev/reference/bGlasso.html).
+We also implemented the standard Graphical LASSO to infer a graph without predictors. The main interface is `bGlasso`. For more details, please see the [reference](https://yunyishen.ml/CAR-LASSO/dev/reference/bGlasso.html).
 
-## Network for Gaussian data
+## GLASSO Network for Gaussian data
 
-This is the case when data is Gaussian or can be transformed to Gaussian. We only need responses in this case
+This is the case when data is Gaussian or can be transformed to Gaussian. We only need responses in this case. We use a 5-node AR1 model to simulate data:
 
 ```{r ar1data}
 set.seed(42)
@@ -31,28 +31,29 @@ dt <- dt[,1:5]
 head(dt)
 
 ```
-Different from `CARlasso` we do not really need to have a formula. To use the Normal version, we should set `link="identity"` which is the default. 
+
+Unlike `CARlasso`, we do not really need to have a formula (because we do not have predictors, only responses). To use the Normal version, we should set `link="identity"` which is the default. 
 
 
-```{r ar1example_first}
+```{r ar1example_first, eval = FALSE}
 glassores <- bGlasso(data = dt)
 plot(glassores)
 ```
 
-We could see the false link due to the common input.
+Some of the connections are actually due to predictors. 
 
-## Network for compositional data
+## GLASSO Network for compositional data
 
-This is common in microbe related studies and some ecological applications with relative abundance only. For instance, microbe relative abundance came from sequencing and in this case we will have the sum of "abundance" decided by the sequence depth rather than the real total abundance. The data is usually described as "compositional". In `CARlasso` this type of data were modelled as Logit-Normal-multinomial. In this case, we have less relative abundance need to have a "reference level" taxa and all others are "relative" to this taxa, we will give a reduced version:
+This is common in the case of microbe-related studies and some ecological applications with relative abundances. For instance, microbe relative abundance come from sequencing and in this case, the sum of "abundance" is determined by the sequence depth rather than the real total abundance. The data is usually described as "compositional". 
 
-Have a look of the data, still a dataframe with all predictors and responses
+We first extract only the responses that we want to include in the model:
 
 ```{r comp_data}
 dt <- mgp154[,c("Alistipes","Bacteroides",
                         "Eubacterium","Parabacteroides","all_others")]
 ```
 
-To run the composition model, we need to set `link="logit"`
+To run the composition model in `bGlasso`, we need to set `link="logit"`
 
 ```{r compositional1, eval = FALSE}
 gut_res <- bGlasso( data = dt,link = "logit", 
@@ -61,13 +62,14 @@ gut_res <- bGlasso( data = dt,link = "logit",
 plot(gut_res)
 ```
 
-Note that in this case the last one in the dataframe will be the reference level 
+Note that in this case the last one in the dataframe will be the reference level (`all_others` in this case).
 
-## Network for counting data
+## GLASSO Network for counting data
 
-This is common in a lot of ecological applications. For instance number of seedlings within a site. The responses were count rather than continuous. In `CARlasso` it is modelled as Poisson with rate follow log-Normal. We will give the example using the data above since the responses are indeed count, but keep in mind we need to be careful whether a couting data is real counting or compositional. To distinguish them, ask the question: **Is the sum know/decided by us/not free**? If yes, we want to use compositional models. 
+This is common in a lot of ecological applications. For instance, number of seedlings within a site. The responses are counts rather than continuous. 
+We will use the same compositional data as before to illustrate the counts model. However, it is important to note that relative abundances should not be considered as counts. To distinguish between compositional and count data, one can ask the question: **is the sum decided by us?** If yes, we want to use compositional models.
 
-To run the composition model, we need to set `link="log"`
+To run the count model, we need to set `link="log"`. Note that we only include the first 4 responses:
 
 ```{r counting, eval = FALSE}
 gut_res <- gut_res <- bGlasso( data = dt[,1:4],link = "log", 

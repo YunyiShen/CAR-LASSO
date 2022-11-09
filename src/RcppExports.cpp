@@ -6,6 +6,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // CAR_ALASSO_hir_Cpp
 List CAR_ALASSO_hir_Cpp(const arma::mat& data, const arma::mat& design, const int link, const int n_iter, const int n_burn_in, const int thin_by, const arma::mat r_beta, const arma::mat delta_beta, const arma::vec r_Omega, const arma::vec delta_Omega, const arma::vec& lambda_diag, int ns, int m, int emax, bool progress);
 RcppExport SEXP _CARlasso_CAR_ALASSO_hir_Cpp(SEXP dataSEXP, SEXP designSEXP, SEXP linkSEXP, SEXP n_iterSEXP, SEXP n_burn_inSEXP, SEXP thin_bySEXP, SEXP r_betaSEXP, SEXP delta_betaSEXP, SEXP r_OmegaSEXP, SEXP delta_OmegaSEXP, SEXP lambda_diagSEXP, SEXP nsSEXP, SEXP mSEXP, SEXP emaxSEXP, SEXP progressSEXP) {
@@ -191,23 +196,6 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type p(pSEXP);
     Rcpp::traits::input_parameter< int >::type n(nSEXP);
     rcpp_result_gen = Rcpp::wrap(update_car_tau2_helper(beta, lambda2, Omega, k, p, n));
-    return rcpp_result_gen;
-END_RCPP
-}
-// sample_Omega_prior_cpp
-Rcpp::List sample_Omega_prior_cpp(int k, const int n_iter, const int n_burn_in, const int thin_by, const double lambda_a, const double lambda_b, bool progress);
-RcppExport SEXP _CARlasso_sample_Omega_prior_cpp(SEXP kSEXP, SEXP n_iterSEXP, SEXP n_burn_inSEXP, SEXP thin_bySEXP, SEXP lambda_aSEXP, SEXP lambda_bSEXP, SEXP progressSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type k(kSEXP);
-    Rcpp::traits::input_parameter< const int >::type n_iter(n_iterSEXP);
-    Rcpp::traits::input_parameter< const int >::type n_burn_in(n_burn_inSEXP);
-    Rcpp::traits::input_parameter< const int >::type thin_by(thin_bySEXP);
-    Rcpp::traits::input_parameter< const double >::type lambda_a(lambda_aSEXP);
-    Rcpp::traits::input_parameter< const double >::type lambda_b(lambda_bSEXP);
-    Rcpp::traits::input_parameter< bool >::type progress(progressSEXP);
-    rcpp_result_gen = Rcpp::wrap(sample_Omega_prior_cpp(k, n_iter, n_burn_in, thin_by, lambda_a, lambda_b, progress));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -558,7 +546,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_CARlasso_update_car_mu_helper", (DL_FUNC) &_CARlasso_update_car_mu_helper, 7},
     {"_CARlasso_update_car_Omega_helper", (DL_FUNC) &_CARlasso_update_car_Omega_helper, 9},
     {"_CARlasso_update_car_tau2_helper", (DL_FUNC) &_CARlasso_update_car_tau2_helper, 6},
-    {"_CARlasso_sample_Omega_prior_cpp", (DL_FUNC) &_CARlasso_sample_Omega_prior_cpp, 7},
     {"_CARlasso_rgig", (DL_FUNC) &_CARlasso_rgig, 3},
     {"_CARlasso_update_Z_helper_CAR", (DL_FUNC) &_CARlasso_update_Z_helper_CAR, 9},
     {"_CARlasso_rtn1", (DL_FUNC) &_CARlasso_rtn1, 4},

@@ -108,14 +108,14 @@ List CAR_ALASSO_hir_Cpp(const arma::mat & data, // col composition data, ROW as 
   }
 
 
-  int n_save = floor(n_iter/thin_by); //
+  int n_save = floor(static_cast<double>(n_iter/thin_by)); //
   int i_save = 0;  
   
   // mcmc matrices:
   arma::mat beta_mcmc(n_save,k * p); // beta mcmc
   beta_mcmc += NA_REAL; 
   
-  arma::mat Omega_mcmc(n_save , floor( k * (k+1)/2 )  ); // vectorized column first, but had no diagnol
+  arma::mat Omega_mcmc(n_save , floor( static_cast<double>(k * (k+1)/2) )  ); // vectorized column first, but had no diagnol
   Omega_mcmc += NA_REAL;
   
   

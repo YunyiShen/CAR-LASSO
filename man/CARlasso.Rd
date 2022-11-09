@@ -2,7 +2,7 @@
 % Please edit documentation in R/CAR-LASSO.R
 \name{CARlasso}
 \alias{CARlasso}
-\title{Gibbs sampler for Conditional Auto Regressive LASSO and extensions}
+\title{Gibbs sampler for Conditional Autoregressive LASSO and extensions}
 \usage{
 CARlasso(
   formula,
