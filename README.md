@@ -30,7 +30,7 @@ devtools::install_github("YunyiShen/CAR-LASSO")
 
 ## Documentation
 
-For more information, please check out [the tutorial](https://yunyishen.ml/CAR-LASSO/dev/articles/network.html).
+For more information, please check out [the tutorial](https://yunyishen.github.io/CAR-LASSO/).
 
 ### Fitting a CAR-ALASSO network on human gut microbiome data
 
@@ -101,12 +101,12 @@ plot(car_res)
 
 ### Fitting a standard Graphical LASSO network
 
-Our package also includes functions to fit a standard graphical LASSO, see [this page](https://yunyishen.ml/CAR-LASSO/dev/articles/glasso.html) in the tutorial for more details. 
+Our package also includes functions to fit a standard graphical LASSO, see [this page](https://yunyishen.github.io/CAR-LASSO/articles/glasso.html) in the tutorial for more details. 
 
 
 ### Fitting your own hierarchical model
 
-If you would like lower level interface of CAR-LASSO, see [this page](https://yunyishen.ml/CAR-LASSO/dev/articles/buildown.html) in the tutorial.
+If you would like lower level interface of CAR-LASSO, see [this page](https://yunyishen.github.io/CAR-LASSO/articles/buildown.html) in the tutorial.
 
 
 ## Contributions
